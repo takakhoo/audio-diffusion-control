@@ -125,6 +125,27 @@ def leakage(rows: list[dict], keys: list[str]) -> dict[str, float]:
     return {k: slope(rows, k, natural_std(rows, k) or np.nan) for k in keys}
 
 
+def selectivity(rows: list[dict], key: str, others: list[str], sign: float = 1.0) -> float:
+    """How much a slider moves its own descriptor relative to everything else.
+
+    The slope of the target descriptor divided by the mean absolute slope of the other
+    descriptors, all in units of their spread across unsteered clips. 1 means the slider moves
+    its target no more than it moves an average bystander.
+    """
+    own = sign * slope(rows, key, natural_std(rows, key) or np.nan)
+    drift = [abs(slope(rows, k, natural_std(rows, k) or np.nan)) for k in others if k != key]
+    drift = [d for d in drift if np.isfinite(d)]
+    return float(own / np.mean(drift)) if drift and np.mean(drift) > 0 else np.nan
+
+
+def monotone_share(rows: Iterable[dict], key: str, sign: float = 1.0, threshold: float = 0.8) -> float:
+    """Share of trajectories whose rank correlation with position exceeds the threshold."""
+    scales, values = trajectories(rows, key)
+    rho = np.array([_spearman(scales, sign * v) for v in values])
+    rho = rho[np.isfinite(rho)]
+    return float((rho > threshold).mean()) if len(rho) else np.nan
+
+
 def frechet(a: np.ndarray, b: np.ndarray) -> float:
     """Fréchet distance between Gaussians fitted to two embedding sets."""
     mu_a, mu_b = a.mean(0), b.mean(0)

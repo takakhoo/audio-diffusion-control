@@ -88,3 +88,14 @@ def test_intervals_shrink_with_more_trajectories_and_cover_the_truth():
     assert b["ci"] < a["ci"]
     assert abs(b["mean"] - 400) < b["ci"] * 1.5
     assert M.monotonicity(many, "target")["rho_ci"] < M.monotonicity(few, "target")["rho_ci"]
+
+
+def test_selectivity_and_monotone_share():
+    clean = make_rows(effect=100)
+    assert M.selectivity(clean, "target", ["target", "other"]) > 20
+    assert M.monotone_share(clean, "target") == 1.0
+    leaky = make_rows(effect=100)
+    for r in leaky:
+        r["other"] += 0.5 * r["scale"]
+    assert M.selectivity(leaky, "target", ["target", "other"]) < M.selectivity(clean, "target", ["target", "other"])
+    assert M.monotone_share(make_rows(effect=0, noise=20), "target") < 0.3

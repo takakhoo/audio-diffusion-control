@@ -3,7 +3,7 @@ import pytest
 
 pytest.importorskip("torch")
 
-from audiosliders.contrast import independent_directions, principal_directions, split_ends
+from audiosliders.contrast import axis_stability, independent_directions, principal_directions, split_ends
 
 
 def test_split_ends_is_balanced_within_groups():
@@ -40,7 +40,7 @@ def test_principal_directions_ignore_between_prompt_offsets():
 def test_independent_directions_unmix_what_pca_mixes():
     pytest.importorskip("sklearn")
     rng = np.random.default_rng(2)
-    n, dim = 4000, 24
+    n, dim = 2000, 24
     # Two independent heavy-tailed causes of equal strength, each along its own non-orthogonal axis.
     a, b = np.zeros(dim), np.zeros(dim)
     a[0], b[0], b[1] = 1.0, 0.6, 0.8
@@ -58,3 +58,33 @@ def test_independent_directions_unmix_what_pca_mixes():
     assert purity(ica) > 0.97
     assert purity(pca) < 0.9
     assert (kurt > 1).all()
+
+
+def test_axis_stability_is_high_for_real_structure_and_low_for_noise():
+    rng = np.random.default_rng(3)
+    groups = np.zeros(1200, dtype=int)
+    basis = np.linalg.qr(rng.normal(size=(16, 16)))[0][:3]
+    structured = (rng.normal(size=(1200, 3)) * np.array([6.0, 3.0, 1.5])) @ basis + rng.normal(size=(1200, 16)) * 0.1
+    noise = rng.normal(size=(1200, 16))
+    assert axis_stability(structured, groups, "pca", n=3) > 0.95
+    assert axis_stability(noise, groups, "pca", n=3) < 0.8
+
+
+def test_sparse_autoencoder_recovers_planted_features(tmp_path):
+    torch = pytest.importorskip("torch")
+    from audiosliders import sae
+
+    rng = np.random.default_rng(4)
+    atoms = rng.normal(size=(12, 20))
+    atoms /= np.linalg.norm(atoms, axis=1, keepdims=True)
+    codes = (rng.random((3000, 12)) < 0.15) * rng.uniform(1, 2, size=(3000, 12))
+    data = codes @ atoms + rng.normal(size=(3000, 20)) * 0.01
+    model, stats = sae.fit(data, features=24, k=3, steps=1500, batch=256, device="cpu")
+    assert stats["explained"] > 0.8
+    best = np.abs(sae.directions(model) @ atoms.T).max(0)
+    assert (best > 0.9).mean() >= 0.9
+    sae.save(model, data, str(tmp_path / "sae.npz"))
+    feature = int(np.abs(sae.directions(model) @ atoms[0]).argmax())
+    scores = sae.activation(str(tmp_path / "sae.npz"), data, feature)
+    top = np.argsort(scores)[-300:]  # the clips a slider's high set would be drawn from
+    assert (codes[top, 0] > 0).mean() > 0.9

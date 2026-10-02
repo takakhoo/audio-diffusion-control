@@ -113,6 +113,22 @@ def independent_directions(emb: np.ndarray, groups: np.ndarray, n: int = 16, sub
     return directions[order], kurt[order]
 
 
+def axis_stability(emb: np.ndarray, groups: np.ndarray, method: str = "pca", n: int = 8, seed: int = 0) -> float:
+    """How reproducible a set of discovered axes is: fit on two random halves of the corpus,
+    match axes one to one, and return the mean absolute cosine of the matched pairs."""
+    from scipy.optimize import linear_sum_assignment
+
+    order = np.random.default_rng(seed).permutation(len(emb))
+    halves = []
+    for idx in (order[: len(order) // 2], order[len(order) // 2 :]):
+        fn = independent_directions if method == "ica" else principal_directions
+        d = fn(emb[idx], groups[idx], n)[0]
+        halves.append(d / np.linalg.norm(d, axis=1, keepdims=True))
+    cos = np.abs(halves[0] @ halves[1].T)
+    rows, cols = linear_sum_assignment(-cos)
+    return float(cos[rows, cols].mean())
+
+
 def train_contrast(
     model,
     bank: SliderBank,
@@ -226,6 +242,14 @@ def main() -> None:
         meta.update(emb=args.emb, source=path, index=int(index))
         if args.emb == "clap":
             meta["direction"] = direction.tolist()
+    elif kind == "sae":
+        from .sae import activation
+
+        path, _, index = rest.rpartition(":")
+        values = activation(path, corpus[args.emb], int(index))
+        meta.update(emb=args.emb, source=path, index=int(index))
+        if args.emb == "clap":
+            meta["direction"] = np.load(path)["atoms"][int(index)].tolist()
     elif kind == "tags":
         vocab = np.load(args.vocab)
         names = list(vocab["tags"])
