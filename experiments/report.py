@@ -246,7 +246,8 @@ def main():
         w.writeheader()
         w.writerows(table)
     cols = [("slider", "Slider", None), ("method", "Method", None), ("rho", "Monotonicity ρ", 2),
-            ("consistent", "Ends ordered", 2), ("usable_lo", "Usable from", 1), ("usable_hi", "to", 1),
+            ("consistent", "Ends ordered", 2), ("muq_rho", "MuQ ρ", 2), ("muq_ordered", "MuQ ordered", 2),
+            ("usable_lo", "Usable from", 1), ("usable_hi", "to", 1),
             ("usable_range_in_std", "Descriptor moved (std)", 2), ("usable_clap_range", "CLAP moved", 3),
             ("usable_clap_keep", "Piece kept", 2), ("ce_at_zero", "Quality at 0", 2),
             ("ce_at_ends", "Quality at ends", 2)]
@@ -257,7 +258,7 @@ def main():
             v = r.get(key)
             cell = "" if v is None or (isinstance(v, float) and not np.isfinite(v)) else (
                 f"{v:.{digits}f}" if digits is not None else str(v))
-            ci = r.get({"rho": "rho_ci", "usable_range_in_std": "usable_range_ci"}.get(key, ""))
+            ci = r.get({"rho": "rho_ci", "usable_range_in_std": "usable_range_ci", "muq_rho": "muq_rho_ci"}.get(key, ""))
             if cell and ci is not None and np.isfinite(ci):
                 cell += f" ± {ci:.{digits}f}"
             cells.append(cell)

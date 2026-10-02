@@ -77,3 +77,44 @@ Existing LoRA tooling for Stable Audio Open: stable-audio-tools ships native LoR
 - The sampler's sigma maps to model time by t = (2/pi) atan(sigma). In z_t = cos(pi t/2) x0 + sin(pi t/2) eps form the transformer can be called directly with no scheduler.
 - `laion/larger_clap_music` loads into transformers 5.18 with every text embedding identical. `laion/larger_clap_music_and_speech` and `laion/clap-htsat-unfused` behave correctly.
 - The CLAP feature extractor in transformers is numpy and non-differentiable. A CLAP-space training loss needs a torch mel front end (48 kHz, n_fft 1024, hop 480, 64 Slaney mel bins from 50 Hz to 14 kHz, log10 power).
+
+## Second pass (2 October 2026): how the closest work measures, and what that means for us
+
+Read from full texts and repositories. Numbers are theirs.
+
+### TADA in detail ([arXiv:2602.11910](https://arxiv.org/abs/2602.11910), [code, MIT](https://github.com/luk-st/steer-audio))
+
+- **Backbone and scale.** The benchmark runs on ACE-Step v1 (3.5B), with Stable Audio Open and AudioLDM2 used only to localize layers. 9 concepts, 100 test prompts, one seed, 31 strengths, 30-second clips.
+- **Metric.** Alignment against preservation, summarised as an area under the curve: alignment is the change in CLAP or MuQ-MuLan similarity to a fixed query, preservation is LPAPS distance to the unsteered clip. Quality is Audiobox Aesthetics at matched preservation.
+- **Result.** Localized sparse-autoencoder steering scores highest (0.118 MuQ AUC). Their LoRA Concept Sliders baseline scores 0.086 and is second on the CLAP version of the metric. Restricting the LoRA to the few "functional" cross-attention layers costs it 21 to 25%.
+- **Independent checks.** They validate mood against spectral centroid and tempo against onset rate, which is the same instinct as our descriptor test, applied to two concepts.
+- **Listening study.** 32 sessions, 1,279 ratings, three 1-to-5 questions per sample on an interactive strength slider. Concept Sliders was not included.
+
+What we take: MuQ-MuLan as a second, CLAP-independent scorer (done, `experiments/muq_score.py`); activation steering as a baseline (done, `audiosliders/steer.py`); the gap that nobody has human data on LoRA music sliders.
+
+### FreeSliders in detail ([arXiv:2511.00103](https://arxiv.org/abs/2511.00103))
+
+- Stable Audio Open 1.0, 10-second clips, 10 concepts of which 8 are sound effects; the two musical ones are choir pitch and electric versus acoustic guitar. 10 seeds, 7 strengths. No listening study.
+- Metrics: conceptual range (CLAP alignment gained toward each end), conceptual smoothness (spread of consecutive alignment gaps), semantic preservation (mean LPAPS to the unsteered clip).
+- Their Concept Sliders LoRA baseline sometimes goes the wrong way (negative range on one concept). Our `guidance` method is the same training-free idea without their automatic strength search.
+
+### Others found
+
+| Work | What it adds |
+|---|---|
+| [AnchorSteer](https://arxiv.org/abs/2605.31053), Chang et al., KDD 2026 | Text-free concept modules on Stable Audio Open trained by reconstruction on 1,000 self-generated clips per concept, with a 28-person study. The nearest relative of our set trainer; it trains an injected module per concept where we train a signed low-rank update between two sets. |
+| [Do Text-to-Music Models Really Follow Instructions?](https://arxiv.org/abs/2608.11899), Wang, 2026 | Scores key and beat control on ACE-Step 1.5, Stable Audio 3, and LeVo2 with a key estimator and a beat tracker against matched neutral prompts. Shows that apparent agreement with an instruction can be the model's prior. Supports measuring with independent estimators. |
+| Anonymous [Audio-Concept-Sliders](https://github.com/audiosliderreview2026-byte/Audio-Concept-Sliders) repo | AudioLDM2, real-audio editing through inversion. Includes a prompt-free paired or unpaired regime with a loss toward target-domain latents. |
+| Community [ACE-Step 1.5 XL Concept Sliders](https://huggingface.co/Xanthius/Ace-Step-1.5-XL-Concept-Sliders) | 19 sliders trained with ai-toolkit, no evaluation published. We load them through `SliderBank.load_peft` and run them through the same protocol as ours. |
+| [A Quantized Native Runtime for On-Device Semantic Audio Generation](https://arxiv.org/abs/2607.08526), Spanio and Rodà, 2026 | Mainly a runtime paper on Stable Audio 3. Our literature pass reports from its full text that it compares difference-in-means steering with a LoRA and finds late-step injection halves the damage, which matches our gating result. Not re-read by us; check before citing for that claim. |
+
+### Measures added because of this pass
+
+- **MuQ-MuLan** direction score, in a separate environment because MuQ needs transformers 4.x.
+- **Beat This** beat tracker for tempo, in place of the librosa tempo estimate that suffers octave errors.
+- **Confidence intervals** on every rank correlation and effect size.
+- Still to add: LPAPS and the TADA area-under-curve for a like-for-like row; Essentia mood and instrument classifiers; a key estimator.
+
+### Other open backbones worth a slider study
+
+Stable Audio 3 (flow matching, open base checkpoints, official LoRA documentation, in diffusers) is the obvious third backbone. MiniMax Music 3, YuE2, DiffRhythm 2, and Magenta RealTime 2 have open weights but are autoregressive or hybrid, so the trainers here would need more than a wrapper.

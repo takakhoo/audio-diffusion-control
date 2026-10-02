@@ -19,6 +19,12 @@ def load_rows(path: str | Path) -> list[dict]:
     path = Path(path)
     path = path / "rows.jsonl" if path.is_dir() else path
     rows = [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
+    extra = path.with_name("muq.jsonl")
+    if extra.exists():
+        # Scores from MuQ-MuLan, written by experiments/muq_score.py in the same order as the rows.
+        for r, line in zip(rows, extra.read_text().splitlines()):
+            m = json.loads(line)
+            r.update(muq_dir=m["muq_pos"] - m["muq_neg"], muq_prompt=m["muq_prompt"])
     for r in rows:
         for hz, octv in (("centroid_hz", "centroid_oct"), ("rolloff_hz", "rolloff_oct")):
             if hz in r and octv not in r:
@@ -187,6 +193,9 @@ def summarize(rows: list[dict], key: str | None, sign: float = 1.0) -> dict[str,
         mono = monotonicity(rows, "clap_dir")
         resp = response(rows, "clap_dir")
         out.update(clap_rho=mono["rho"], clap_range=float(resp["level"][-1] - resp["level"][0]))
+    if any("muq_dir" in r for r in rows):
+        mono = monotonicity(rows, "muq_dir")
+        out.update(muq_rho=mono["rho"], muq_rho_ci=mono["rho_ci"], muq_ordered=mono["consistent"])
     for k in ("clap_keep", "chroma_sim", "rhythm_sim", "clap_prompt", "ce", "pq"):
         vals = [r[k] for r in ends if k in r and np.isfinite(r[k])]
         out[f"{k}_at_ends"] = float(np.mean(vals)) if vals else np.nan
