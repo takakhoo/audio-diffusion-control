@@ -80,6 +80,22 @@ def split_ends(values: np.ndarray, groups: np.ndarray, fraction: float = 0.3) ->
     return np.array(high), np.array(low)
 
 
+def graded_positions(values: np.ndarray, groups: np.ndarray, fraction: float = 0.2, cap: float = 2.5) -> np.ndarray:
+    """A slider position for every clip: its standing inside its own prompt, scaled so that
+    the top `fraction` of clips average +1 and the bottom `fraction` average -1.
+
+    Training each clip at its own position, instead of two sets at +1 and -1, tells the slider
+    what the positions between and beyond the ends should sound like.
+    """
+    z = np.full(len(values), np.nan)
+    for g in np.unique(groups):
+        m = (groups == g) & np.isfinite(values)
+        z[m] = (values[m] - values[m].mean()) / (values[m].std() + 1e-9)
+    high, low = split_ends(z, groups, fraction)
+    ref = 0.5 * (z[high].mean() - z[low].mean())
+    return np.clip(np.nan_to_num(z / ref), -cap, cap)
+
+
 def residualize(values: np.ndarray, others: np.ndarray, groups: np.ndarray) -> np.ndarray:
     """Remove from `values` what a linear fit on `others` explains, inside each group.
 
@@ -191,6 +207,7 @@ def train_contrast(
     high: tuple[np.ndarray, list[str]],
     low: tuple[np.ndarray, list[str]],
     log=print,
+    positions: tuple[np.ndarray, np.ndarray] | None = None,
     **meta,
 ) -> list[dict]:
     rng = np.random.default_rng(cfg.seed)
@@ -203,10 +220,19 @@ def train_contrast(
     window = model.frames(cfg.seconds)
     time_axis = 1 + shape.index(window)
     scale = torch.cat([torch.ones(half), -torch.ones(half)]).to(model.device)
+    if positions is not None:
+        # Graded training: each clip has its own position, and clips far from zero are drawn more often.
+        assert cfg.symmetry == 0 and not cfg.paired
+        weights = [np.abs(p) / np.abs(p).sum() for p in positions]
     history, t0 = [], time.time()
     for it in range(cfg.iters):
-        ih = rng.integers(0, len(high[0]), half)
-        il = ih if cfg.paired else rng.integers(0, len(low[0]), half)
+        if positions is not None:
+            ih = rng.choice(len(high[0]), half, p=weights[0])
+            il = rng.choice(len(low[0]), half, p=weights[1])
+            scale = torch.from_numpy(np.concatenate([positions[0][ih], positions[1][il]])).to(model.device, torch.float32)
+        else:
+            ih = rng.integers(0, len(high[0]), half)
+            il = ih if cfg.paired else rng.integers(0, len(low[0]), half)
         x0 = np.concatenate([high[0][ih], low[0][il]])
         if x0.shape[time_axis] > window:
             # Longer clips (real recordings are stored at 30 s) give a fresh crop every time they are drawn.
@@ -269,6 +295,8 @@ def main() -> None:
     ap.add_argument("--balance", default=None,
                     help="comma-separated measurements to balance between the two sets, e.g. rms_db,centroid_hz,ce")
     ap.add_argument("--fraction", type=float, default=0.3)
+    ap.add_argument("--graded", action="store_true",
+                    help="train every clip at its own position along the measurement instead of two sets at +1 and -1")
     ap.add_argument("--prompt-index", type=int, default=None, help="use only clips of this prompt")
     ap.add_argument("--out", default="runs/sliders")
     for f, typ in [("rank", int), ("alpha", float), ("targets", str), ("lr", float), ("iters", int),
@@ -336,7 +364,14 @@ def main() -> None:
         others = np.array([[r.get(k, np.nan) for k in keys] for r in rows], dtype=float)
         values = residualize(np.asarray(values, dtype=float), others, groups)
         meta["balance"] = keys
-    ih, il = split_ends(values, groups, args.fraction)
+    positions = None
+    if args.graded:
+        pos = graded_positions(np.asarray(values, dtype=float), groups, args.fraction)
+        ih, il = np.nonzero(pos > 0)[0], np.nonzero(pos < 0)[0]
+        positions = (pos[ih], pos[il])
+        meta["graded"] = True
+    else:
+        ih, il = split_ends(values, groups, args.fraction)
     over = {k: v for k, v in vars(args).items() if k in ContrastConfig.__dataclass_fields__ and v is not None}
     cfg = ContrastConfig(name=args.name, **{k: v for k, v in over.items() if k != "name"})
 
@@ -344,7 +379,8 @@ def main() -> None:
     bank = SliderBank(model.dit)
     lat = corpus["latents"]
     history = train_contrast(
-        model, bank, cfg, (lat[ih], [prompts[i] for i in ih]), (lat[il], [prompts[i] for i in il]), **meta
+        model, bank, cfg, (lat[ih], [prompts[i] for i in ih]), (lat[il], [prompts[i] for i in il]),
+        positions=positions, **meta
     )
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)

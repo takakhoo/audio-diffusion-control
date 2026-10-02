@@ -134,3 +134,18 @@ def test_internal_axes_recover_a_planted_direction_at_natural_scale():
     unit = axes[0] / np.linalg.norm(axes[0])
     assert abs((unit * planted).sum()) > 0.99
     assert abs(np.linalg.norm(axes[0]) - 2.0) < 0.2
+
+
+def test_graded_positions_put_the_set_ends_at_plus_and_minus_one():
+    from audiosliders.contrast import graded_positions
+
+    rng = np.random.default_rng(8)
+    groups = np.repeat(np.arange(20), 24)
+    values = rng.normal(size=480) * 3 + groups * 10.0  # prompts differ far more than seeds do
+    pos = graded_positions(values, groups, 0.2)
+    high, low = split_ends(values, groups, 0.2)
+    assert abs(pos[high].mean() - 1) < 0.05 and abs(pos[low].mean() + 1) < 0.05
+    assert abs(pos.mean()) < 0.05 and np.abs(pos).max() <= 2.5
+    for g in range(20):  # the order inside a prompt is kept
+        m = groups == g
+        assert (np.argsort(pos[m]) == np.argsort(values[m])).all()
