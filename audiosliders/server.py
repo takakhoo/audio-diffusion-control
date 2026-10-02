@@ -1,6 +1,6 @@
 """Live demo server: type a prompt, set any combination of sliders, hear the result.
 
-    python -m audiosliders.server --sliders runs/sliders/release --port 7860
+    python -m audiosliders.server --sliders runs/sliders/ace --backbone ace-turbo --port 7860
 
 Serves the static page in docs/ and two endpoints the page uses when it finds them:
 GET /api/sliders and POST /api/generate.
@@ -22,7 +22,7 @@ from fastapi.responses import Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from .backbone import StableAudio
+from .backbone import load_backbone
 from .descriptors import describe
 from .lora import SliderBank
 
@@ -31,14 +31,14 @@ class Request(BaseModel):
     prompt: str = Field(min_length=1, max_length=400)
     seed: int = 0
     seconds: float = Field(default=10.0, ge=2.0, le=30.0)
-    steps: int = Field(default=50, ge=10, le=100)
-    guidance: float = Field(default=7.0, ge=1.0, le=12.0)
+    steps: int | None = Field(default=None, ge=4, le=100)
+    guidance: float | None = Field(default=None, ge=1.0, le=12.0)
     sliders: dict[str, float] = {}
     start: float = Field(default=1.0, ge=0.0, le=1.0)
 
 
-def build(slider_dir: Path, static_dir: Path, device: str = "cuda") -> FastAPI:
-    model = StableAudio(device)
+def build(slider_dir: Path, static_dir: Path, backbone: str = "ace-turbo", device: str = "cuda") -> FastAPI:
+    model = load_backbone(backbone, device)
     bank = SliderBank(model.dit)
     meta = {f.stem: bank.load(f.stem, f) for f in sorted(slider_dir.glob("*.safetensors"))}
     lock = threading.Lock()
@@ -87,10 +87,11 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--sliders", required=True, help="directory of .safetensors sliders")
     ap.add_argument("--static", default="docs")
+    ap.add_argument("--backbone", default="ace-turbo")
     ap.add_argument("--host", default="127.0.0.1")
     ap.add_argument("--port", type=int, default=7860)
     args = ap.parse_args()
-    uvicorn.run(build(Path(args.sliders), Path(args.static)), host=args.host, port=args.port)
+    uvicorn.run(build(Path(args.sliders), Path(args.static), args.backbone), host=args.host, port=args.port)
 
 
 if __name__ == "__main__":

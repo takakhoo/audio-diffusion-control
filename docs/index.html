@@ -71,19 +71,21 @@ footer { margin-top: 56px; font-size: 14px; color: var(--muted); }
 <body>
 <main>
   <h1>Audio Sliders</h1>
-  <p class="lede">Drag a slider and the same piece of generated music gets brighter, denser, wetter, or more percussive. Each slider is a small LoRA on Stable Audio Open 1.0, and each one is scored by measuring the audio it produces.</p>
+  <p class="lede">Drag a slider and the same piece of generated music changes along one axis: mood, harmony, groove, ensemble size, brightness, and more. Each slider is a small LoRA on a frozen music model, scored by measuring the audio it produces and by whether the result still sounds like music.</p>
   <div class="links">
     <a href="https://github.com/takakhoo/audio-diffusion-control">Code and results</a>
     <a href="https://github.com/takakhoo/audio-diffusion-control/blob/main/docs/RESEARCH.md">Research map</a>
   </div>
 
   <section class="panel" id="player">
-    <p class="label">Prompt</p>
-    <div class="chips" id="prompts"></div>
+    <p class="label">Model</p>
+    <div class="chips" id="models"></div>
     <p class="label">Slider</p>
     <div class="chips" id="sliders"></div>
-    <p class="label">Control method</p>
+    <p class="label">How the slider was made</p>
     <div class="chips" id="methods"></div>
+    <p class="label">Prompt</p>
+    <div class="chips" id="prompts"></div>
     <div class="stage">
       <canvas id="spec" width="1200" height="360" aria-label="Spectrogram of the current clip"></canvas>
       <div class="transport">
@@ -121,12 +123,12 @@ footer { margin-top: 56px; font-size: 14px; color: var(--muted); }
   </section>
 
   <footer>
-    Audio generated with Stable Audio Open 1.0 (Stability AI Community License). All clips on this page share one seed per prompt; only the slider changes.
+    Audio generated with ACE-Step 1.5 (MIT) and Stable Audio Open 1.0 (Stability AI Community License). Within a track every clip shares one prompt and seed; only the slider position changes.
   </footer>
 </main>
 <script>
 const $ = (id) => document.getElementById(id);
-const state = { manifest: null, prompt: 0, slider: null, method: null, index: 3, playing: false };
+const state = { manifest: null, model: null, prompt: 0, slider: null, method: null, index: 3, playing: false };
 let ctx = null, voices = [], buffers = [], loadToken = 0, startedAt = 0;
 
 const fmt = (v, unit) => {
@@ -146,27 +148,33 @@ function chips(el, items, current, onPick) {
   });
 }
 
-function clipsFor() {
-  const m = state.manifest;
-  return m.clips[`${state.method}/${state.slider}/${state.prompt}`] || [];
+function clipsFor(prompt = state.prompt) {
+  return state.manifest.clips[`${state.model}/${state.method}/${state.slider}/${prompt}`] || [];
 }
 
 function render() {
-  const m = state.manifest, s = m.sliders[state.slider];
+  const m = state.manifest, model = m.models[state.model];
+  if (!model.sliders[state.slider]) state.slider = Object.keys(model.sliders)[0];
+  const s = model.sliders[state.slider];
   if (!s.methods.includes(state.method)) state.method = s.methods[0];
-  chips($("prompts"), m.prompts.map((p, i) => [i, p]), state.prompt, (k) => { state.prompt = k; render(); load(); });
-  chips($("sliders"), Object.entries(m.sliders).map(([k, v]) => [k, v.label]), state.slider, (k) => { state.slider = k; render(); load(); });
-  chips($("methods"), s.methods.map((k) => [k, m.methods[k].label]), state.method, (k) => { state.method = k; render(); load(); });
+  const available = model.prompts.map((p, i) => [i, p]).filter(([i]) => clipsFor(i).length);
+  if (!available.some(([i]) => i === state.prompt)) state.prompt = available[0][0];
+  const pick = (field) => (k) => { state[field] = k; render(); load(); };
+  chips($("models"), Object.entries(m.models).map(([k, v]) => [k, v.label]), state.model, pick("model"));
+  chips($("sliders"), Object.entries(model.sliders).map(([k, v]) => [k, v.label]), state.slider, pick("slider"));
+  chips($("methods"), s.methods.map((k) => [k, m.methods[k].label]), state.method, pick("method"));
+  chips($("prompts"), available, state.prompt, pick("prompt"));
   $("low").textContent = s.low; $("high").textContent = s.high;
-  $("method-note").textContent = m.methods[state.method].note;
+  $("method-note").textContent = `${m.methods[state.method].note} ${model.note}`;
   const clips = clipsFor();
   $("scale").max = clips.length - 1;
+  state.index = Math.min(state.index, clips.length - 1);
   $("ticks").innerHTML = clips.map((c) => `<span>${c.x > 0 ? "+" : ""}${c.x}</span>`).join("");
   update();
 }
 
 function update() {
-  const m = state.manifest, s = m.sliders[state.slider], clips = clipsFor();
+  const m = state.manifest, s = m.models[state.model].sliders[state.slider], clips = clipsFor();
   const i = Math.min(state.index, clips.length - 1), c = clips[i];
   if (!c) return;
   $("scale").value = i;
@@ -326,10 +334,12 @@ $("play").onclick = () => state.playing ? stop() : start();
 $("scale").oninput = (e) => { state.index = +e.target.value; update(); };
 fetch("demo/manifest.json").then((r) => r.json()).then((m) => {
   state.manifest = m;
-  state.slider = Object.keys(m.sliders)[0];
-  state.method = m.sliders[state.slider].methods[0];
-  state.index = Math.floor(m.scales.length / 2);
-  render(); table(); load();
+  state.model = Object.keys(m.models)[0];
+  state.slider = Object.keys(m.models[state.model].sliders)[0];
+  state.method = m.models[state.model].sliders[state.slider].methods[0];
+  render();
+  state.index = Math.floor(clipsFor().length / 2);
+  update(); table(); load();
 }).catch(() => { $("player").innerHTML = "<p>The demo data has not been published yet.</p>"; });
 live();
 </script>
