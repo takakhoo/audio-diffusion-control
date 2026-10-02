@@ -179,6 +179,10 @@ function update() {
   if (!c) return;
   $("scale").value = i;
   $("pos").textContent = `${c.x > 0 ? "+" : ""}${c.x}`;
+  try {
+    const link = new URLSearchParams({ model: state.model, slider: state.slider, method: state.method, prompt: state.prompt, x: c.x });
+    history.replaceState(null, "", `?${link}`);
+  } catch (e) {}
   const zero = clips.find((k) => k.x === 0) || c;
   const stats = [];
   if (s.measure) stats.push([s.measure_label, fmt(c.v, s.unit), `${c.v - zero.v >= 0 ? "+" : ""}${fmt(c.v - zero.v, s.unit)} vs 0`]);
@@ -307,6 +311,7 @@ function table() {
 }
 
 async function live() {
+  if (location.hostname.endsWith("github.io")) return;  // static hosting has no generation server
   let sliders;
   try { sliders = await (await fetch("api/sliders")).json(); } catch (e) { return; }
   if (!Array.isArray(sliders)) return;
@@ -334,11 +339,16 @@ $("play").onclick = () => state.playing ? stop() : start();
 $("scale").oninput = (e) => { state.index = +e.target.value; update(); };
 fetch("demo/manifest.json").then((r) => r.json()).then((m) => {
   state.manifest = m;
-  state.model = Object.keys(m.models)[0];
-  state.slider = Object.keys(m.models[state.model].sliders)[0];
-  state.method = m.models[state.model].sliders[state.slider].methods[0];
+  // Deep links: ?model=ace&slider=mood&method=lora&prompt=2&x=1.5 opens the page in that state.
+  const q = new URLSearchParams(location.search);
+  state.model = m.models[q.get("model")] ? q.get("model") : Object.keys(m.models)[0];
+  const sliders = m.models[state.model].sliders;
+  state.slider = sliders[q.get("slider")] ? q.get("slider") : Object.keys(sliders)[0];
+  state.method = sliders[state.slider].methods.includes(q.get("method")) ? q.get("method") : sliders[state.slider].methods[0];
+  if (q.has("prompt")) state.prompt = +q.get("prompt") || 0;
   render();
-  state.index = Math.floor(clipsFor().length / 2);
+  const xs = clipsFor().map((c) => c.x);
+  state.index = q.has("x") && xs.includes(+q.get("x")) ? xs.indexOf(+q.get("x")) : Math.floor(xs.length / 2);
   update(); table(); load();
 }).catch(() => { $("player").innerHTML = "<p>The demo data has not been published yet.</p>"; });
 live();

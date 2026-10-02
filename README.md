@@ -18,14 +18,14 @@ Six musical sliders on ACE-Step 1.5 XL turbo, each trained from one prompt pair 
 
 | Slider | What rises toward + (CLAP tags) | What falls | Measured descriptor follows? (ρ, ends ordered) | Usable span | Piece kept | Enjoyment at the ends |
 |---|---|---|---|---|---:|---:|
-| **mood** (sad to happy) | happy, latin, reggae | distorted, dark-toned, lo-fi | major/minor fit: 0.39, 75% | -1 to +2 | 0.79 | 6.65 |
-| **ensemble** (solo to full) | orchestral film score, epic, choir | straight, funk, hip hop | production complexity: 0.60, 90% | -1.5 to +2 | 0.80 | 6.56 |
-| **groove** (stiff to groovy) | latin, funk, reggae | choir, strings, cello | no descriptor assigned | -1.5 to +2 | 0.79 | 6.88 |
-| **harmony** (plain to rich) | minor key, melancholic, major key | country, vocals, violin | harmonic change rate: 0.41, 76% | -1.5 to +2 | 0.83 | 6.64 |
-| **melody** (texture to tune) | romantic, happy, blues | lo-fi, mysterious, calm | key clarity: 0.48, 78% | -1 to +2 | 0.80 | 6.47 |
-| **tension** (relaxed to tense) | metal, rock, distorted | melancholic, uplifting, sad | no descriptor assigned | -1.5 to +1 | 0.83 | 5.64 |
+| [**mood**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=mood&prompt=0&x=2) (sad to happy) | happy, latin, reggae | distorted, dark-toned, lo-fi | major/minor fit: 0.39, 75% | -1 to +2 | 0.79 | 6.65 |
+| [**ensemble**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=ensemble&prompt=0&x=2) (solo to full) | orchestral film score, epic, choir | straight, funk, hip hop | production complexity: 0.60, 90% | -1.5 to +2 | 0.80 | 6.56 |
+| [**groove**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=groove&prompt=0&x=2) (stiff to groovy) | latin, funk, reggae | choir, strings, cello | no descriptor assigned | -1.5 to +2 | 0.79 | 6.88 |
+| [**harmony**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=harmony&prompt=0&x=2) (plain to rich) | minor key, melancholic, major key | country, vocals, violin | harmonic change rate: 0.41, 76% | -1.5 to +2 | 0.83 | 6.64 |
+| [**melody**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=melody&prompt=0&x=2) (texture to tune) | romantic, happy, blues | lo-fi, mysterious, calm | key clarity: 0.48, 78% | -1 to +2 | 0.80 | 6.47 |
+| [**tension**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=tension&prompt=0&x=1) (relaxed to tense) | metal, rock, distorted | melancholic, uplifting, sad | no descriptor assigned | -1.5 to +1 | 0.83 | 5.64 |
 
-For scale: unsteered clips score 6.95 on Audiobox Aesthetics content enjoyment, and 2,000 real recordings from FMA average 6.1. "Usable span" is how far the slider goes before mean enjoyment falls more than 0.5 below the unsteered clips. "Piece kept" is CLAP similarity to the unsteered clip at the ends of that span. Full tables: [`results/ace/`](results/ace/).
+Each slider name opens the live demo on that slider. For scale: unsteered clips score 6.95 on Audiobox Aesthetics content enjoyment, and 2,000 real recordings from FMA average 6.1. "Usable span" is how far the slider goes before mean enjoyment falls more than 0.5 below the unsteered clips. "Piece kept" is CLAP similarity to the unsteered clip at the ends of that span. Full tables: [`results/ace/`](results/ace/).
 
 ## Contents
 
