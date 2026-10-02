@@ -29,6 +29,7 @@ ap.add_argument("--out", required=True)
 ap.add_argument("--grid", type=float, nargs="+", default=[-1, 0, 1])
 ap.add_argument("--n-prompts", type=int, default=24)
 ap.add_argument("--seconds", type=float, default=10.0)
+ap.add_argument("--start", type=float, default=1.0, help="sliders are active for t <= start")
 args = ap.parse_args()
 
 spec = yaml.safe_load(Path("configs/sliders.yaml").read_text())
@@ -45,7 +46,7 @@ pool = ProcessPoolExecutor(12)
 rows, pending = [], []
 for i, prompt in enumerate(prompts):
     audio = model.generate([prompt] * len(cells), [100 * i] * len(cells), seconds=args.seconds,
-                           wrap=lambda p: bank.gated(p, {"a": sa, "b": sb})).cpu().numpy()
+                           wrap=lambda p: bank.gated(p, {"a": sa, "b": sb}, start=args.start)).cpu().numpy()
     emb = clap.audio(audio, model.sample_rate)
     zero = cells.index((0.0, 0.0)) if (0.0, 0.0) in cells else 0
     for k, ((x, y), score) in enumerate(zip(cells, aesthetics(audio, model.sample_rate))):
