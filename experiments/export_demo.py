@@ -3,7 +3,7 @@
     python experiments/export_demo.py --source ace=runs/eval/ace --source sao=runs/eval/main \
         --discovered ace=runs/eval/ace_pca:results/discovery/ace/sliders.json --prompts 0 3 7 12
 
-Copies one seed per prompt as MP3 and writes docs/demo/manifest.json, which the page
+Copies one seed per prompt as AAC and writes docs/demo/manifest.json, which the page
 reads. Run on the machine that holds the evaluation output; needs ffmpeg.
 """
 
@@ -50,7 +50,7 @@ ap.add_argument("--discovered-seeds", type=int, default=3)
 ap.add_argument("--sliders", nargs="+", default=None)
 ap.add_argument("--methods", nargs="+", default=["lora", "contrast", "guidance", "embed", "dsp"])
 ap.add_argument("--summary", default=None, help="JSON written by experiments/report.py")
-ap.add_argument("--bitrate", default="128k")
+ap.add_argument("--bitrate", default="96k")
 args = ap.parse_args()
 
 spec = yaml.safe_load(Path("configs/sliders.yaml").read_text())
@@ -59,16 +59,17 @@ manifest = dict(models={}, methods={}, clips={})
 
 
 def publish(model, method, name, run, rows, pid, seed, prompt_slot):
-    """Convert one trajectory to MP3 and return its clip list."""
+    """Convert one trajectory to AAC and return its clip list."""
     mine = sorted((r for r in rows if r["prompt_index"] == pid and r["seed"] == seed), key=lambda r: r["scale"])
     clips = []
     for r in mine:
         src = run / f"p{pid:02d}_s{seed:05d}_x{r['scale']:+.2f}.flac"
-        rel = Path("audio") / model / method / name / f"p{prompt_slot:02d}_x{r['scale']:+.2f}.mp3"
+        rel = Path("audio") / model / method / name / f"p{prompt_slot:02d}_x{r['scale']:+.2f}.m4a"
         dst = out / rel
         dst.parent.mkdir(parents=True, exist_ok=True)
         if not dst.exists():
-            subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", str(src), "-b:a", args.bitrate, str(dst)], check=True)
+            subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", str(src), "-c:a", "aac", "-b:a", args.bitrate,
+                            "-movflags", "+faststart", str(dst)], check=True)
         clips.append(dict(x=r["scale"], f=str(rel), keep=r.get("clap_keep"), chroma=r.get("chroma_sim"),
                           dir=r.get("clap_dir"), ce=r.get("ce"), pq=r.get("pq"), row=r))
     return clips

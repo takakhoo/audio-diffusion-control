@@ -4,9 +4,13 @@
 
 **Sliders for generated music that are measured, and that keep it sounding like music.** A slider is a small LoRA on a frozen text-to-music model. Drag it and the same piece, same prompt and same seed, moves along one axis: sad to happy, solo to full ensemble, stiff to groovy, plain harmony to rich harmony, dark to bright. The model is untouched and the slider adds no extra sampling passes.
 
-![How a slider is used and trained](results/figures/pipeline.png)
+![Four sliders sweeping across their range on ACE-Step, with the spectrogram, enjoyment score, and similarity to the original at each position](results/demo/sliders.gif)
 
-> **Status (2 Oct 2026): evaluation still running.** Everything below is measured and reproducible from this repository. Tables will grow as the remaining runs finish, and the audio demo page is published when its clips are exported.
+*Four real sliders on four held-out prompts. Each panel is one prompt and one seed; only the slider moves. The knob sweeps from the middle to +2, back to -2, and home, while the spectrogram redraws and the readout shows the Audiobox enjoyment score and how close the clip stays to the unsteered one.*
+
+**[Listen and drag the sliders yourself: live demo](https://takakhoo.github.io/audio-diffusion-control/)** (8 sliders, 5 prompts, 360 clips, with the measured numbers at every position)
+
+> **Status (2 Oct 2026): evaluation still running.** Everything below is measured and reproducible from this repository. Tables will grow as the remaining runs finish.
 
 ## Headline
 
@@ -32,6 +36,8 @@ For scale: unsteered clips score 6.95 on Audiobox Aesthetics content enjoyment, 
 - [Layout](#layout)
 
 ## How it works
+
+![How a slider is used and trained](results/figures/pipeline.png)
 
 1. **One mechanism.** Every linear layer in the transformer's attention and feed-forward blocks gets a rank-4 update whose strength is a number read at each forward pass. Zero is the original model; negative values work as well as positive ones; several sliders add ([`lora.py`](audiosliders/lora.py)).
 2. **Trained from a prompt pair.** The slider at ±1 learns to reproduce the frozen model's prediction shifted by the difference between its predictions for "prompt, happy" and "prompt, sad". This is the Concept Sliders objective, here for a v-prediction diffusion model and a rectified-flow model ([`train.py`](audiosliders/train.py)).

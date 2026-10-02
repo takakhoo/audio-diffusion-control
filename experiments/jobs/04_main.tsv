@@ -23,53 +23,62 @@ eval_lora_tension	python experiments/evaluate.py --method lora --slider tension 
 eval_lora_vintage	python experiments/evaluate.py --method lora --slider vintage --weights runs/sliders/v1/vintage.safetensors --out runs/eval/main/lora_vintage --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio --start 0.97
 eval_lora_melody	python experiments/evaluate.py --method lora --slider melody --weights runs/sliders/v1/melody.safetensors --out runs/eval/main/lora_melody --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio --start 0.97
 eval_lora_dynamics	python experiments/evaluate.py --method lora --slider dynamics --weights runs/sliders/v1/dynamics.safetensors --out runs/eval/main/lora_dynamics --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio --start 0.97
-train_d1_density_d	python -m audiosliders.contrast density_d --corpus runs/corpus/train --by descriptor:onset_rate --out runs/sliders/d1
-train_d1_percussion_d	python -m audiosliders.contrast percussion_d --corpus runs/corpus/train --by descriptor:percussive_ratio --out runs/sliders/d1
-train_d1_reverb_d	python -m audiosliders.contrast reverb_d --corpus runs/corpus/train --by descriptor:decay_s --out runs/sliders/d1
-train_d1_bass_d	python -m audiosliders.contrast bass_d --corpus runs/corpus/train --by descriptor:bass_ratio --out runs/sliders/d1
-train_d1_width_d	python -m audiosliders.contrast width_d --corpus runs/corpus/train --by descriptor:side_ratio --out runs/sliders/d1
-train_d1_energy_d	python -m audiosliders.contrast energy_d --corpus runs/corpus/train --by descriptor:flux --out runs/sliders/d1
-train_d1_mood_d	python -m audiosliders.contrast mood_d --corpus runs/corpus/train --by descriptor:majorness --out runs/sliders/d1
-train_d1_lofi_d	python -m audiosliders.contrast lofi_d --corpus runs/corpus/train --by descriptor:rolloff_hz:-1 --out runs/sliders/d1
-train_d1_distortion_d	python -m audiosliders.contrast distortion_d --corpus runs/corpus/train --by descriptor:flatness --out runs/sliders/d1
-train_d1_quality_d	python -m audiosliders.contrast quality_d --corpus runs/corpus/train --by descriptor:ce --out runs/sliders/d1
-train_d1_production_d	python -m audiosliders.contrast production_d --corpus runs/corpus/train --by descriptor:pq --out runs/sliders/d1
-train_d1_ensemble_d	python -m audiosliders.contrast ensemble_d --corpus runs/corpus/train --by descriptor:pc --out runs/sliders/d1
-train_d1_harmony_d	python -m audiosliders.contrast harmony_d --corpus runs/corpus/train --by descriptor:harmonic_change --out runs/sliders/d1
-train_d1_groove_d	python -m audiosliders.contrast groove_d --corpus runs/corpus/train --by descriptor:pulse_clarity --out runs/sliders/d1
-train_d1_dynamics_d	python -m audiosliders.contrast dynamics_d --corpus runs/corpus/train --by descriptor:dynamics_db --out runs/sliders/d1
-train_d1_melody_d	python -m audiosliders.contrast melody_d --corpus runs/corpus/train --by descriptor:key_clarity --out runs/sliders/d1
-eval_contrast_brightness	python experiments/evaluate.py --method lora --slider brightness --weights runs/sliders/d1/brightness_d.safetensors --out runs/eval/main/contrast_brightness --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
-eval_contrast_density	python experiments/evaluate.py --method lora --slider density --weights runs/sliders/d1/density_d.safetensors --out runs/eval/main/contrast_density --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
-eval_contrast_percussion	python experiments/evaluate.py --method lora --slider percussion --weights runs/sliders/d1/percussion_d.safetensors --out runs/eval/main/contrast_percussion --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
-eval_contrast_reverb	python experiments/evaluate.py --method lora --slider reverb --weights runs/sliders/d1/reverb_d.safetensors --out runs/eval/main/contrast_reverb --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
-eval_contrast_bass	python experiments/evaluate.py --method lora --slider bass --weights runs/sliders/d1/bass_d.safetensors --out runs/eval/main/contrast_bass --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
-eval_contrast_width	python experiments/evaluate.py --method lora --slider width --weights runs/sliders/d1/width_d.safetensors --out runs/eval/main/contrast_width --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
-eval_contrast_energy	python experiments/evaluate.py --method lora --slider energy --weights runs/sliders/d1/energy_d.safetensors --out runs/eval/main/contrast_energy --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
-eval_contrast_mood	python experiments/evaluate.py --method lora --slider mood --weights runs/sliders/d1/mood_d.safetensors --out runs/eval/main/contrast_mood --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
-eval_contrast_lofi	python experiments/evaluate.py --method lora --slider lofi --weights runs/sliders/d1/lofi_d.safetensors --out runs/eval/main/contrast_lofi --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
-eval_contrast_distortion	python experiments/evaluate.py --method lora --slider distortion --weights runs/sliders/d1/distortion_d.safetensors --out runs/eval/main/contrast_distortion --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
-eval_contrast_quality	python experiments/evaluate.py --method lora  --weights runs/sliders/d1/quality_d.safetensors --out runs/eval/main/contrast_quality --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
-eval_contrast_production	python experiments/evaluate.py --method lora  --weights runs/sliders/d1/production_d.safetensors --out runs/eval/main/contrast_production --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
-eval_contrast_ensemble	python experiments/evaluate.py --method lora --slider ensemble --weights runs/sliders/d1/ensemble_d.safetensors --out runs/eval/main/contrast_ensemble --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
-eval_contrast_harmony	python experiments/evaluate.py --method lora --slider harmony --weights runs/sliders/d1/harmony_d.safetensors --out runs/eval/main/contrast_harmony --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
-eval_contrast_groove	python experiments/evaluate.py --method lora --slider groove --weights runs/sliders/d1/groove_d.safetensors --out runs/eval/main/contrast_groove --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
-eval_contrast_dynamics	python experiments/evaluate.py --method lora --slider dynamics --weights runs/sliders/d1/dynamics_d.safetensors --out runs/eval/main/contrast_dynamics --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
-eval_contrast_melody	python experiments/evaluate.py --method lora --slider melody --weights runs/sliders/d1/melody_d.safetensors --out runs/eval/main/contrast_melody --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
 eval_dsp_brightness	python experiments/evaluate.py --method dsp --slider brightness --out runs/eval/main/dsp_brightness --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
 eval_dsp_reverb	python experiments/evaluate.py --method dsp --slider reverb --out runs/eval/main/dsp_reverb --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
 eval_dsp_distortion	python experiments/evaluate.py --method dsp --slider distortion --out runs/eval/main/dsp_distortion --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
 eval_dsp_lofi	python experiments/evaluate.py --method dsp --slider lofi --out runs/eval/main/dsp_lofi --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
 eval_dsp_bass	python experiments/evaluate.py --method dsp --slider bass --out runs/eval/main/dsp_bass --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
 eval_dsp_width	python experiments/evaluate.py --method dsp --slider width --out runs/eval/main/dsp_width --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
+train_d1_density_d	python -m audiosliders.contrast density_d --corpus runs/corpus/train --by descriptor:onset_rate --out runs/sliders/d1
+train_d1_percussion_d	python -m audiosliders.contrast percussion_d --corpus runs/corpus/train --by descriptor:percussive_ratio --out runs/sliders/d1
+train_d1_reverb_d	python -m audiosliders.contrast reverb_d --corpus runs/corpus/train --by descriptor:decay_s --out runs/sliders/d1
+train_d1_quality_d	python -m audiosliders.contrast quality_d --corpus runs/corpus/train --by descriptor:ce --out runs/sliders/d1
+train_d1_production_d	python -m audiosliders.contrast production_d --corpus runs/corpus/train --by descriptor:pq --out runs/sliders/d1
+train_d1_bass_d	python -m audiosliders.contrast bass_d --corpus runs/corpus/train --by descriptor:bass_ratio --out runs/sliders/d1
+train_d1_width_d	python -m audiosliders.contrast width_d --corpus runs/corpus/train --by descriptor:side_ratio --out runs/sliders/d1
+train_d1_energy_d	python -m audiosliders.contrast energy_d --corpus runs/corpus/train --by descriptor:flux --out runs/sliders/d1
+eval_contrast_brightness	python experiments/evaluate.py --method lora --slider brightness --weights runs/sliders/d1/brightness_d.safetensors --out runs/eval/main/contrast_brightness --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
+eval_contrast_density	python experiments/evaluate.py --method lora --slider density --weights runs/sliders/d1/density_d.safetensors --out runs/eval/main/contrast_density --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
+eval_contrast_percussion	python experiments/evaluate.py --method lora --slider percussion --weights runs/sliders/d1/percussion_d.safetensors --out runs/eval/main/contrast_percussion --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
+eval_contrast_reverb	python experiments/evaluate.py --method lora --slider reverb --weights runs/sliders/d1/reverb_d.safetensors --out runs/eval/main/contrast_reverb --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
+eval_contrast_quality	python experiments/evaluate.py --method lora  --weights runs/sliders/d1/quality_d.safetensors --out runs/eval/main/contrast_quality --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
+eval_contrast_production	python experiments/evaluate.py --method lora  --weights runs/sliders/d1/production_d.safetensors --out runs/eval/main/contrast_production --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
+eval_contrast_bass	python experiments/evaluate.py --method lora --slider bass --weights runs/sliders/d1/bass_d.safetensors --out runs/eval/main/contrast_bass --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
+eval_contrast_width	python experiments/evaluate.py --method lora --slider width --weights runs/sliders/d1/width_d.safetensors --out runs/eval/main/contrast_width --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
+eval_contrast_energy	python experiments/evaluate.py --method lora --slider energy --weights runs/sliders/d1/energy_d.safetensors --out runs/eval/main/contrast_energy --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
 eval_guidance_brightness	python experiments/evaluate.py --method guidance --slider brightness --out runs/eval/main/guidance_brightness --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
 eval_embed_brightness	python experiments/evaluate.py --method embed --slider brightness --out runs/eval/main/embed_brightness --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
-eval_guidance_density	python experiments/evaluate.py --method guidance --slider density --out runs/eval/main/guidance_density --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
-eval_embed_density	python experiments/evaluate.py --method embed --slider density --out runs/eval/main/embed_density --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
+eval_guidance_bass	python experiments/evaluate.py --method guidance --slider bass --out runs/eval/main/guidance_bass --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
+eval_embed_bass	python experiments/evaluate.py --method embed --slider bass --out runs/eval/main/embed_bass --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
+eval_guidance_width	python experiments/evaluate.py --method guidance --slider width --out runs/eval/main/guidance_width --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
+eval_embed_width	python experiments/evaluate.py --method embed --slider width --out runs/eval/main/embed_width --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
 eval_guidance_reverb	python experiments/evaluate.py --method guidance --slider reverb --out runs/eval/main/guidance_reverb --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
 eval_embed_reverb	python experiments/evaluate.py --method embed --slider reverb --out runs/eval/main/embed_reverb --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
+eval_guidance_mood	python experiments/evaluate.py --method guidance --slider mood --out runs/eval/main/guidance_mood --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
+eval_embed_mood	python experiments/evaluate.py --method embed --slider mood --out runs/eval/main/embed_mood --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
 eval_guidance_energy	python experiments/evaluate.py --method guidance --slider energy --out runs/eval/main/guidance_energy --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
 eval_embed_energy	python experiments/evaluate.py --method embed --slider energy --out runs/eval/main/embed_energy --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
+compose_brightness_reverb	python experiments/compose.py brightness reverb --weights runs/sliders/v1 --out runs/eval/compose/brightness_reverb --start 0.97
+compose_mood_energy	python experiments/compose.py mood energy --weights runs/sliders/v1 --out runs/eval/compose/mood_energy --start 0.97
+compose_bass_width	python experiments/compose.py bass width --weights runs/sliders/v1 --out runs/eval/compose/bass_width --start 0.97
+train_d1_mood_d	python -m audiosliders.contrast mood_d --corpus runs/corpus/train --by descriptor:majorness --out runs/sliders/d1
+train_d1_lofi_d	python -m audiosliders.contrast lofi_d --corpus runs/corpus/train --by descriptor:rolloff_hz:-1 --out runs/sliders/d1
+train_d1_distortion_d	python -m audiosliders.contrast distortion_d --corpus runs/corpus/train --by descriptor:flatness --out runs/sliders/d1
+train_d1_ensemble_d	python -m audiosliders.contrast ensemble_d --corpus runs/corpus/train --by descriptor:pc --out runs/sliders/d1
+train_d1_harmony_d	python -m audiosliders.contrast harmony_d --corpus runs/corpus/train --by descriptor:harmonic_change --out runs/sliders/d1
+train_d1_groove_d	python -m audiosliders.contrast groove_d --corpus runs/corpus/train --by descriptor:pulse_clarity --out runs/sliders/d1
+train_d1_dynamics_d	python -m audiosliders.contrast dynamics_d --corpus runs/corpus/train --by descriptor:dynamics_db --out runs/sliders/d1
+train_d1_melody_d	python -m audiosliders.contrast melody_d --corpus runs/corpus/train --by descriptor:key_clarity --out runs/sliders/d1
+eval_contrast_mood	python experiments/evaluate.py --method lora --slider mood --weights runs/sliders/d1/mood_d.safetensors --out runs/eval/main/contrast_mood --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
+eval_contrast_lofi	python experiments/evaluate.py --method lora --slider lofi --weights runs/sliders/d1/lofi_d.safetensors --out runs/eval/main/contrast_lofi --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
+eval_contrast_distortion	python experiments/evaluate.py --method lora --slider distortion --weights runs/sliders/d1/distortion_d.safetensors --out runs/eval/main/contrast_distortion --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
+eval_contrast_ensemble	python experiments/evaluate.py --method lora --slider ensemble --weights runs/sliders/d1/ensemble_d.safetensors --out runs/eval/main/contrast_ensemble --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
+eval_contrast_harmony	python experiments/evaluate.py --method lora --slider harmony --weights runs/sliders/d1/harmony_d.safetensors --out runs/eval/main/contrast_harmony --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
+eval_contrast_groove	python experiments/evaluate.py --method lora --slider groove --weights runs/sliders/d1/groove_d.safetensors --out runs/eval/main/contrast_groove --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
+eval_contrast_dynamics	python experiments/evaluate.py --method lora --slider dynamics --weights runs/sliders/d1/dynamics_d.safetensors --out runs/eval/main/contrast_dynamics --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
+eval_contrast_melody	python experiments/evaluate.py --method lora --slider melody --weights runs/sliders/d1/melody_d.safetensors --out runs/eval/main/contrast_melody --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
+eval_guidance_density	python experiments/evaluate.py --method guidance --slider density --out runs/eval/main/guidance_density --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
+eval_embed_density	python experiments/evaluate.py --method embed --slider density --out runs/eval/main/embed_density --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
 eval_guidance_tempo	python experiments/evaluate.py --method guidance --slider tempo --out runs/eval/main/guidance_tempo --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
 eval_embed_tempo	python experiments/evaluate.py --method embed --slider tempo --out runs/eval/main/embed_tempo --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
 eval_guidance_percussion	python experiments/evaluate.py --method guidance --slider percussion --out runs/eval/main/guidance_percussion --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
@@ -78,14 +87,5 @@ eval_guidance_distortion	python experiments/evaluate.py --method guidance --slid
 eval_embed_distortion	python experiments/evaluate.py --method embed --slider distortion --out runs/eval/main/embed_distortion --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
 eval_guidance_lofi	python experiments/evaluate.py --method guidance --slider lofi --out runs/eval/main/guidance_lofi --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
 eval_embed_lofi	python experiments/evaluate.py --method embed --slider lofi --out runs/eval/main/embed_lofi --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
-eval_guidance_bass	python experiments/evaluate.py --method guidance --slider bass --out runs/eval/main/guidance_bass --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
-eval_embed_bass	python experiments/evaluate.py --method embed --slider bass --out runs/eval/main/embed_bass --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
-eval_guidance_width	python experiments/evaluate.py --method guidance --slider width --out runs/eval/main/guidance_width --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
-eval_embed_width	python experiments/evaluate.py --method embed --slider width --out runs/eval/main/embed_width --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
-eval_guidance_mood	python experiments/evaluate.py --method guidance --slider mood --out runs/eval/main/guidance_mood --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
-eval_embed_mood	python experiments/evaluate.py --method embed --slider mood --out runs/eval/main/embed_mood --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
 eval_guidance_electronic	python experiments/evaluate.py --method guidance --slider electronic --out runs/eval/main/guidance_electronic --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
 eval_embed_electronic	python experiments/evaluate.py --method embed --slider electronic --out runs/eval/main/embed_electronic --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
-compose_brightness_reverb	python experiments/compose.py brightness reverb --weights runs/sliders/v1 --out runs/eval/compose/brightness_reverb --start 0.97
-compose_mood_energy	python experiments/compose.py mood energy --weights runs/sliders/v1 --out runs/eval/compose/mood_energy --start 0.97
-compose_bass_width	python experiments/compose.py bass width --weights runs/sliders/v1 --out runs/eval/compose/bass_width --start 0.97

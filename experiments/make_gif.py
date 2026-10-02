@@ -73,7 +73,8 @@ for k, p in enumerate(panels):
     ax.text(1.0, 1.03, p["prompt"][:46], transform=ax.transAxes, ha="right", va="bottom", fontsize=9, color=MUTED)
     sl = fig.add_subplot(inner[1])
     scales = [r["scale"] for r in p["rows"]]
-    sl.set_xlim(scales[0] - 0.9, scales[-1] + 0.9); sl.set_ylim(-1, 1); sl.axis("off")
+    pad = 0.42 * (scales[-1] - scales[0])
+    sl.set_xlim(scales[0] - pad, scales[-1] + pad); sl.set_ylim(-1, 1); sl.axis("off")
     sl.plot([scales[0], scales[-1]], [0, 0], color=TRACK, linewidth=6, solid_capstyle="round")
     sl.scatter(scales, [0] * n, s=14, color=MUTED, zorder=2)
     knob = sl.scatter([0], [0], s=260, color=ACCENT, edgecolor=SURFACE, linewidth=2, zorder=3)
