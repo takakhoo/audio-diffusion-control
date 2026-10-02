@@ -72,7 +72,7 @@ for r in table:
     lines.append(
         f"| {r['concept']} | {r['component']} | {100 * r['variance_share']:.1f}% | "
         f"{', '.join(r['corpus_toward'][:3])} / {', '.join(r['corpus_away'][:3])} | {r['follows']:.2f} | "
-        f"{r['usable_lo']:+.0f} to {r['usable_hi']:+.0f} | {spread:.1f} | {r['kept']:.2f} | "
+        f"{r['usable_lo']:+.1f} to {r['usable_hi']:+.1f} | {spread:.1f} | {r['kept']:.2f} | "
         f"{', '.join(r['rises'])} / {', '.join(r['falls'])} |")
 (out / "sliders.md").write_text("\n".join(lines) + "\n")
 (out / "sliders.json").write_text(json.dumps(dict(sliders=table, curves=curves), indent=1))

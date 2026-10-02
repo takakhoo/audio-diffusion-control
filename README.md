@@ -140,7 +140,9 @@ For each of five broad concepts, 1,024 clips were generated on ACE-Step and thei
 | electronic dance music | 3 (7.1%) | calm, minor key, lo-fi, piano | aggressive, trumpet, loud, latin |
 | orchestral music | 4 (7.3%) | piano, lo-fi, dreamy, cello | organ, choir, bells, loud |
 
-All 30 are in [`results/discovery/ace/pca.md`](results/discovery/ace/pca.md) with their correlations to every descriptor. Training these directions into sliders with the set trainer is in the running queue.
+All 30 are in [`results/discovery/ace/pca.md`](results/discovery/ace/pca.md) with their correlations to every descriptor.
+
+**The axes become working sliders.** For three concepts we trained the four leading components into sliders with the set trainer (top against bottom 30% of clips along the component) and tested each on 32 fresh seeds of its concept. All 12 follow the axis they were trained on: the rank correlation between slider position and the output's projection on the axis is between 0.43 and 0.81. The words agree too. The leading piano axis was labelled "lo-fi, distorted, hip hop" against "acoustic guitar, reggae, happy" from the corpus alone, and in the slider's output the tags that rise are "distorted, dark-toned, lo-fi" and those that fall are "latin, reggae, happy". Full table: [`results/discovery/ace/sliders.md`](results/discovery/ace/sliders.md). These sliders stay usable to about ±1.5; past that they degrade the clip, unlike the prompt-pair sliders, which reach ±2.
 
 ### 9. How well a slider learns its target
 
