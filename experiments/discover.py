@@ -1,9 +1,12 @@
-"""Unsupervised directions in the corpus: PCA of CLAP embeddings, read against descriptors.
+"""Unsupervised axes: PCA over CLAP embeddings of many clips, read in musical terms.
 
-Each prompt's mean embedding is removed first, so the components describe how clips of
-the same prompt differ from one another. For every component the script reports its share
-of that within-prompt variance and its rank correlation with each measured descriptor,
-which is what tells us what a discovered direction means before any slider is trained.
+    python experiments/discover.py --corpus runs/corpus/concepts --per-prompt --out results/discovery/concepts
+
+With --per-prompt every prompt is decomposed separately (one concept, many seeds), which is
+the SliderSpace setting. Without it, each prompt's mean is removed and all prompts are
+pooled. For every component the script reports its share of variance, the tags it points
+toward and away from, and its rank correlation with each measured descriptor and with the
+aesthetics scores. Nothing here trains a slider; it says what a direction means first.
 """
 
 import argparse
@@ -14,23 +17,14 @@ import numpy as np
 from scipy.stats import spearmanr
 
 from audiosliders.contrast import load_corpus, principal_directions
+from audiosliders.tags import label_direction
 
-KEYS = ["centroid_hz", "rolloff_hz", "bass_ratio", "flatness", "flux", "rms_db", "onset_rate", "pulse_bpm",
-        "percussive_ratio", "decay_s", "side_ratio", "majorness", "crest_db", "clap_prompt"]
-
-ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-ap.add_argument("--corpus", default="runs/corpus/train")
-ap.add_argument("--out", default="results/discovery")
-ap.add_argument("--n", type=int, default=16)
-args = ap.parse_args()
-
-corpus = load_corpus(args.corpus)
-rows = corpus["rows"]
-groups = np.array([r["prompt_index"] for r in rows])
-directions, share = principal_directions(corpus["clap"], groups, args.n)
+KEYS = ["centroid_hz", "bass_ratio", "flatness", "flux", "rms_db", "onset_rate", "pulse_bpm", "pulse_clarity",
+        "percussive_ratio", "decay_s", "side_ratio", "majorness", "key_clarity", "harmonic_change", "dynamics_db",
+        "clap_prompt", "ce", "pq", "pc"]
 
 
-def within(values: np.ndarray) -> np.ndarray:
+def zscore(values: np.ndarray, groups: np.ndarray) -> np.ndarray:
     out = values.astype(float).copy()
     for g in np.unique(groups):
         m = groups == g
@@ -38,30 +32,61 @@ def within(values: np.ndarray) -> np.ndarray:
     return out
 
 
-desc = {k: within(np.array([r.get(k, np.nan) for r in rows], dtype=float)) for k in KEYS}
-proj = corpus["clap"] @ directions.T
-table = []
-for i in range(args.n):
-    p = within(proj[:, i])
-    corr = {}
-    for k in KEYS:
-        ok = np.isfinite(desc[k])
-        corr[k] = float(spearmanr(p[ok], desc[k][ok]).statistic)
-    best = sorted(corr, key=lambda k: -abs(corr[k]))[:3]
-    table.append(dict(component=i, variance_share=float(share[i]), correlations=corr, strongest=best))
-    print(f"PC{i:02d} {100 * share[i]:5.1f}%  " + "  ".join(f"{k} {corr[k]:+.2f}" for k in best))
+def analyse(rows, clap, groups, n, vocab):
+    directions, share = principal_directions(clap, groups, n)
+    proj = clap @ directions.T
+    desc = {k: zscore(np.array([r.get(k, np.nan) for r in rows], dtype=float), groups) for k in KEYS
+            if any(k in r for r in rows)}
+    table = []
+    for i in range(len(directions)):
+        p = zscore(proj[:, i], groups)
+        corr = {}
+        for k, v in desc.items():
+            ok = np.isfinite(v)
+            corr[k] = float(spearmanr(p[ok], v[ok]).statistic) if ok.sum() > 10 else float("nan")
+        entry = dict(component=i, variance_share=float(share[i]), correlations=corr,
+                     strongest=sorted((k for k in corr if np.isfinite(corr[k])), key=lambda k: -abs(corr[k]))[:3])
+        if vocab is not None:
+            entry["toward"], entry["away"] = label_direction(directions[i], vocab, k=4)
+        table.append(entry)
+    return directions, table
 
-# The reverse view: how much of each descriptor do the first n components explain together?
-explained = {}
-for k in KEYS:
-    ok = np.isfinite(desc[k])
-    x = np.stack([within(proj[:, i])[ok] for i in range(args.n)], 1)
-    coef, *_ = np.linalg.lstsq(x, desc[k][ok], rcond=None)
-    explained[k] = float(1 - ((desc[k][ok] - x @ coef) ** 2).sum() / (desc[k][ok] ** 2).sum())
-print("R^2 of each descriptor from the components:", {k: round(v, 2) for k, v in explained.items()})
 
-out = Path(args.out)
-out.mkdir(parents=True, exist_ok=True)
-(out / "pca.json").write_text(json.dumps(dict(n_clips=len(rows), n_prompts=int(len(np.unique(groups))),
-                                             components=table, descriptor_r2=explained), indent=1))
-np.save(out / "directions.npy", directions)
+def main():
+    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap.add_argument("--corpus", required=True)
+    ap.add_argument("--out", required=True)
+    ap.add_argument("--vocab", default="runs/reference/vocab.npz")
+    ap.add_argument("--n", type=int, default=12)
+    ap.add_argument("--per-prompt", action="store_true")
+    args = ap.parse_args()
+
+    corpus = load_corpus(args.corpus)
+    rows, clap = corpus["rows"], corpus["clap"]
+    groups = np.array([r["prompt_index"] for r in rows])
+    vocab = np.load(args.vocab)["text"] if Path(args.vocab).exists() else None
+    out = Path(args.out)
+    out.mkdir(parents=True, exist_ok=True)
+
+    report, lines = {}, []
+    sets = [(rows[int(np.argmax(groups == g))]["prompt"], groups == g) for g in np.unique(groups)] if args.per_prompt \
+        else [("all prompts, per-prompt mean removed", np.ones(len(rows), dtype=bool))]
+    for name, mask in sets:
+        sub = [r for r, m in zip(rows, mask) if m]
+        directions, table = analyse(sub, clap[mask], groups[mask], args.n, vocab)
+        report[name] = dict(n_clips=int(mask.sum()), components=table)
+        np.save(out / f"directions_{name.replace(' ', '_').replace(',', '')[:40]}.npy", directions)
+        lines += [f"### {name} ({int(mask.sum())} clips)", "",
+                  "| PC | Variance | Toward | Away | Strongest measured correlates |", "|---:|---:|---|---|---|"]
+        for e in table:
+            corr = ", ".join(f"{k} {e['correlations'][k]:+.2f}" for k in e["strongest"])
+            lines.append(f"| {e['component']} | {100 * e['variance_share']:.1f}% | {', '.join(e.get('toward', []))} | "
+                         f"{', '.join(e.get('away', []))} | {corr} |")
+        lines.append("")
+    (out / "pca.json").write_text(json.dumps(report, indent=1))
+    (out / "pca.md").write_text("\n".join(lines))
+    print("\n".join(lines))
+
+
+if __name__ == "__main__":
+    main()

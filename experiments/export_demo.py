@@ -75,7 +75,8 @@ for name in args.sliders or list(spec):
                     subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", str(src), "-b:a", args.bitrate, str(dst)],
                                    check=True)
                 clips.append(dict(x=r["scale"], f=str(rel), v=r.get(measure) if measure else None,
-                                  keep=r.get("clap_keep"), chroma=r.get("chroma_sim"), dir=r.get("clap_dir")))
+                                  keep=r.get("clap_keep"), chroma=r.get("chroma_sim"), dir=r.get("clap_dir"),
+                                  ce=r.get("ce"), pq=r.get("pq")))
             manifest["clips"][f"{method}/{name}/{prompt_ids.index(pid)}"] = clips
             manifest["scales"] = [c["x"] for c in clips]
 if args.summary:

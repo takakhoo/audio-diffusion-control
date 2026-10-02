@@ -174,9 +174,10 @@ function update() {
   const zero = clips.find((k) => k.x === 0) || c;
   const stats = [];
   if (s.measure) stats.push([s.measure_label, fmt(c.v, s.unit), `${c.v - zero.v >= 0 ? "+" : ""}${fmt(c.v - zero.v, s.unit)} vs 0`]);
-  if (c.keep != null) stats.push(["same clip? (CLAP similarity to 0)", fmt(c.keep), "1.0 = identical"]);
-  if (c.chroma != null) stats.push(["same notes? (chroma similarity)", fmt(c.chroma), "1.0 = identical"]);
   if (c.dir != null) stats.push(["text direction (CLAP)", fmt(c.dir), `${c.dir - zero.dir >= 0 ? "+" : ""}${fmt(c.dir - zero.dir)} vs 0`]);
+  if (c.ce != null) stats.push(["still music? (enjoyment, 1-10)", fmt(c.ce), `${c.ce - zero.ce >= 0 ? "+" : ""}${fmt(c.ce - zero.ce)} vs 0`]);
+  if (c.keep != null) stats.push(["same piece? (CLAP similarity to 0)", fmt(c.keep), "1.0 = identical"]);
+  if (c.chroma != null) stats.push(["same notes? (chroma similarity)", fmt(c.chroma), "1.0 = identical"]);
   $("readout").innerHTML = stats.map(([k, v, d]) => `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="d">${d}</div></div>`).join("");
   drawCurve(clips, i, s);
   voices.forEach((v, k) => v.gain.gain.setTargetAtTime(k === i ? 1 : 0, ctx.currentTime, 0.015));
