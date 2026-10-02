@@ -16,10 +16,10 @@ from pathlib import Path
 import numpy as np
 from scipy.stats import spearmanr
 
-from audiosliders.contrast import load_corpus, principal_directions
+from audiosliders.contrast import independent_directions, load_corpus, principal_directions
 from audiosliders.tags import label_direction
 
-KEYS = ["centroid_hz", "bass_ratio", "flatness", "flux", "rms_db", "onset_rate", "pulse_bpm", "pulse_clarity",
+KEYS = ["beat_bpm", "centroid_hz", "bass_ratio", "flatness", "flux", "rms_db", "onset_rate", "pulse_bpm", "pulse_clarity",
         "percussive_ratio", "decay_s", "side_ratio", "majorness", "key_clarity", "harmonic_change", "dynamics_db",
         "clap_prompt", "ce", "pq", "pc"]
 
@@ -32,8 +32,11 @@ def zscore(values: np.ndarray, groups: np.ndarray) -> np.ndarray:
     return out
 
 
-def analyse(rows, clap, groups, n, vocab):
-    directions, share = principal_directions(clap, groups, n)
+def analyse(rows, clap, groups, n, vocab, method="pca"):
+    if method == "ica":
+        directions, share = independent_directions(clap, groups, n)
+    else:
+        directions, share = principal_directions(clap, groups, n)
     proj = clap @ directions.T
     desc = {k: zscore(np.array([r.get(k, np.nan) for r in rows], dtype=float), groups) for k in KEYS
             if any(k in r for r in rows)}
@@ -59,10 +62,18 @@ def main():
     ap.add_argument("--vocab", default="runs/reference/vocab.npz")
     ap.add_argument("--n", type=int, default=12)
     ap.add_argument("--per-prompt", action="store_true")
+    ap.add_argument("--method", default="pca", choices=["pca", "ica"])
+    ap.add_argument("--emb", default="clap", choices=["clap", "muq"],
+                    help="embedding space; with muq pass the MuQ vocabulary file as --vocab")
+    ap.add_argument("--max-vocal", type=float, default=None)
     args = ap.parse_args()
 
     corpus = load_corpus(args.corpus)
-    rows, clap = corpus["rows"], corpus["clap"]
+    if args.max_vocal is not None:
+        vocal = np.array([r.get("vocal_score", -np.inf) for r in corpus["rows"]])
+        keep = vocal <= np.quantile(vocal, args.max_vocal)
+        corpus = {k: ([r for r, kk in zip(v, keep) if kk] if k == "rows" else v[keep]) for k, v in corpus.items()}
+    rows, clap = corpus["rows"], corpus[args.emb]
     groups = np.array([r["prompt_index"] for r in rows])
     vocab = np.load(args.vocab)["text"] if Path(args.vocab).exists() else None
     out = Path(args.out)
@@ -73,14 +84,15 @@ def main():
         else [("all prompts, per-prompt mean removed", np.ones(len(rows), dtype=bool))]
     for name, mask in sets:
         sub = [r for r, m in zip(rows, mask) if m]
-        directions, table = analyse(sub, clap[mask], groups[mask], args.n, vocab)
+        directions, table = analyse(sub, clap[mask], groups[mask], args.n, vocab, args.method)
         report[name] = dict(n_clips=int(mask.sum()), components=table)
         np.save(out / f"directions_{name.replace(' ', '_').replace(',', '')[:40]}.npy", directions)
         lines += [f"### {name} ({int(mask.sum())} clips)", "",
-                  "| PC | Variance | Toward | Away | Strongest measured correlates |", "|---:|---:|---|---|---|"]
+                  "| Axis | Variance share or kurtosis | Toward | Away | Strongest measured correlates |", "|---:|---:|---|---|---|"]
         for e in table:
             corr = ", ".join(f"{k} {e['correlations'][k]:+.2f}" for k in e["strongest"])
-            lines.append(f"| {e['component']} | {100 * e['variance_share']:.1f}% | {', '.join(e.get('toward', []))} | "
+            size = f"{100 * e['variance_share']:.1f}%" if args.method == "pca" else f"{e['variance_share']:.1f}"
+            lines.append(f"| {e['component']} | {size} | {', '.join(e.get('toward', []))} | "
                          f"{', '.join(e.get('away', []))} | {corr} |")
         lines.append("")
     (out / "pca.json").write_text(json.dumps(report, indent=1))

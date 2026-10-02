@@ -46,12 +46,17 @@ def load_corpus(path: str | Path) -> dict:
     """Concatenate the shards written by experiments/make_corpus.py."""
     path = Path(path)
     shards = sorted(p.stem.split("_")[1] for p in path.glob("rows_*.jsonl"))
-    rows, latents, clap = [], [], []
+    rows, latents, clap, muq = [], [], [], []
     for tag in shards:
         rows += [json.loads(line) for line in (path / f"rows_{tag}.jsonl").read_text().splitlines() if line]
         latents.append(np.load(path / f"latents_{tag}.npy"))
         clap.append(np.load(path / f"clap_{tag}.npy"))
-    return dict(rows=rows, latents=np.concatenate(latents), clap=np.concatenate(clap))
+        if (path / f"muq_{tag}.npy").exists():
+            muq.append(np.load(path / f"muq_{tag}.npy"))
+    out = dict(rows=rows, latents=np.concatenate(latents), clap=np.concatenate(clap))
+    if len(muq) == len(shards):
+        out["muq"] = np.concatenate(muq)
+    return out
 
 
 def split_ends(values: np.ndarray, groups: np.ndarray, fraction: float = 0.3) -> tuple[np.ndarray, np.ndarray]:
@@ -78,6 +83,34 @@ def principal_directions(clap: np.ndarray, groups: np.ndarray, n: int = 16) -> t
     _, sing, vt = np.linalg.svd(centered, full_matrices=False)
     share = sing**2 / (sing**2).sum()
     return vt[:n], share[:n]
+
+
+def independent_directions(emb: np.ndarray, groups: np.ndarray, n: int = 16, subspace: int = 32,
+                           seed: int = 0) -> tuple[np.ndarray, np.ndarray]:
+    """Independent components of the embeddings, as an alternative to principal components.
+
+    PCA finds orthogonal directions of largest variance, which can each mix several causes.
+    ICA, run inside the leading principal subspace, looks instead for directions whose
+    projections are statistically independent and non-Gaussian, which tends to isolate one
+    cause per direction. Returns (unit directions in embedding space, excess kurtosis of each),
+    ordered from most to least heavy-tailed and signed so the heavier tail is positive.
+    """
+    from sklearn.decomposition import FastICA
+
+    centered = emb.astype(np.float64).copy()
+    for g in np.unique(groups):
+        centered[groups == g] -= centered[groups == g].mean(0)
+    _, _, vt = np.linalg.svd(centered, full_matrices=False)
+    basis = vt[:subspace]
+    ica = FastICA(n_components=n, whiten="unit-variance", random_state=seed, max_iter=2000, tol=1e-4)
+    sources = ica.fit_transform(centered @ basis.T)
+    directions = ica.components_ @ basis
+    directions /= np.linalg.norm(directions, axis=1, keepdims=True)
+    z = (sources - sources.mean(0)) / sources.std(0)
+    skew, kurt = (z**3).mean(0), (z**4).mean(0) - 3
+    directions *= np.where(skew < 0, -1.0, 1.0)[:, None]
+    order = np.argsort(-kurt)
+    return directions[order], kurt[order]
 
 
 def train_contrast(
@@ -141,8 +174,9 @@ def main() -> None:
     ap.add_argument("name")
     ap.add_argument("--corpus", required=True)
     ap.add_argument("--by", required=True,
-                    help="descriptor:<key>[:-1], pca:<index>, or tags:<tag>|<tag> (CLAP similarity to the first tag "
-                         "minus the second; needs --vocab)")
+                    help="descriptor:<key>[:-1], pca:<index>, ica:<index>, or tags:<tag>|<tag> (CLAP similarity to "
+                         "the first tag minus the second; needs --vocab)")
+    ap.add_argument("--emb", default="clap", choices=["clap", "muq"], help="embedding space for pca and ica")
     ap.add_argument("--vocab", default="runs/reference/vocab.npz")
     ap.add_argument("--max-vocal", type=float, default=None,
                     help="keep only clips whose vocal_score is below this quantile (real recordings)")
@@ -163,8 +197,7 @@ def main() -> None:
     if args.max_vocal is not None:
         vocal = np.array([r.get("vocal_score", -np.inf) for r in corpus["rows"]])
         keep = vocal <= np.quantile(vocal, args.max_vocal)
-        corpus = dict(rows=[r for r, k in zip(corpus["rows"], keep) if k], latents=corpus["latents"][keep],
-                      clap=corpus["clap"][keep])
+        corpus = {k: ([r for r, kk in zip(v, keep) if kk] if k == "rows" else v[keep]) for k, v in corpus.items()}
     rows = corpus["rows"]
     groups = np.array([r["prompt_index"] for r in rows])
     prompts = [r["prompt"] for r in rows]
@@ -174,9 +207,17 @@ def main() -> None:
         key, _, sign = rest.partition(":")
         values = np.array([r[key] for r in rows], dtype=float) * (float(sign) if sign else 1.0)
     elif kind == "pca":
-        directions, share = principal_directions(corpus["clap"], groups, int(rest) + 1)
-        values = corpus["clap"] @ directions[int(rest)]
-        meta.update(variance_share=float(share[int(rest)]), direction=directions[int(rest)].tolist())
+        directions, share = principal_directions(corpus[args.emb], groups, int(rest) + 1)
+        values = corpus[args.emb] @ directions[int(rest)]
+        meta.update(variance_share=float(share[int(rest)]), emb=args.emb)
+        if args.emb == "clap":
+            meta["direction"] = directions[int(rest)].tolist()
+    elif kind == "ica":
+        directions, kurt = independent_directions(corpus[args.emb], groups)
+        values = corpus[args.emb] @ directions[int(rest)]
+        meta.update(kurtosis=float(kurt[int(rest)]), emb=args.emb)
+        if args.emb == "clap":
+            meta["direction"] = directions[int(rest)].tolist()
     elif kind == "tags":
         vocab = np.load(args.vocab)
         names = list(vocab["tags"])
