@@ -19,8 +19,9 @@ ap.add_argument("--logs", default="../logs")
 ap.add_argument("--per-gpu", type=int, default=1)
 args = ap.parse_args()
 
-done_dir = Path("runs/.done")
+done_dir, claim_dir = Path("runs/.done"), Path("runs/.claim")
 done_dir.mkdir(parents=True, exist_ok=True)
+claim_dir.mkdir(parents=True, exist_ok=True)
 Path(args.logs).mkdir(parents=True, exist_ok=True)
 todo: queue.Queue = queue.Queue()
 for line in Path(args.jobs).read_text().splitlines():
@@ -39,6 +40,12 @@ def worker(gpu: str) -> None:
             return
         if (done_dir / name).exists():
             continue
+        # Several runners can share one job file: a job is claimed by creating its lock file,
+        # which fails if another runner got there first.
+        try:
+            os.close(os.open(claim_dir / name, os.O_CREAT | os.O_EXCL))
+        except FileExistsError:
+            continue
         t0 = time.time()
         # Cap math-library threads: every job also runs a pool of descriptor workers, and
         # uncapped they oversubscribe a shared machine many times over.
@@ -48,6 +55,7 @@ def worker(gpu: str) -> None:
             code = subprocess.call(cmd, shell=True, env=env, stdout=log, stderr=subprocess.STDOUT)
         if code == 0:
             (done_dir / name).touch()
+        (claim_dir / name).unlink(missing_ok=True)
         print(f"{'ok  ' if code == 0 else 'FAIL'} {name} gpu{gpu} {time.time() - t0:.0f}s", flush=True)
 
 
