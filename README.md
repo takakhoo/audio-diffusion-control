@@ -37,11 +37,13 @@ For scale: unsteered clips score 6.95 on Audiobox Aesthetics content enjoyment, 
 
 ## How it works
 
-![How a slider is used and trained](results/figures/pipeline.png)
+![Where the slider sits inside the transformer](results/figures/architecture.png)
 
 1. **One mechanism.** Every linear layer in the transformer's attention and feed-forward blocks gets a rank-4 update whose strength is a number read at each forward pass. Zero is the original model; negative values work as well as positive ones; several sliders add ([`lora.py`](audiosliders/lora.py)).
 2. **Trained from a prompt pair.** The slider at ±1 learns to reproduce the frozen model's prediction shifted by the difference between its predictions for "prompt, happy" and "prompt, sad". This is the Concept Sliders objective, here for a v-prediction diffusion model and a rectified-flow model ([`train.py`](audiosliders/train.py)).
 3. **Or trained from two sets of clips, with no text.** Generate a corpus with the model, measure something on every clip, and train the slider with the plain denoising loss at +1 on the top 30% and at -1 on the bottom 30%. One update serves both ends with opposite sign, so what the sets share cancels. The measurement can be a signal descriptor, a quality score, or the projection on a discovered direction ([`contrast.py`](audiosliders/contrast.py)).
+![How a slider is used and the two ways to train one](results/figures/pipeline.png)
+
 4. **Two backbones, one interface.** ACE-Step 1.5 XL turbo (48 kHz, 8 steps, 0.4 s per 10 s clip) and Stable Audio Open 1.0 (44.1 kHz, 50 steps, 0.65 s per clip) ([`ace.py`](audiosliders/ace.py), [`backbone.py`](audiosliders/backbone.py)).
 
 ## The science, step by step
@@ -64,6 +66,10 @@ Each curve is the mean change from the unsteered clip over 72 trajectories, in u
 
 ### 3. Pushing too far stops sounding like music, and that is measurable
 
+![Enjoyment scores of unsteered model output and real recordings](results/figures/quality_reference.png)
+
+First the yardstick. Audiobox Aesthetics scores 2,000 real recordings from FMA at 6.12 on average. Unsteered ACE-Step output scores 6.92 with a much tighter spread, and unsteered Stable Audio Open output scores 6.16, about the same as the real recordings. Then the same score at every slider position:
+
 ![Content enjoyment against slider position, ACE-Step](results/ace/quality.png)
 
 The dashed line is the mean of real recordings. Five of the six sliders stay above it across the whole range. Tension collapses past +1, which is why its usable span ends there. The negative ends (sadder, sparser, plainer) cost a little enjoyment; the positive ends cost almost none.
@@ -79,6 +85,8 @@ On Stable Audio Open the slider can be switched on only after the earliest, nois
 | **step 21** | **1.41** | **0.85** | **0.84** | **5.87** |
 | step 29 | 0.42 | 0.97 | 0.97 | 6.08 |
 
+![Range, similarity, and enjoyment against the step at which the slider turns on](results/figures/gating.png)
+
 Starting at step 21 keeps most of the effect and cuts the loss in enjoyment from 1.0 to 0.3 points. All four tested sliders show the same pattern ([`results/gating/`](results/gating/)).
 
 ### 5. The embedding can say yes while the waveform says no
@@ -93,6 +101,8 @@ Sorting the model's own clips by measured spectral centroid and training between
 
 For each of five broad concepts, 1,024 clips were generated on ACE-Step and their CLAP embeddings decomposed with PCA. The leading components carry 16 to 25% of the variance within a concept, and the tags they point toward and away from read as musical contrasts:
 
+![Variance carried by the first six components of each concept](results/figures/discovery.png)
+
 | Concept | Component | Toward | Away |
 |---|---|---|---|
 | guitar music | 1 (17.8%) | latin, repetitive, happy, funk | mysterious, distorted, tense, improvised |
@@ -103,6 +113,12 @@ For each of five broad concepts, 1,024 clips were generated on ACE-Step and thei
 | orchestral music | 4 (7.3%) | piano, lo-fi, dreamy, cello | organ, choir, bells, loud |
 
 All 30 are in [`results/discovery/ace/pca.md`](results/discovery/ace/pca.md) with their correlations to every descriptor. Training these directions into sliders with the set trainer is in the running queue.
+
+### 8. How well a slider learns its target
+
+![Share of the guidance target not yet reproduced, by training iteration](results/figures/training_curves.png)
+
+The prompt-pair trainer asks the slider to reproduce a shift in the frozen model's prediction. After 1,000 iterations the Stable Audio sliders reproduce about 62% of that shift on average and the ACE-Step sliders about 31%. The ACE-Step sliders work anyway, as section 2 shows, but they are the ones with the most room left: longer training and higher rank are the obvious next experiments.
 
 ## Try it
 
