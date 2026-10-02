@@ -203,8 +203,9 @@ class StableAudio:
         s_end = sig[last]
         return x / torch.sqrt(s_end * s_end + 1.0), sigma_to_t(s_end)
 
-    def decode(self, z: Tensor, seconds: float | None = None, chunk: int = 8) -> Tensor:
+    def decode(self, z: Tensor, seconds: float | None = None) -> Tensor:
         """Latents to stereo waveforms in [-1, 1], shape (B, 2, T). Differentiable."""
+        chunk = max(1, 2048 // z.shape[-1])
         outs = [self.vae.decode(z[i : i + chunk].float()).sample for i in range(0, len(z), chunk)]
         audio = torch.cat(outs)
         if seconds is not None:
@@ -222,9 +223,10 @@ class StableAudio:
         wrap: Callable[[Predictor], Predictor] | None = None,
         sde: bool = False,
         latents: bool = False,
+        cond: Cond | None = None,
     ) -> Tensor:
         """Text to audio. `wrap` lets sliders and baselines modify the guided predictor."""
-        cond = self.encode(prompts, seconds)
+        cond = cond if cond is not None else self.encode(prompts, seconds)
         predict = self.cfg(cond, guidance)
         if wrap is not None:
             predict = wrap(predict)
