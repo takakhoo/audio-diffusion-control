@@ -1,0 +1,422 @@
+[
+ {
+  "slider": "acoustic_electronic",
+  "trained_from": "two sets of the model's clips",
+  "embedding": "clap",
+  "axis": 3,
+  "toward": [
+   "acoustic",
+   "sad",
+   "blues"
+  ],
+  "away": [
+   "studio",
+   "playful",
+   "electronic dance"
+  ],
+  "rho": 0.5499999999999999,
+  "rho_ci": 0.09575039276775822,
+  "ordered": 0.9305555555555556,
+  "rho_full": 0.47271825396825407,
+  "top": 1.5,
+  "moved_real_std": [
+   0.6409837014728401,
+   0.5344472889850572
+  ],
+  "moved_seed_std": [
+   1.480689056726677,
+   1.234587167160514
+  ],
+  "coverage_all_prompts": 0.6420306247802698,
+  "coverage_one_prompt": 0.5911262092353473,
+  "kept": 0.8646593745797873,
+  "ce": [
+   7.082289695739746,
+   6.951201664076911,
+   7.143102566401164
+  ],
+  "musicality": [
+   2.6761874755223594,
+   2.766794674926334,
+   2.6887409488360086
+  ],
+  "rises": [
+   "choir",
+   "epic",
+   "classical",
+   "strings"
+  ],
+  "falls": [
+   "funk",
+   "reggae",
+   "latin",
+   "studio"
+  ],
+  "descriptors": {
+   "flatness": -0.37853535749786754,
+   "side_ratio": 0.1864761148206226,
+   "bass_ratio": -0.16608876098129557
+  },
+  "n": 72
+ },
+ {
+  "slider": "arousal",
+  "trained_from": "two sets of the model's clips",
+  "embedding": "muq",
+  "axis": 3,
+  "toward": [
+   "quiet",
+   "minor key",
+   "dreamy"
+  ],
+  "away": [
+   "aggressive",
+   "dry",
+   "rhythmic"
+  ],
+  "rho": 0.8166666666666667,
+  "rho_ci": 0.04994933270070478,
+  "ordered": 0.9861111111111112,
+  "rho_full": 0.6770833333333335,
+  "top": 1.5,
+  "moved_real_std": [
+   1.185069136434981,
+   1.1147347705231674
+  ],
+  "moved_seed_std": [
+   2.1437845352213847,
+   2.016549995648494
+  ],
+  "coverage_all_prompts": 0.8345774595421046,
+  "coverage_one_prompt": 0.6808124863319216,
+  "kept": 0.839426812198427,
+  "ce": [
+   7.091299076875051,
+   6.951201664076911,
+   7.161247154076894
+  ],
+  "musicality": [
+   2.7207712531089783,
+   2.766794674926334,
+   2.677538255850474
+  ],
+  "rises": [
+   "choir",
+   "reverberant",
+   "cello",
+   "orchestral film score"
+  ],
+  "falls": [
+   "latin",
+   "funk",
+   "reggae",
+   "playful"
+  ],
+  "descriptors": {
+   "flatness": -0.6145110639050575,
+   "pulse_clarity": -0.2750989675396598,
+   "decay_s": 0.25551206892593503
+  },
+  "n": 72
+ },
+ {
+  "slider": "classical_funk",
+  "trained_from": "two sets of the model's clips",
+  "embedding": "clap",
+  "axis": 4,
+  "toward": [
+   "classical",
+   "epic",
+   "melodic"
+  ],
+  "away": [
+   "funk",
+   "drums",
+   "happy"
+  ],
+  "rho": 0.6416666666666666,
+  "rho_ci": 0.06211991785291741,
+  "ordered": 0.9583333333333334,
+  "rho_full": 0.4315476190476191,
+  "top": 1.5,
+  "moved_real_std": [
+   0.7697242081781445,
+   0.5788938003881231
+  ],
+  "moved_seed_std": [
+   1.646782546850074,
+   1.2385114003563182
+  ],
+  "coverage_all_prompts": 0.7110523952340153,
+  "coverage_one_prompt": 0.5279684591987034,
+  "kept": 0.8515076380636957,
+  "ce": [
+   7.1628143257564965,
+   6.951201664076911,
+   7.0852642390463085
+  ],
+  "musicality": [
+   2.717222167385949,
+   2.766794674926334,
+   2.668986270825068
+  ],
+  "rises": [
+   "choir",
+   "epic",
+   "bells",
+   "classical"
+  ],
+  "falls": [
+   "funk",
+   "reggae",
+   "latin",
+   "country"
+  ],
+  "descriptors": {
+   "flatness": -0.3158211986948053,
+   "bass_ratio": -0.24852576963281664,
+   "decay_s": 0.24075663528509456
+  },
+  "n": 72
+ },
+ {
+  "slider": "jazz_electronic",
+  "trained_from": "two sets of the model's clips",
+  "embedding": "muq",
+  "axis": 5,
+  "toward": [
+   "jazz",
+   "saxophone",
+   "trumpet"
+  ],
+  "away": [
+   "electronic dance",
+   "synthesizer",
+   "electronic"
+  ],
+  "rho": 0.611111111111111,
+  "rho_ci": 0.07206669180808883,
+  "ordered": 0.9444444444444444,
+  "rho_full": 0.4702380952380953,
+  "top": 1.5,
+  "moved_real_std": [
+   0.6074063918912684,
+   0.3346040512977313
+  ],
+  "moved_seed_std": [
+   1.2327452308998492,
+   0.6790866115068557
+  ],
+  "coverage_all_prompts": 0.7715410186109138,
+  "coverage_one_prompt": 0.5450343178697242,
+  "kept": 0.8673420167631574,
+  "ce": [
+   7.082404712835948,
+   6.951201664076911,
+   7.090375138653649
+  ],
+  "musicality": [
+   2.7704334722624884,
+   2.766794674926334,
+   2.629430608616935
+  ],
+  "rises": [
+   "jazz",
+   "funk",
+   "repetitive",
+   "latin"
+  ],
+  "falls": [
+   "bells",
+   "choir",
+   "melodic",
+   "loud"
+  ],
+  "descriptors": {
+   "bass_ratio": 0.13621743769855202,
+   "majorness": -0.11647863180488784,
+   "pc": 0.11504960635115752
+  },
+  "n": 72
+ },
+ {
+  "slider": "piano_axis",
+  "trained_from": "two sets of the model's clips",
+  "embedding": "muq",
+  "axis": 4,
+  "toward": [
+   "piano",
+   "melancholic",
+   "electric piano"
+  ],
+  "away": [
+   "organ",
+   "rock",
+   "folk"
+  ],
+  "rho": 0.6305555555555554,
+  "rho_ci": 0.07453572405910788,
+  "ordered": 0.9583333333333334,
+  "rho_full": 0.5659722222222224,
+  "top": 1.5,
+  "moved_real_std": [
+   0.752498843796159,
+   0.9422779791823309
+  ],
+  "moved_seed_std": [
+   1.4155338382349214,
+   1.7725294537695324
+  ],
+  "coverage_all_prompts": 0.8007707271009952,
+  "coverage_one_prompt": 0.6927535539216098,
+  "kept": 0.8654359889527162,
+  "ce": [
+   7.103785740004645,
+   6.951201664076911,
+   7.055977377626631
+  ],
+  "musicality": [
+   2.663197378317515,
+   2.766794674926334,
+   2.716991808679369
+  ],
+  "rises": [
+   "electronic dance",
+   "lo-fi",
+   "calm",
+   "melodic"
+  ],
+  "falls": [
+   "jazz",
+   "latin",
+   "acoustic guitar",
+   "improvised"
+  ],
+  "descriptors": {
+   "bass_ratio": -0.1702877435557392,
+   "side_ratio": 0.15831702472523826,
+   "pc": -0.1338721353001219
+  },
+  "n": 72
+ },
+ {
+  "slider": "strings_synth",
+  "trained_from": "two sets of the model's clips",
+  "embedding": "muq",
+  "axis": 1,
+  "toward": [
+   "acoustic guitar",
+   "electric guitar",
+   "strings"
+  ],
+  "away": [
+   "reverberant",
+   "choir",
+   "synthesizer"
+  ],
+  "rho": 0.4013888888888888,
+  "rho_ci": 0.0852453634878436,
+  "ordered": 0.8194444444444444,
+  "rho_full": 0.3764880952380953,
+  "top": 1.5,
+  "moved_real_std": [
+   0.44135755698527823,
+   0.5213153994237123
+  ],
+  "moved_seed_std": [
+   0.8134787917636372,
+   0.9608513880393915
+  ],
+  "coverage_all_prompts": 0.7977302042018666,
+  "coverage_one_prompt": 0.5989184367718999,
+  "kept": 0.8670575879514217,
+  "ce": [
+   7.146812114450666,
+   6.951201664076911,
+   7.027782301108043
+  ],
+  "musicality": [
+   2.6846069577667446,
+   2.766794674926334,
+   2.6890113121933408
+  ],
+  "rises": [
+   "staccato",
+   "distorted",
+   "trumpet",
+   "drums"
+  ],
+  "falls": [
+   "calm",
+   "reggae",
+   "dreamy",
+   "swung"
+  ],
+  "descriptors": {
+   "pc": -0.2599485496440671,
+   "flatness": 0.23882328943995937,
+   "dynamics_db": 0.19419336588738734
+  },
+  "n": 72
+ },
+ {
+  "slider": "valence",
+  "trained_from": "two sets of the model's clips",
+  "embedding": "muq",
+  "axis": 7,
+  "toward": [
+   "dark",
+   "metal",
+   "dark-toned"
+  ],
+  "away": [
+   "playful",
+   "pop",
+   "simple"
+  ],
+  "rho": 0.4958333333333332,
+  "rho_ci": 0.08835727153715095,
+  "ordered": 0.9305555555555556,
+  "rho_full": 0.449404761904762,
+  "top": 1.5,
+  "moved_real_std": [
+   0.6201866457393918,
+   0.454492451567779
+  ],
+  "moved_seed_std": [
+   1.232831114774151,
+   0.903457756744718
+  ],
+  "coverage_all_prompts": 0.6591801005055185,
+  "coverage_one_prompt": 0.5361000852203421,
+  "kept": 0.8736696831054158,
+  "ce": [
+   7.0979057682885065,
+   6.951201664076911,
+   7.051035132673052
+  ],
+  "musicality": [
+   2.7831532061100006,
+   2.766794674926334,
+   2.6688974135451846
+  ],
+  "rises": [
+   "cello",
+   "reverberant",
+   "trumpet",
+   "saxophone"
+  ],
+  "falls": [
+   "playful",
+   "happy",
+   "country",
+   "simple"
+  ],
+  "descriptors": {
+   "flatness": -0.20752112569345585,
+   "key_clarity": -0.15501276973162448,
+   "pulse_clarity": -0.15416575010852873
+  },
+  "n": 72
+ }
+]

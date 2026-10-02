@@ -1,0 +1,16 @@
+\begin{table}[t]\centering\small\setlength{\tabcolsep}{3pt}
+\begin{tabular}{llrrrrrrr}
+\toprule
+Axis & From & $\rho$ & Ord. & Real & Seeds & Kept & CE & Mus. \\
+\midrule
+acoustic/electronic & sets & 0.55 & 0.93 & 0.64 & 1.48 & 0.86 & 7.11 & 2.68 \\
+arousal & sets & 0.82 & 0.99 & 1.19 & 2.14 & 0.84 & 7.13 & 2.70 \\
+classical/funk & sets & 0.64 & 0.96 & 0.77 & 1.65 & 0.85 & 7.12 & 2.69 \\
+jazz/electronic & sets & 0.61 & 0.94 & 0.61 & 1.23 & 0.87 & 7.09 & 2.70 \\
+piano & sets & 0.63 & 0.96 & 0.75 & 1.42 & 0.87 & 7.08 & 2.69 \\
+strings/synth & sets & 0.40 & 0.82 & 0.44 & 0.81 & 0.87 & 7.09 & 2.69 \\
+valence & sets & 0.50 & 0.93 & 0.62 & 1.23 & 0.87 & 7.07 & 2.73 \\
+\bottomrule
+\end{tabular}
+\caption{Sliders along axes of real music on ACE-Step, positions $-1$ to $+1$. From: a prompt pair made of the axis's tags, or two sets of the model's clips. $\rho$, Ord.: rank correlation between position and the output's projection on the axis, and share of trajectories with $-1$ and $+1$ in the right order. Real, Seeds: movement along the axis between $-1$ and $+1$ in standard deviations of real recordings and of one prompt's seeds. Kept: CLAP similarity to the unsteered clip. CE, Mus.: enjoyment and SongEval musicality at $\pm1$ (unsteered: 6.95 and 2.77).}\label{tab:axes}
+\end{table}

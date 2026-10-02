@@ -134,20 +134,27 @@ axes = RESULTS / "ace_v2" / "real_axes.json"
 if axes.exists():
     rows = json.loads(axes.read_text())
     short = {"two sets of the model's clips": "sets", "prompt pair from the axis's tags": "pair"}
-    lines = [r"\begin{table}[t]\centering\small\setlength{\tabcolsep}{3.5pt}", r"\begin{tabular}{llrrrrr}", r"\toprule",
-             r"Axis & From & $\rho$ & $\pm1$ & Ends & Kept & CE$_\text{ends}$ \\", r"\midrule"]
+    mean = lambda v: fmt((v[0] + v[2]) / 2) if v else "--"
+    lines = [r"\begin{table}[t]\centering\small\setlength{\tabcolsep}{3pt}", r"\begin{tabular}{llrrrrrrr}", r"\toprule",
+             r"Axis & From & $\rho$ & Ord. & Real & Seeds & Kept & CE & Mus. \\", r"\midrule"]
     for r in sorted(rows, key=lambda r: (r["slider"], r["trained_from"])):
         lines.append(" & ".join([
-            r["slider"].replace("_", " "), short[r["trained_from"]], fmt(r["rho"]), fmt(r["moved_real_std"][0]),
-            fmt(r["moved_real_std"][1]), fmt(r["kept"]), fmt((r["ce"][0] + r["ce"][2]) / 2)]) + r" \\")
+            r["slider"].replace("_axis", "").replace("_", "/"), short[r["trained_from"]], fmt(r["rho"]), fmt(r["ordered"]),
+            fmt(r["moved_real_std"][0]), fmt(r["moved_seed_std"][0]), fmt(r["kept"]), mean(r["ce"]),
+            mean(r.get("musicality"))]) + r" \\")
     lines += [r"\bottomrule", r"\end{tabular}",
-              r"\caption{Sliders along axes of real music on ACE-Step, trained from a prompt pair made of the axis's tags or "
-              r"from two sets of the model's clips. $\rho$: rank correlation between position and the output's projection on "
-              r"the axis. $\pm1$ and Ends: movement along the axis between positions $-1$ and $+1$ and between the extreme "
-              r"positions ($\pm2$ for pairs, $\pm1.5$ for sets), in standard deviations of real recordings. Kept: CLAP "
-              r"similarity to the unsteered clip at $\pm1$. CE at 0 is " + fmt(rows[0]["ce"][1]) + r".}\label{tab:axes}",
-              r"\end{table}"]
+              r"\caption{Sliders along axes of real music on ACE-Step, positions $-1$ to $+1$. From: a prompt pair made of the "
+              r"axis's tags, or two sets of the model's clips. $\rho$, Ord.: rank correlation between position and the "
+              r"output's projection on the axis, and share of trajectories with $-1$ and $+1$ in the right order. Real, Seeds: "
+              r"movement along the axis between $-1$ and $+1$ in standard deviations of real recordings and of one prompt's "
+              r"seeds. Kept: CLAP similarity to the unsteered clip. CE, Mus.: enjoyment and SongEval musicality at $\pm1$ "
+              r"(unsteered: " + fmt(rows[0]["ce"][1]) + " and " + mean(None if not rows[0].get("musicality") else [rows[0]["musicality"][1]] * 3)
+              + r").}\label{tab:axes}", r"\end{table}"]
     (PAPER / "tables" / "axes.tex").write_text("\n".join(lines) + "\n")
+    sets = [r for r in rows if short[r["trained_from"]] == "sets"]
+    macros.update(axN=str(len(sets)), axRhoLo=fmt(min(r["rho"] for r in sets)), axRhoHi=fmt(max(r["rho"] for r in sets)),
+                  axRealLo=fmt(min(r["moved_real_std"][0] for r in sets)), axRealHi=fmt(max(r["moved_real_std"][0] for r in sets)),
+                  axKeepLo=fmt(min(r["kept"] for r in sets)), axKeepHi=fmt(max(r["kept"] for r in sets)))
 
 macros.update(nPrompts="24", nReal="2{,}000", fmaCE="6.12", aceCE="6.92", saoCE="6.16")
 (PAPER / "numbers.tex").write_text("".join(f"\\newcommand{{\\{k}}}{{{v}}}\n" for k, v in sorted(macros.items())))

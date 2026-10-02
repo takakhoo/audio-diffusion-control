@@ -53,35 +53,40 @@ for run in sorted(Path(args.eval).iterdir()):
         proj = emb @ np.load(source)[index]
     for r, v in zip(rows, proj):
         r["axis"] = float(v)
-    mono, resp = M.monotonicity(rows, "axis"), M.response(rows, "axis")
+    # Correlation over the positions every method shares (-1 to +1); `rho_full` keeps the whole range.
+    mono, resp = M.monotonicity(M.within(rows, -1.0, 1.0), "axis"), M.response(rows, "axis")
+    full = M.monotonicity(rows, "axis")
     scales = list(resp["scales"])
     span = lambda x: float(resp["mean"][scales.index(x)] - resp["mean"][scales.index(-x)])
     at = lambda x: np.array([r["scale"] == x for r in rows])
     up, down = tag_shift(emb[at(1.0)], emb[at(-1.0)], text, k=4)
     leak = M.leakage(rows, [k for k in KEYS if all(k in r for r in rows)])
     top = sorted(leak, key=lambda k: -abs(leak[k]))[:3]
-    ce = {x: float(np.mean([r["ce"] for r in rows if r["scale"] == x])) for x in (scales[0], 0.0, scales[-1])}
+    ce = {x: float(np.mean([r["ce"] for r in rows if r["scale"] == x])) for x in (-1.0, 0.0, 1.0)}
+    music = {x: float(np.mean([r["se_musicality"] for r in rows if r["scale"] == x])) for x in (-1.0, 0.0, 1.0)} \
+        if "se_musicality" in rows[0] else {}
     table.append(dict(
         slider=name, trained_from=METHODS[method], embedding=declared["emb"], axis=index, toward=axis["toward"][:3], away=axis["away"][:3],
-        rho=mono["rho"], rho_ci=mono["rho_ci"], ordered=mono["consistent"],
+        rho=mono["rho"], rho_ci=mono["rho_ci"], ordered=mono["consistent"], rho_full=full["rho"],
         top=scales[-1], moved_real_std=[span(x) / model["real_std"][index] for x in (1.0, scales[-1])],
         moved_seed_std=[span(x) / model["generated_within_std"][index] for x in (1.0, scales[-1])],
         coverage_all_prompts=model["total"][index], coverage_one_prompt=model["within"][index],
         kept=float(np.mean([r["clap_keep"] for r in rows if abs(r["scale"]) == 1.0])), ce=list(ce.values()),
+        musicality=list(music.values()),
         rises=[t for t, _ in up], falls=[t for t, _ in down],
         descriptors={k: leak[k] for k in top}, n=len({(r["prompt_index"], r["seed"]) for r in rows}),
     ))
 
-lines = ["| Slider | Trained from | Axis from real music (toward / away) | ρ with the axis | Ends ordered | "
-         "Moved at ±1 (std of real music) | Moved at the ends | Same, in std of one prompt's seeds | Piece kept at ±1 | "
-         "Enjoyment at low end / 0 / high end | Tags that rise / fall | Descriptors moved most (std per unit) |",
-         "|---|---|---|---:|---:|---:|---:|---:|---:|---|---|---|"]
+lines = ["| Slider | Trained from | Axis from real music (toward / away) | ρ with the axis, -1 to +1 | -1 and +1 ordered | "
+         "Moved between -1 and +1 (std of real music) | Same, in std of one prompt's seeds | Moved between the ends | Piece kept at ±1 | "
+         "Enjoyment at -1 / 0 / +1 | Musicality at -1 / 0 / +1 | Tags that rise / fall | Descriptors moved most (std per unit) |",
+         "|---|---|---|---:|---:|---:|---:|---:|---:|---|---|---|---|"]
 for r in sorted(table, key=lambda r: (r["slider"], r["trained_from"])):
     lines.append(
         f"| {r['slider']} | {r['trained_from']} | {', '.join(r['toward'])} / {', '.join(r['away'])} | "
         f"{r['rho']:.2f} ± {r['rho_ci']:.2f} | {100 * r['ordered']:.0f}% | {r['moved_real_std'][0]:.2f} | "
-        f"{r['moved_real_std'][1]:.2f} (±{r['top']:g}) | {r['moved_seed_std'][1]:.2f} | {r['kept']:.2f} | "
-        f"{' / '.join(f'{v:.2f}' for v in r['ce'])} | {', '.join(r['rises'])} / {', '.join(r['falls'])} | "
+        f"{r['moved_seed_std'][0]:.2f} | {r['moved_real_std'][1]:.2f} (±{r['top']:g}) | {r['kept']:.2f} | "
+        f"{' / '.join(f'{v:.2f}' for v in r['ce'])} | {' / '.join(f'{v:.2f}' for v in r['musicality'])} | {', '.join(r['rises'])} / {', '.join(r['falls'])} | "
         f"{', '.join(f'{k} {v:+.2f}' for k, v in r['descriptors'].items())} |")
 out = Path(args.out)
 out.mkdir(parents=True, exist_ok=True)
