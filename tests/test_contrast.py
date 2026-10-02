@@ -3,7 +3,7 @@ import pytest
 
 pytest.importorskip("torch")
 
-from audiosliders.contrast import axis_stability, independent_directions, principal_directions, split_ends
+from audiosliders.contrast import axis_stability, independent_directions, principal_directions, residualize, split_ends
 
 
 def test_split_ends_is_balanced_within_groups():
@@ -88,3 +88,17 @@ def test_sparse_autoencoder_recovers_planted_features(tmp_path):
     scores = sae.activation(str(tmp_path / "sae.npz"), data, feature)
     top = np.argsort(scores)[-300:]  # the clips a slider's high set would be drawn from
     assert (codes[top, 0] > 0).mean() > 0.9
+
+
+def test_residualized_sets_are_balanced_on_the_bystander():
+    rng = np.random.default_rng(5)
+    groups = np.repeat(np.arange(4), 250)
+    loudness = rng.normal(size=1000)
+    target = 0.8 * loudness + rng.normal(size=1000) * 0.6  # the target is confounded with loudness
+    raw_high, raw_low = split_ends(target, groups, 0.2)
+    clean = residualize(target, loudness[:, None], groups)
+    high, low = split_ends(clean, groups, 0.2)
+    raw_gap = loudness[raw_high].mean() - loudness[raw_low].mean()
+    gap = loudness[high].mean() - loudness[low].mean()
+    assert raw_gap > 1.5 and abs(gap) < 0.15
+    assert target[high].mean() - target[low].mean() > 1.0
