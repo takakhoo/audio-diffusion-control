@@ -255,7 +255,9 @@ Arousal, valence, and instrument contrasts did not come out of the model's raw a
 
 ![Share of the guidance target not yet reproduced, by training iteration](results/figures/training_curves.png)
 
-The prompt-pair trainer asks the slider to reproduce a shift in the frozen model's prediction. After 1,000 iterations the Stable Audio sliders reproduce about 62% of that shift on average and the ACE-Step sliders about 31%. The ACE-Step sliders work anyway, as section 2 shows, but they are the ones with the most room left: longer training and higher rank are the obvious next experiments.
+The prompt-pair trainer asks the slider to reproduce a shift in the frozen model's prediction. After 1,000 iterations the Stable Audio sliders reproduce about 62% of that shift on average and the ACE-Step sliders about 31%. The ACE-Step sliders work anyway, as section 2 shows, and they are the ones with the most room left.
+
+Both obvious follow-ups were run on the mood slider ([`results/ace/ablations.md`](results/ace/ablations.md)). Three times the training raises the descriptor correlation from 0.39 to 0.52. Rank 16, a doubled guidance multiplier, and restricting the update to cross-attention all leave it at 0.29 to 0.32. The CLAP direction score reads 0.92 or 0.93 for every one of the five recipes, so the embedding score cannot tell a better slider from a worse one here and the waveform descriptor can. The same file has the two-slider grids: effects roughly add, with interaction terms a fifth to a third of the main effects.
 
 ### 13. Against other methods
 
