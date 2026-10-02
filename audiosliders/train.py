@@ -99,6 +99,7 @@ def main() -> None:
     ap.add_argument("slider", help="key in the sliders config")
     ap.add_argument("--sliders", default="configs/sliders.yaml")
     ap.add_argument("--prompts", default="configs/prompts.yaml")
+    ap.add_argument("--split", default="train", help="which prompt list to train on: train (48) or large (648)")
     ap.add_argument("--out", default="runs/sliders")
     ap.add_argument("--tag", default=None, help="output name, defaults to the slider key")
     for f, typ in [("rank", int), ("alpha", float), ("targets", str), ("lr", float), ("iters", int),
@@ -108,7 +109,7 @@ def main() -> None:
     args = ap.parse_args()
 
     spec = yaml.safe_load(Path(args.sliders).read_text())[args.slider]
-    prompts = yaml.safe_load(Path(args.prompts).read_text())["train"]
+    prompts = yaml.safe_load(Path(args.prompts).read_text())[args.split]
     over = {k: v for k, v in vars(args).items() if k in TrainConfig.__dataclass_fields__ and v is not None}
     cfg = TrainConfig(name=args.slider, positive=spec["positive"], negative=spec["negative"], **over)
     tag = args.tag or args.slider

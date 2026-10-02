@@ -28,7 +28,7 @@ tempo:
   ends: [slow, fast]
   positive: very fast tempo, rapid, racing, double time
   negative: very slow tempo, sluggish, half time, lingering
-  measure: pulse_bpm
+  measure: beat_bpm
 percussion:
   ends: [no drums, heavy drums]
   positive: heavy drums, pounding percussion, strong beat

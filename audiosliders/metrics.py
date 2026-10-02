@@ -19,6 +19,10 @@ def load_rows(path: str | Path) -> list[dict]:
     path = Path(path)
     path = path / "rows.jsonl" if path.is_dir() else path
     rows = [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
+    beats = path.with_name("beat.jsonl")
+    if beats.exists():
+        for r, line in zip(rows, beats.read_text().splitlines()):
+            r.setdefault("beat_bpm", json.loads(line)["beat_bpm"])
     extra = path.with_name("muq.jsonl")
     if extra.exists():
         # Scores from MuQ-MuLan, written by experiments/muq_score.py in the same order as the rows.

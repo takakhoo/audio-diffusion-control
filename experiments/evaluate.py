@@ -69,6 +69,12 @@ def main():
     clap = Clap()
     aesthetics = Aesthetics()
     sr = model.sample_rate
+    try:
+        from beat_this.inference import Audio2Beats
+
+        tracker = Audio2Beats(checkpoint_path="final0", device="cuda", dbn=False)
+    except Exception:  # the beat tracker is optional; without it tempo falls back to the librosa estimate
+        tracker = None
     bank = None
     if args.method == "lora":
         bank = SliderBank(model.dit)
@@ -137,6 +143,9 @@ def main():
                 idx = j * n + k
                 row = dict(prompt_index=i, prompt=prompts[i], seed=seed, scale=scale, **scores[idx])
                 row["clap_prompt"] = float(emb[idx] @ text_emb[j])
+                if tracker is not None:
+                    found, _ = tracker(audio[idx].mean(0), sr)
+                    row["beat_bpm"] = float(60 / np.median(np.diff(found))) if len(found) > 3 else float("nan")
                 row["clap_keep"] = float(emb[idx] @ emb[j * n + zero])
                 if direction is not None:
                     row["clap_dir"] = float(emb[idx] @ direction)

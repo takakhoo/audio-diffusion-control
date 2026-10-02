@@ -20,7 +20,7 @@ from audiosliders import metrics
 MEASURES = dict(
     centroid_oct=("spectral centroid", "oct above A440"), centroid_hz=("spectral centroid", "Hz"),
     onset_rate=("onsets per second", "/s"), decay_s=("energy decay time", "s"), flux=("spectral flux", ""),
-    pulse_bpm=("estimated tempo", "BPM"), percussive_ratio=("percussive energy share", ""),
+    pulse_bpm=("estimated tempo", "BPM"), beat_bpm=("tempo (beat tracker)", "BPM"), percussive_ratio=("percussive energy share", ""),
     flatness=("spectral flatness", ""), rolloff_oct=("95% rolloff", "oct above A440"), rolloff_hz=("95% rolloff", "Hz"),
     bass_ratio=("energy below 150 Hz", "dB"), side_ratio=("side / mid energy", "dB"),
     majorness=("major minus minor key fit", ""), harmonic_change=("harmonic change rate", ""),
