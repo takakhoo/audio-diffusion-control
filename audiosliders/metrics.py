@@ -133,6 +133,28 @@ def kernel_distance(a: np.ndarray, b: np.ndarray, scale: float = 1000.0) -> floa
     return float(scale * (term_a + term_b - 2 * kab.mean()))
 
 
+def usable_span(rows: Iterable[dict], quality: str = "ce", tolerance: float = 0.5) -> tuple[float, float]:
+    """The slider positions over which mean quality stays within `tolerance` of the unsteered clips.
+
+    Walks outward from zero in each direction and stops at the first position that falls
+    below. Returns (lowest usable scale, highest usable scale).
+    """
+    r = response(rows, quality)
+    scales, level = r["scales"], r["level"]
+    zero = int(np.argmin(np.abs(scales)))
+    floor = level[zero] - tolerance
+    lo = hi = zero
+    while hi + 1 < len(scales) and level[hi + 1] >= floor:
+        hi += 1
+    while lo - 1 >= 0 and level[lo - 1] >= floor:
+        lo -= 1
+    return float(scales[lo]), float(scales[hi])
+
+
+def within(rows: Iterable[dict], lo: float, hi: float) -> list[dict]:
+    return [r for r in rows if lo <= r["scale"] <= hi]
+
+
 def summarize(rows: list[dict], key: str | None, sign: float = 1.0) -> dict[str, float]:
     """The headline numbers for one method on one slider."""
     scales = sorted({r["scale"] for r in rows})
@@ -158,4 +180,18 @@ def summarize(rows: list[dict], key: str | None, sign: float = 1.0) -> dict[str,
     for k in ("clap_prompt", "ce", "pq"):
         base = [r[k] for r in rows if r["scale"] == 0 and k in r]
         out[f"{k}_at_zero"] = float(np.mean(base)) if base else np.nan
+    if any("ce" in r for r in rows):
+        # The same questions asked only over the positions where the output still scores as music.
+        lo, hi = usable_span(rows)
+        out.update(usable_lo=lo, usable_hi=hi)
+        inside = within(rows, lo, hi)
+        if key and hi > lo:
+            resp, std = response(inside, key), natural_std(rows, key)
+            out["usable_range_in_std"] = float(sign * (resp["level"][-1] - resp["level"][0]) / std) if std else np.nan
+        if hi > lo and any("clap_dir" in r for r in rows):
+            resp = response(inside, "clap_dir")
+            out["usable_clap_range"] = float(resp["level"][-1] - resp["level"][0])
+        ends = [r for r in inside if r["scale"] in (lo, hi) and r["scale"] != 0]
+        vals = [r["clap_keep"] for r in ends if "clap_keep" in r]
+        out["usable_clap_keep"] = float(np.mean(vals)) if vals else np.nan
     return out

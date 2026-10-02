@@ -134,12 +134,67 @@ def leakage_figure(runs, spec, method, out, plt):
     return names, table
 
 
+def quality_figure(runs, spec, out, plt, real_mean=None):
+    """Aesthetics content-enjoyment at each slider position: a flat line means the music survives."""
+    sliders = [s for s in spec if any(k[1] == s and any("ce" in r for r in v) for k, v in runs.items())]
+    if not sliders:
+        return
+    cols = min(5, len(sliders))
+    rows_n = int(np.ceil(len(sliders) / cols))
+    fig, axes = plt.subplots(rows_n, cols, figsize=(2.9 * cols, 2.4 * rows_n), squeeze=False, sharey=True)
+    for ax, name in zip(axes.flat, sliders):
+        for method in COLORS:
+            if (method, name) in runs and any("ce" in r for r in runs[(method, name)]):
+                r = M.response(runs[(method, name)], "ce")
+                ax.fill_between(r["scales"], r["level"] - r["ci"], r["level"] + r["ci"], color=COLORS[method],
+                                alpha=0.15, linewidth=0)
+                ax.plot(r["scales"], r["level"], color=COLORS[method], marker="o", label=LABELS[method])
+        if real_mean is not None:
+            ax.axhline(real_mean, color=MUTED, linewidth=1, linestyle=(0, (4, 3)))
+        ax.set_title(name)
+        ax.set_xlabel("slider position")
+    for ax in axes.flat[len(sliders):]:
+        ax.axis("off")
+    axes[0, 0].set_ylabel("content enjoyment (1-10)")
+    handles, labels = axes[0, 0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower center", ncol=len(handles), frameon=False, bbox_to_anchor=(0.5, -0.03))
+    note = "  Dashed: mean of 2,000 real recordings (FMA)." if real_mean is not None else ""
+    fig.suptitle("Does it still sound like music as the slider moves?" + note, x=0.01, ha="left", fontweight="bold",
+                 fontsize=12)
+    fig.tight_layout(rect=(0, 0.04, 1, 0.95))
+    fig.savefig(out / "quality.png", bbox_inches="tight")
+    plt.close(fig)
+
+
+def tag_table(root, runs, spec, vocab_path, out):
+    """Which musical tags rise and fall between the two ends of each slider."""
+    from audiosliders.tags import tag_shift
+
+    text = np.load(vocab_path)["text"]
+    lines = ["| Slider | Method | Rises toward + | Falls toward + |", "|---|---|---|---|"]
+    for (method, name), rows in runs.items():
+        emb_path = root / f"{method}_{name}" / "clap.npy"
+        if not emb_path.exists():
+            continue
+        all_rows = M.load_rows(root / f"{method}_{name}")
+        emb = np.load(emb_path)
+        scales = sorted({r["scale"] for r in rows})
+        hi = np.array([r["scale"] == scales[-1] for r in all_rows])
+        lo = np.array([r["scale"] == scales[0] for r in all_rows])
+        up, down = tag_shift(emb[hi], emb[lo], text)
+        fmt = lambda items: ", ".join(f"{t} ({d:+.3f})" for t, d in items)
+        lines.append(f"| {name} | {LABELS.get(method, method)} | {fmt(up)} | {fmt(down)} |")
+    (out / "tags.md").write_text("\n".join(lines) + "\n")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--eval", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--reference", default=None, help="base run whose CLAP embeddings anchor the kernel distance")
     ap.add_argument("--max-scale", type=float, default=None, help="ignore scales beyond this magnitude")
+    ap.add_argument("--real", default=None, help="directory with clap.npy and rows.jsonl of real recordings")
+    ap.add_argument("--vocab", default=None, help="vocab.npz with tag text embeddings")
     args = ap.parse_args()
 
     import matplotlib
@@ -154,6 +209,8 @@ def main():
     if args.max_scale is not None:
         runs = {k: [r for r in v if abs(r["scale"]) <= args.max_scale] for k, v in runs.items()}
     reference = np.load(Path(args.reference) / "clap.npy") if args.reference else None
+    real = np.load(Path(args.real) / "clap.npy") if args.real else None
+    real_ce = float(np.mean([r["ce"] for r in M.load_rows(args.real)])) if args.real else None
 
     table = []
     for (method, name), rows in runs.items():
@@ -171,6 +228,13 @@ def main():
             zero = np.array([r["scale"] == 0 for r in all_rows])
             row["kad_at_ends"] = M.kernel_distance(emb[ends], reference)
             row["kad_at_zero"] = M.kernel_distance(emb[zero], reference)
+        if real is not None and (Path(args.eval) / f"{method}_{name}" / "clap.npy").exists():
+            emb = np.load(Path(args.eval) / f"{method}_{name}" / "clap.npy")
+            all_rows = M.load_rows(Path(args.eval) / f"{method}_{name}")
+            scales = sorted({r["scale"] for r in rows})
+            for label, pick in (("lo", scales[0]), ("zero", 0.0), ("hi", scales[-1])):
+                mask = np.array([r["scale"] == pick for r in all_rows])
+                row[f"kad_real_{label}"] = M.kernel_distance(emb[mask], real)
         table.append(row)
     table.sort(key=lambda r: (list(spec).index(r["slider"]), list(LABELS.values()).index(r["method"])))
 
@@ -180,9 +244,10 @@ def main():
         w.writeheader()
         w.writerows(table)
     cols = [("slider", "Slider", None), ("method", "Method", None), ("rho", "Monotonicity ρ", 2),
-            ("consistent", "Ends ordered", 2), ("range_in_std", "Range (std)", 2), ("clap_range", "CLAP range", 3),
-            ("clap_keep_at_ends", "CLAP kept", 2), ("chroma_sim_at_ends", "Chroma kept", 2),
-            ("clap_prompt_at_ends", "Prompt score", 2)]
+            ("consistent", "Ends ordered", 2), ("usable_lo", "Usable from", 1), ("usable_hi", "to", 1),
+            ("usable_range_in_std", "Descriptor moved (std)", 2), ("usable_clap_range", "CLAP moved", 3),
+            ("usable_clap_keep", "Piece kept", 2), ("ce_at_zero", "Quality at 0", 2),
+            ("ce_at_ends", "Quality at ends", 2)]
     lines = ["| " + " | ".join(c[1] for c in cols) + " |", "|" + "|".join("---" if c[2] is None else "---:" for c in cols) + "|"]
     for r in table:
         cells = []
@@ -199,6 +264,9 @@ def main():
 
     response_figure(runs, spec, out, plt)
     tradeoff_figure(runs, spec, out, plt)
+    quality_figure(runs, spec, out, plt, real_ce)
+    if args.vocab:
+        tag_table(Path(args.eval), runs, spec, args.vocab, out)
     with (out / "leakage.csv").open("w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["method", "slider"] + LEAK_KEYS)

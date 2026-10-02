@@ -67,3 +67,16 @@ def test_summarize_reports_headline_numbers():
     out = M.summarize(rows, "target")
     assert out["rho"] == pytest.approx(1.0) and out["range"] == pytest.approx(400)
     assert out["clap_range"] == pytest.approx(0.04) and out["clap_keep_at_ends"] == pytest.approx(0.8)
+
+
+def test_usable_span_stops_where_quality_drops():
+    rows = make_rows(effect=100, scales=(-3, -2, -1, 0, 1, 2, 3))
+    quality = {-3: 4.0, -2: 6.8, -1: 7.0, 0: 7.1, 1: 6.9, 2: 6.0, 3: 6.9}
+    for r in rows:
+        r.update(ce=quality[r["scale"]], clap_keep=1 - 0.1 * abs(r["scale"]), clap_dir=0.01 * r["scale"])
+    assert M.usable_span(rows) == (-2.0, 1.0)
+    out = M.summarize(rows, "target")
+    assert (out["usable_lo"], out["usable_hi"]) == (-2.0, 1.0)
+    assert out["usable_range_in_std"] == pytest.approx(300 / M.natural_std(rows, "target"))
+    assert out["usable_clap_range"] == pytest.approx(0.03)
+    assert out["usable_clap_keep"] == pytest.approx(0.85)
