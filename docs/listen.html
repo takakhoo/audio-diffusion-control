@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Audio Sliders: listening test</title>
+<meta name="description" content="A ten-minute listening test: do people hear what the measurements say a slider does?">
+<style>
+:root {
+  --bg: #faf9f7; --panel: #ffffff; --ink: #1c1b19; --muted: #6b6861; --line: #e4e1da;
+  --accent: #c2410c; --accent-soft: #fde7d9; --track: #d9d5cc;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #131210; --panel: #1c1a17; --ink: #f1eee8; --muted: #a09b90; --line: #2e2b26;
+    --accent: #fb923c; --accent-soft: #3a2415; --track: #3a362f;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 var(--sans); }
+main { max-width: 720px; margin: 0 auto; padding: 40px 16px 80px; }
+h1 { font-size: clamp(28px, 6vw, 40px); line-height: 1.1; letter-spacing: -0.02em; margin: 0 0 12px; }
+h2 { font-size: 20px; margin: 0 0 12px; }
+p { margin: 0 0 12px; }
+a { color: var(--accent); }
+.lede { font-size: 18px; color: var(--muted); }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px; margin-top: 24px; }
+.label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 8px; }
+.progress { height: 6px; border-radius: 3px; background: var(--track); overflow: hidden; margin-bottom: 16px; }
+.progress div { height: 100%; background: var(--accent); width: 0; }
+.clips { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+.clip { border: 1px solid var(--line); border-radius: 12px; padding: 14px; text-align: center; }
+.clip b { display: block; margin-bottom: 8px; }
+button { font: inherit; cursor: pointer; }
+.btn { padding: 10px 16px; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--ink); }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn.primary, :root:not([data-theme="light"]) .btn[aria-pressed="true"] { color: #1c1005; } }
+.scale { display: flex; gap: 8px; flex-wrap: wrap; margin: 6px 0 14px; }
+.scale .btn { min-width: 44px; }
+.ends { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); max-width: 300px; }
+.row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 16px; }
+.note { font-size: 14px; color: var(--muted); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; margin-top: 8px; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+td.num { font-family: var(--mono); text-align: right; }
+.hidden { display: none; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Listening test</h1>
+  <p class="lede">About ten minutes, with headphones if you have them. You hear short clips of generated music and answer one question about each pair. There are no right answers to study for: the point is to find out whether people hear what the measurements say.</p>
+
+  <section class="panel" id="intro">
+    <h2>Before you start</h2>
+    <p>Each clip is ten seconds long. Listen to both clips in a pair as often as you like, then answer.</p>
+    <p class="note">Nothing is uploaded. Your answers stay in this browser tab until you download them at the end, and it is up to you whether to send the file to anyone. No name or contact detail is asked for.</p>
+    <p class="label" style="margin-top:16px">How much music do you play or make?</p>
+    <div class="scale" id="experience"></div>
+    <div class="ends"><span>none</span><span>professionally</span></div>
+    <div class="row"><button class="btn primary" id="begin" disabled>Start</button><span class="note" id="loading">Loading the clip list.</span></div>
+  </section>
+
+  <section class="panel hidden" id="trial">
+    <div class="progress"><div id="bar"></div></div>
+    <p class="label" id="count"></p>
+    <h2 id="question"></h2>
+    <div class="clips">
+      <div class="clip"><b id="nameA">Clip A</b><button class="btn" id="playA">Play</button></div>
+      <div class="clip"><b id="nameB">Clip B</b><button class="btn" id="playB">Play</button></div>
+    </div>
+    <div id="answers"></div>
+    <div class="row"><button class="btn primary" id="next" disabled>Next</button><span class="note" id="hint">Play both clips first.</span></div>
+  </section>
+
+  <section class="panel hidden" id="done">
+    <h2>Done. Thank you.</h2>
+    <p>Here is how your answers line up with the measurements. In the first kind of question, "expected" means you picked the clip the slider was pushed toward.</p>
+    <div id="summary"></div>
+    <div class="row">
+      <button class="btn primary" id="download">Download my answers</button>
+      <button class="btn" id="copy">Copy to clipboard</button>
+      <a href="./">Back to the demo</a>
+    </div>
+    <p class="note" style="margin-top:12px">The file holds your answers, how long each took, and your answer to the music question. Nothing else.</p>
+  </section>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const shuffle = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const pickOne = (a) => a[Math.floor(Math.random() * a.length)];
+
+// Which slider and method each direction question draws from. Positions -1 and +1 are inside
+// the usable span of every one of them.
+const DIRECTION = [
+  ["mood", "lora"], ["harmony", "lora"], ["harmony", "contrast"], ["ensemble", "lora"], ["brightness", "lora"],
+  ["density", "contrast"], ["energy", "contrast"], ["arousal", "lora"], ["arousal", "contrast"],
+  ["valence", "contrast"], ["jazz_electronic", "lora"], ["piano_axis", "lora"],
+];
+const SAME = [
+  ["mood", "lora", 2], ["mood", "lora", -1], ["ensemble", "lora", 2], ["arousal", "lora", -2], ["arousal", "contrast", 1],
+  ["harmony", "contrast", 1], ["jazz_electronic", "lora", 2], ["tension", "lora", 2], ["brightness", "lora", -2],
+  ["piano_axis", "contrast", -1],
+];
+
+const state = { experience: null, trials: [], index: 0, answers: [], heard: new Set(), startedAt: 0, audio: new Audio() };
+let manifest = null;
+
+function clip(model, method, slider, prompt, x) {
+  const clips = manifest.clips[`${model}/${method}/${slider}/${prompt}`] || [];
+  return clips.find((c) => c.x === x);
+}
+
+function build() {
+  const model = "ace", m = manifest.models[model], prompts = m.prompts.map((_, i) => i);
+  const trials = [];
+  DIRECTION.forEach(([slider, method]) => {
+    const s = m.sliders[slider];
+    if (!s || !s.methods.includes(method)) return;
+    const p = pickOne(prompts.filter((i) => clip(model, method, slider, i, -1) && clip(model, method, slider, i, 1)));
+    if (p === undefined) return;
+    const highFirst = Math.random() < 0.5;
+    trials.push({ task: "direction", model, method, slider, prompt: p, question: `Which clip is more "${s.high}"?`,
+      a: clip(model, method, slider, p, highFirst ? 1 : -1), b: clip(model, method, slider, p, highFirst ? -1 : 1), expected: highFirst ? "A" : "B" });
+  });
+  SAME.forEach(([slider, method, x]) => {
+    const s = m.sliders[slider];
+    if (!s || !s.methods.includes(method)) return;
+    const p = pickOne(prompts.filter((i) => clip(model, method, slider, i, 0) && clip(model, method, slider, i, x)));
+    if (p === undefined) return;
+    trials.push({ task: "same", model, method, slider, prompt: p, x, question: "Clip B is an edited version of clip A.",
+      a: clip(model, method, slider, p, 0), b: clip(model, method, slider, p, x) });
+  });
+  // One check: the two clips are the same file. A careful listener rates them as the same piece.
+  const c = clip(model, "lora", "mood", 0, 0);
+  if (c) trials.push({ task: "same", check: true, model, method: "lora", slider: "mood", prompt: 0, x: 0,
+    question: "Clip B is an edited version of clip A.", a: c, b: c });
+  return shuffle(trials);
+}
+
+function scale(el, name, low, high, onPick) {
+  el.insertAdjacentHTML("beforeend", `<p class="label">${name}</p>`);
+  const row = document.createElement("div"); row.className = "scale";
+  for (let v = 1; v <= 5; v++) {
+    const b = document.createElement("button"); b.className = "btn"; b.textContent = v; b.setAttribute("aria-pressed", "false");
+    b.onclick = () => { row.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", "false")); b.setAttribute("aria-pressed", "true"); onPick(v); };
+    row.appendChild(b);
+  }
+  el.appendChild(row);
+  el.insertAdjacentHTML("beforeend", `<div class="ends" style="margin:-8px 0 12px"><span>${low}</span><span>${high}</span></div>`);
+}
+
+function ready() {
+  const t = state.trials[state.index], a = state.current;
+  const answered = t.task === "direction" ? !!a.choice : a.same != null && a.quality != null;
+  const heard = state.heard.has("A") && state.heard.has("B");
+  $("next").disabled = !(answered && heard);
+  $("hint").textContent = heard ? (answered ? "" : "Pick an answer.") : "Play both clips first.";
+}
+
+function play(which) {
+  const t = state.trials[state.index];
+  state.audio.pause();
+  state.audio.src = (which === "A" ? t.a : t.b).f;
+  state.audio.currentTime = 0;
+  state.audio.play();
+  state.heard.add(which);
+  ready();
+}
+
+function show() {
+  const t = state.trials[state.index];
+  state.heard = new Set(); state.current = {}; state.startedAt = performance.now();
+  state.audio.pause();
+  $("bar").style.width = `${100 * state.index / state.trials.length}%`;
+  $("count").textContent = `Question ${state.index + 1} of ${state.trials.length}`;
+  $("question").textContent = t.question;
+  $("nameA").textContent = t.task === "same" ? "Clip A (original)" : "Clip A";
+  $("nameB").textContent = t.task === "same" ? "Clip B (edited)" : "Clip B";
+  const box = $("answers"); box.innerHTML = "";
+  if (t.task === "direction") {
+    const row = document.createElement("div"); row.className = "scale";
+    ["A", "B"].forEach((k) => {
+      const b = document.createElement("button"); b.className = "btn"; b.textContent = `Clip ${k}`; b.setAttribute("aria-pressed", "false");
+      b.onclick = () => { row.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", "false")); b.setAttribute("aria-pressed", "true"); state.current.choice = k; ready(); };
+      row.appendChild(b);
+    });
+    box.appendChild(row);
+  } else {
+    scale(box, "Is B still the same piece of music as A?", "a different piece", "clearly the same piece", (v) => { state.current.same = v; ready(); });
+    scale(box, "Does B sound like finished music?", "broken or unpleasant", "as good as A or better", (v) => { state.current.quality = v; ready(); });
+  }
+  ready();
+}
+
+function next() {
+  const t = state.trials[state.index];
+  state.answers.push({ task: t.task, check: !!t.check, model: t.model, method: t.method, slider: t.slider, prompt: t.prompt,
+    xA: t.a.x, xB: t.b.x, expected: t.expected || null, ...state.current, ms: Math.round(performance.now() - state.startedAt) });
+  state.index += 1;
+  if (state.index < state.trials.length) return show();
+  state.audio.pause();
+  $("trial").classList.add("hidden"); $("done").classList.remove("hidden");
+  const dir = state.answers.filter((a) => a.task === "direction");
+  const same = state.answers.filter((a) => a.task === "same" && !a.check);
+  const hit = dir.filter((a) => a.choice === a.expected).length;
+  const mean = (xs) => xs.length ? (xs.reduce((p, q) => p + q, 0) / xs.length).toFixed(1) : "n/a";
+  let html = `<table><tr><td>Direction heard as expected</td><td class="num">${hit} of ${dir.length}</td></tr>` +
+    `<tr><td>Still the same piece (1 to 5)</td><td class="num">${mean(same.map((a) => a.same))}</td></tr>` +
+    `<tr><td>Still sounds like finished music (1 to 5)</td><td class="num">${mean(same.map((a) => a.quality))}</td></tr></table>`;
+  html += "<table><tr><th>Slider</th><th>Made by</th><th>Your pick</th></tr>" + dir.map((a) =>
+    `<tr><td>${manifest.models[a.model].sliders[a.slider].label}</td><td>${manifest.methods[a.method].label}</td><td>${a.choice === a.expected ? "as expected" : "the other one"}</td></tr>`).join("") + "</table>";
+  $("summary").innerHTML = html;
+}
+
+function result() {
+  return JSON.stringify({ study: "audio-sliders-listening-v1", finished: new Date().toISOString(), experience: state.experience, answers: state.answers }, null, 1);
+}
+
+for (let v = 1; v <= 5; v++) {
+  const b = document.createElement("button"); b.className = "btn"; b.textContent = v; b.setAttribute("aria-pressed", "false");
+  b.onclick = () => { $("experience").querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", "false")); b.setAttribute("aria-pressed", "true"); state.experience = v; $("begin").disabled = !manifest; };
+  $("experience").appendChild(b);
+}
+$("playA").onclick = () => play("A");
+$("playB").onclick = () => play("B");
+$("next").onclick = next;
+$("begin").onclick = () => { state.trials = build(); $("intro").classList.add("hidden"); $("trial").classList.remove("hidden"); show(); };
+$("download").onclick = () => {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([result()], { type: "application/json" }));
+  a.download = `audio-sliders-listening-${Date.now()}.json`;
+  a.click();
+};
+$("copy").onclick = () => navigator.clipboard.writeText(result()).then(() => { $("copy").textContent = "Copied"; });
+fetch("demo/manifest.json").then((r) => r.json()).then((m) => {
+  manifest = m;
+  $("loading").textContent = "Pick a number above, then start.";
+  $("begin").disabled = state.experience == null;
+}).catch(() => { $("loading").textContent = "The clip list could not be loaded."; });
+</script>
+</body>
+</html>

@@ -10,6 +10,8 @@
 
 **[Listen and drag the sliders yourself: live demo](https://takakhoo.github.io/audio-diffusion-control/)** (18 sliders, 5 prompts, 920 loudness-matched clips, with the measured numbers at every position)
 
+**[Take the ten-minute listening test](https://takakhoo.github.io/audio-diffusion-control/listen.html)**: 23 questions on the same clips, nothing uploaded, and it shows how your ears line up with the measurements at the end.
+
 > **Status (2 Oct 2026).** Everything below is measured and reproducible from this repository. Still running: the text sliders retrained on 648 prompts, graded set training, Stable Audio 3, and a replication of the real-music axes on 81,600 more recordings.
 
 ## Headline
@@ -324,7 +326,7 @@ Most of them do what their names say; the drum slider moves the percussive share
 
 ```bash
 pip install -e ".[dev]"
-python -m pytest -q          # 54 CPU tests, no model download
+python -m pytest -q          # 57 CPU tests, no model download
 ```
 
 With a GPU:

@@ -1,6 +1,8 @@
 # Listening study: design
 
-Not yet run. This is the plan for the one piece of evidence the project lacks: whether people hear what the measurements say. It needs human-subjects review before any data is collected.
+Not yet run. This is the plan for the one piece of evidence the project lacks: whether people hear what the measurements say. It needs human-subjects review before any data is collected for publication.
+
+**A pilot version is live**: [takakhoo.github.io/audio-diffusion-control/listen.html](https://takakhoo.github.io/audio-diffusion-control/listen.html). It runs tasks A and C below on the published demo clips (12 direction questions at positions -1 and +1, 10 edited-clip ratings, one hidden identical pair), takes about ten minutes, and uploads nothing: answers stay in the browser and download as a JSON file. [`experiments/listening_results.py`](../experiments/listening_results.py) turns a set of those files into accuracy with exact binomial intervals and mean ratings. The pilot is for checking the procedure and for informal feedback. It compares two ways of making a slider on some attributes and does not include the method comparison of task B.
 
 ## What it has to answer
 
