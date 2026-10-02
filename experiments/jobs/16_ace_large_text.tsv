@@ -1,0 +1,17 @@
+# The eight ACE-Step text sliders retrained on 648 prompts instead of 48, twice as many iterations.
+aceL_train_mood	python -m audiosliders.train mood --backbone ace-turbo --eta 2 --split large --iters 2000 --out runs/sliders/ace_L
+aceL_train_harmony	python -m audiosliders.train harmony --backbone ace-turbo --eta 2 --split large --iters 2000 --out runs/sliders/ace_L
+aceL_train_groove	python -m audiosliders.train groove --backbone ace-turbo --eta 2 --split large --iters 2000 --out runs/sliders/ace_L
+aceL_train_ensemble	python -m audiosliders.train ensemble --backbone ace-turbo --eta 2 --split large --iters 2000 --out runs/sliders/ace_L
+aceL_train_tension	python -m audiosliders.train tension --backbone ace-turbo --eta 2 --split large --iters 2000 --out runs/sliders/ace_L
+aceL_train_melody	python -m audiosliders.train melody --backbone ace-turbo --eta 2 --split large --iters 2000 --out runs/sliders/ace_L
+aceL_train_brightness	python -m audiosliders.train brightness --backbone ace-turbo --eta 2 --split large --iters 2000 --out runs/sliders/ace_L
+aceL_train_density	python -m audiosliders.train density --backbone ace-turbo --eta 2 --split large --iters 2000 --out runs/sliders/ace_L
+aceL_eval_mood	python experiments/evaluate.py --backbone ace-turbo --method lora --slider mood --weights runs/sliders/ace_L/mood.safetensors --out runs/eval/ace_L/lora_mood --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
+aceL_eval_harmony	python experiments/evaluate.py --backbone ace-turbo --method lora --slider harmony --weights runs/sliders/ace_L/harmony.safetensors --out runs/eval/ace_L/lora_harmony --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
+aceL_eval_groove	python experiments/evaluate.py --backbone ace-turbo --method lora --slider groove --weights runs/sliders/ace_L/groove.safetensors --out runs/eval/ace_L/lora_groove --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
+aceL_eval_ensemble	python experiments/evaluate.py --backbone ace-turbo --method lora --slider ensemble --weights runs/sliders/ace_L/ensemble.safetensors --out runs/eval/ace_L/lora_ensemble --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
+aceL_eval_tension	python experiments/evaluate.py --backbone ace-turbo --method lora --slider tension --weights runs/sliders/ace_L/tension.safetensors --out runs/eval/ace_L/lora_tension --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
+aceL_eval_melody	python experiments/evaluate.py --backbone ace-turbo --method lora --slider melody --weights runs/sliders/ace_L/melody.safetensors --out runs/eval/ace_L/lora_melody --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
+aceL_eval_brightness	python experiments/evaluate.py --backbone ace-turbo --method lora --slider brightness --weights runs/sliders/ace_L/brightness.safetensors --out runs/eval/ace_L/lora_brightness --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
+aceL_eval_density	python experiments/evaluate.py --backbone ace-turbo --method lora --slider density --weights runs/sliders/ace_L/density.safetensors --out runs/eval/ace_L/lora_density --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio

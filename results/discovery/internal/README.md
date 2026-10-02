@@ -12,7 +12,7 @@ Every other discovery result in this repository looks at the model's output thro
 | Block holding most of the axis | 19 | 31 | 17 | 27 | 15 | 21 | 25 | 23 |
 | Share of the axis in that block | 45% | 62% | 50% | 59% | 35% | 69% | 28% | 49% |
 
-Eight axes carry 90% of how clips of the same prompt differ in these activations. Fitted on two disjoint halves of the prompts, the first eight match with mean cosine 0.82, so they are a property of the model and not of the prompt list. No axis has weight in the first eight blocks. The decomposition is in raw activation units, so blocks with larger outputs count for more.
+Eight axes carry 90% of how clips of the same prompt differ in these activations. Fitted on two disjoint halves of the prompts, the first eight match with mean cosine 0.82, so they belong to the model rather than to the prompt list. No axis has weight in the first eight blocks. The decomposition is in raw activation units, so blocks with larger outputs count for more.
 
 ## What steering along them does
 
