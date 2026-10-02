@@ -113,3 +113,30 @@ dynamics:
   positive: dramatic dynamics, swells and crescendos, wide dynamic range
   negative: flat constant level, heavily compressed, no dynamics
   measure: dynamics_db
+
+# Sliders with no prompt pair: trained only from two sets of clips (see audiosliders/contrast.py).
+# `measure` is still the descriptor that should follow them, where one applies.
+quality:
+  ends: [less enjoyable, more enjoyable]
+  measure: ce
+arousal:
+  ends: [quiet and dreamy, energetic and aggressive]
+  measure: flux
+valence:
+  ends: [dark and distorted, playful and happy]
+  measure: majorness
+jazz_electronic:
+  ends: [electronic, jazz]
+  measure: null
+strings_synth:
+  ends: [synthesizer and choir, guitars and strings]
+  measure: null
+piano_axis:
+  ends: [organ and rock, piano]
+  measure: null
+classical_funk:
+  ends: [funk and drums, classical and epic]
+  measure: null
+acoustic_electronic:
+  ends: [studio electronic, acoustic and blues]
+  measure: null
