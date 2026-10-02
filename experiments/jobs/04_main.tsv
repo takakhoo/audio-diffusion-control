@@ -3,26 +3,26 @@ rescore_train_01	python experiments/rescore_corpus.py --corpus runs/corpus/train
 rescore_train_02	python experiments/rescore_corpus.py --corpus runs/corpus/train --shard 02
 rescore_train_03	python experiments/rescore_corpus.py --corpus runs/corpus/train --shard 03
 eval_base	python experiments/evaluate.py --method base --out runs/eval/main/base_none --seeds 8 --seed-offset 5000 --save-audio
-eval_lora_brightness	python experiments/evaluate.py --method lora --slider brightness --weights runs/sliders/v1/brightness.safetensors --out runs/eval/main/lora_brightness --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio
-eval_lora_density	python experiments/evaluate.py --method lora --slider density --weights runs/sliders/v1/density.safetensors --out runs/eval/main/lora_density --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio
-eval_lora_reverb	python experiments/evaluate.py --method lora --slider reverb --weights runs/sliders/v1/reverb.safetensors --out runs/eval/main/lora_reverb --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio
-eval_lora_energy	python experiments/evaluate.py --method lora --slider energy --weights runs/sliders/v1/energy.safetensors --out runs/eval/main/lora_energy --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio
-eval_lora_tempo	python experiments/evaluate.py --method lora --slider tempo --weights runs/sliders/v1/tempo.safetensors --out runs/eval/main/lora_tempo --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio
-eval_lora_percussion	python experiments/evaluate.py --method lora --slider percussion --weights runs/sliders/v1/percussion.safetensors --out runs/eval/main/lora_percussion --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio
-eval_lora_distortion	python experiments/evaluate.py --method lora --slider distortion --weights runs/sliders/v1/distortion.safetensors --out runs/eval/main/lora_distortion --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio
-eval_lora_lofi	python experiments/evaluate.py --method lora --slider lofi --weights runs/sliders/v1/lofi.safetensors --out runs/eval/main/lora_lofi --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio
-eval_lora_bass	python experiments/evaluate.py --method lora --slider bass --weights runs/sliders/v1/bass.safetensors --out runs/eval/main/lora_bass --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio
-eval_lora_width	python experiments/evaluate.py --method lora --slider width --weights runs/sliders/v1/width.safetensors --out runs/eval/main/lora_width --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio
-eval_lora_mood	python experiments/evaluate.py --method lora --slider mood --weights runs/sliders/v1/mood.safetensors --out runs/eval/main/lora_mood --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio
-eval_lora_electronic	python experiments/evaluate.py --method lora --slider electronic --weights runs/sliders/v1/electronic.safetensors --out runs/eval/main/lora_electronic --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio
-eval_lora_harmony	python experiments/evaluate.py --method lora --slider harmony --weights runs/sliders/v1/harmony.safetensors --out runs/eval/main/lora_harmony --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio
-eval_lora_groove	python experiments/evaluate.py --method lora --slider groove --weights runs/sliders/v1/groove.safetensors --out runs/eval/main/lora_groove --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio
-eval_lora_articulation	python experiments/evaluate.py --method lora --slider articulation --weights runs/sliders/v1/articulation.safetensors --out runs/eval/main/lora_articulation --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio
-eval_lora_ensemble	python experiments/evaluate.py --method lora --slider ensemble --weights runs/sliders/v1/ensemble.safetensors --out runs/eval/main/lora_ensemble --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio
-eval_lora_tension	python experiments/evaluate.py --method lora --slider tension --weights runs/sliders/v1/tension.safetensors --out runs/eval/main/lora_tension --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio
-eval_lora_vintage	python experiments/evaluate.py --method lora --slider vintage --weights runs/sliders/v1/vintage.safetensors --out runs/eval/main/lora_vintage --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio
-eval_lora_melody	python experiments/evaluate.py --method lora --slider melody --weights runs/sliders/v1/melody.safetensors --out runs/eval/main/lora_melody --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio
-eval_lora_dynamics	python experiments/evaluate.py --method lora --slider dynamics --weights runs/sliders/v1/dynamics.safetensors --out runs/eval/main/lora_dynamics --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio
+eval_lora_brightness	python experiments/evaluate.py --method lora --slider brightness --weights runs/sliders/v1/brightness.safetensors --out runs/eval/main/lora_brightness --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio --start 0.97
+eval_lora_density	python experiments/evaluate.py --method lora --slider density --weights runs/sliders/v1/density.safetensors --out runs/eval/main/lora_density --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio --start 0.97
+eval_lora_reverb	python experiments/evaluate.py --method lora --slider reverb --weights runs/sliders/v1/reverb.safetensors --out runs/eval/main/lora_reverb --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio --start 0.97
+eval_lora_energy	python experiments/evaluate.py --method lora --slider energy --weights runs/sliders/v1/energy.safetensors --out runs/eval/main/lora_energy --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio --start 0.97
+eval_lora_tempo	python experiments/evaluate.py --method lora --slider tempo --weights runs/sliders/v1/tempo.safetensors --out runs/eval/main/lora_tempo --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio --start 0.97
+eval_lora_percussion	python experiments/evaluate.py --method lora --slider percussion --weights runs/sliders/v1/percussion.safetensors --out runs/eval/main/lora_percussion --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio --start 0.97
+eval_lora_distortion	python experiments/evaluate.py --method lora --slider distortion --weights runs/sliders/v1/distortion.safetensors --out runs/eval/main/lora_distortion --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio --start 0.97
+eval_lora_lofi	python experiments/evaluate.py --method lora --slider lofi --weights runs/sliders/v1/lofi.safetensors --out runs/eval/main/lora_lofi --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio --start 0.97
+eval_lora_bass	python experiments/evaluate.py --method lora --slider bass --weights runs/sliders/v1/bass.safetensors --out runs/eval/main/lora_bass --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio --start 0.97
+eval_lora_width	python experiments/evaluate.py --method lora --slider width --weights runs/sliders/v1/width.safetensors --out runs/eval/main/lora_width --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio --start 0.97
+eval_lora_mood	python experiments/evaluate.py --method lora --slider mood --weights runs/sliders/v1/mood.safetensors --out runs/eval/main/lora_mood --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio --start 0.97
+eval_lora_electronic	python experiments/evaluate.py --method lora --slider electronic --weights runs/sliders/v1/electronic.safetensors --out runs/eval/main/lora_electronic --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio --start 0.97
+eval_lora_harmony	python experiments/evaluate.py --method lora --slider harmony --weights runs/sliders/v1/harmony.safetensors --out runs/eval/main/lora_harmony --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio --start 0.97
+eval_lora_groove	python experiments/evaluate.py --method lora --slider groove --weights runs/sliders/v1/groove.safetensors --out runs/eval/main/lora_groove --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio --start 0.97
+eval_lora_articulation	python experiments/evaluate.py --method lora --slider articulation --weights runs/sliders/v1/articulation.safetensors --out runs/eval/main/lora_articulation --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio --start 0.97
+eval_lora_ensemble	python experiments/evaluate.py --method lora --slider ensemble --weights runs/sliders/v1/ensemble.safetensors --out runs/eval/main/lora_ensemble --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio --start 0.97
+eval_lora_tension	python experiments/evaluate.py --method lora --slider tension --weights runs/sliders/v1/tension.safetensors --out runs/eval/main/lora_tension --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio --start 0.97
+eval_lora_vintage	python experiments/evaluate.py --method lora --slider vintage --weights runs/sliders/v1/vintage.safetensors --out runs/eval/main/lora_vintage --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio --start 0.97
+eval_lora_melody	python experiments/evaluate.py --method lora --slider melody --weights runs/sliders/v1/melody.safetensors --out runs/eval/main/lora_melody --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio --start 0.97
+eval_lora_dynamics	python experiments/evaluate.py --method lora --slider dynamics --weights runs/sliders/v1/dynamics.safetensors --out runs/eval/main/lora_dynamics --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 3 --save-audio --start 0.97
 train_d1_density_d	python -m audiosliders.contrast density_d --corpus runs/corpus/train --by descriptor:onset_rate --out runs/sliders/d1
 train_d1_percussion_d	python -m audiosliders.contrast percussion_d --corpus runs/corpus/train --by descriptor:percussive_ratio --out runs/sliders/d1
 train_d1_reverb_d	python -m audiosliders.contrast reverb_d --corpus runs/corpus/train --by descriptor:decay_s --out runs/sliders/d1
@@ -62,27 +62,27 @@ eval_dsp_distortion	python experiments/evaluate.py --method dsp --slider distort
 eval_dsp_lofi	python experiments/evaluate.py --method dsp --slider lofi --out runs/eval/main/dsp_lofi --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
 eval_dsp_bass	python experiments/evaluate.py --method dsp --slider bass --out runs/eval/main/dsp_bass --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
 eval_dsp_width	python experiments/evaluate.py --method dsp --slider width --out runs/eval/main/dsp_width --scales -3 -2 -1 0 1 2 3 --seeds 3 --save-audio
-eval_guidance_brightness	python experiments/evaluate.py --method guidance --slider brightness --out runs/eval/main/guidance_brightness --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
+eval_guidance_brightness	python experiments/evaluate.py --method guidance --slider brightness --out runs/eval/main/guidance_brightness --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
 eval_embed_brightness	python experiments/evaluate.py --method embed --slider brightness --out runs/eval/main/embed_brightness --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
-eval_guidance_density	python experiments/evaluate.py --method guidance --slider density --out runs/eval/main/guidance_density --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
+eval_guidance_density	python experiments/evaluate.py --method guidance --slider density --out runs/eval/main/guidance_density --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
 eval_embed_density	python experiments/evaluate.py --method embed --slider density --out runs/eval/main/embed_density --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
-eval_guidance_reverb	python experiments/evaluate.py --method guidance --slider reverb --out runs/eval/main/guidance_reverb --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
+eval_guidance_reverb	python experiments/evaluate.py --method guidance --slider reverb --out runs/eval/main/guidance_reverb --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
 eval_embed_reverb	python experiments/evaluate.py --method embed --slider reverb --out runs/eval/main/embed_reverb --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
-eval_guidance_energy	python experiments/evaluate.py --method guidance --slider energy --out runs/eval/main/guidance_energy --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
+eval_guidance_energy	python experiments/evaluate.py --method guidance --slider energy --out runs/eval/main/guidance_energy --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
 eval_embed_energy	python experiments/evaluate.py --method embed --slider energy --out runs/eval/main/embed_energy --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
-eval_guidance_tempo	python experiments/evaluate.py --method guidance --slider tempo --out runs/eval/main/guidance_tempo --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
+eval_guidance_tempo	python experiments/evaluate.py --method guidance --slider tempo --out runs/eval/main/guidance_tempo --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
 eval_embed_tempo	python experiments/evaluate.py --method embed --slider tempo --out runs/eval/main/embed_tempo --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
-eval_guidance_percussion	python experiments/evaluate.py --method guidance --slider percussion --out runs/eval/main/guidance_percussion --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
+eval_guidance_percussion	python experiments/evaluate.py --method guidance --slider percussion --out runs/eval/main/guidance_percussion --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
 eval_embed_percussion	python experiments/evaluate.py --method embed --slider percussion --out runs/eval/main/embed_percussion --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
-eval_guidance_distortion	python experiments/evaluate.py --method guidance --slider distortion --out runs/eval/main/guidance_distortion --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
+eval_guidance_distortion	python experiments/evaluate.py --method guidance --slider distortion --out runs/eval/main/guidance_distortion --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
 eval_embed_distortion	python experiments/evaluate.py --method embed --slider distortion --out runs/eval/main/embed_distortion --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
-eval_guidance_lofi	python experiments/evaluate.py --method guidance --slider lofi --out runs/eval/main/guidance_lofi --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
+eval_guidance_lofi	python experiments/evaluate.py --method guidance --slider lofi --out runs/eval/main/guidance_lofi --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
 eval_embed_lofi	python experiments/evaluate.py --method embed --slider lofi --out runs/eval/main/embed_lofi --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
-eval_guidance_bass	python experiments/evaluate.py --method guidance --slider bass --out runs/eval/main/guidance_bass --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
+eval_guidance_bass	python experiments/evaluate.py --method guidance --slider bass --out runs/eval/main/guidance_bass --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
 eval_embed_bass	python experiments/evaluate.py --method embed --slider bass --out runs/eval/main/embed_bass --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
-eval_guidance_width	python experiments/evaluate.py --method guidance --slider width --out runs/eval/main/guidance_width --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
+eval_guidance_width	python experiments/evaluate.py --method guidance --slider width --out runs/eval/main/guidance_width --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
 eval_embed_width	python experiments/evaluate.py --method embed --slider width --out runs/eval/main/embed_width --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
-eval_guidance_mood	python experiments/evaluate.py --method guidance --slider mood --out runs/eval/main/guidance_mood --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
+eval_guidance_mood	python experiments/evaluate.py --method guidance --slider mood --out runs/eval/main/guidance_mood --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
 eval_embed_mood	python experiments/evaluate.py --method embed --slider mood --out runs/eval/main/embed_mood --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
-eval_guidance_electronic	python experiments/evaluate.py --method guidance --slider electronic --out runs/eval/main/guidance_electronic --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
+eval_guidance_electronic	python experiments/evaluate.py --method guidance --slider electronic --out runs/eval/main/guidance_electronic --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
 eval_embed_electronic	python experiments/evaluate.py --method embed --slider electronic --out runs/eval/main/embed_electronic --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
