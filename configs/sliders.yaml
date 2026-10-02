@@ -1,0 +1,58 @@
+# One entry per slider. `positive` and `negative` are appended to a base prompt to form
+# the two ends of the slider. `measure` names the descriptor (audiosliders/descriptors.py)
+# that should rise with the slider; `dsp` names the post-processing baseline, if one exists.
+brightness:
+  positive: bright, crisp, sparkling high frequencies, airy treble
+  negative: dark, muffled, dull, low-pass filtered, no treble
+  measure: centroid_hz
+  dsp: tilt_eq
+density:
+  positive: busy, dense, many fast notes, intricate and full arrangement
+  negative: sparse, minimal, few notes, lots of space and silence
+  measure: onset_rate
+reverb:
+  positive: drenched in reverb, huge cathedral hall, distant, long echoing tail
+  negative: completely dry, close-miked, dead room, no reverb
+  measure: decay_s
+  dsp: reverb
+energy:
+  positive: intense, aggressive, powerful, loud and driving
+  negative: gentle, calm, soft, quiet and delicate
+  measure: flux
+tempo:
+  positive: very fast tempo, rapid, racing, double time
+  negative: very slow tempo, sluggish, half time, lingering
+  measure: pulse_bpm
+percussion:
+  positive: heavy drums, pounding percussion, strong beat
+  negative: no drums, no percussion, beatless
+  measure: percussive_ratio
+distortion:
+  positive: distorted, overdriven, gritty, saturated, fuzzy
+  negative: clean, pristine, pure tone, undistorted
+  measure: flatness
+  dsp: drive
+lofi:
+  positive: lo-fi, old cassette tape, vinyl crackle, degraded, narrow band
+  negative: hi-fi, pristine studio recording, crystal clear, full range
+  measure: rolloff_hz
+  measure_sign: -1
+  dsp: lofi
+bass:
+  positive: heavy sub bass, deep booming low end
+  negative: thin, no bass, tinny, only high and mid frequencies
+  measure: bass_ratio
+  dsp: low_shelf
+width:
+  positive: very wide stereo, spacious, panned hard left and right
+  negative: mono, narrow, centered
+  measure: side_ratio
+  dsp: mid_side
+mood:
+  positive: happy, joyful, cheerful, uplifting major key
+  negative: sad, melancholic, sorrowful, dark minor key
+  measure: majorness
+electronic:
+  positive: electronic, synthesizers, drum machine, synthetic
+  negative: acoustic, live instruments, organic, unplugged
+  measure: null

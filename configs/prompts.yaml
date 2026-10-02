@@ -1,0 +1,76 @@
+# Base prompts. Sliders are trained on `train` and every reported number uses `eval`,
+# which shares no prompt with `train`.
+train:
+  - solo jazz guitar, warm tone, swing feel
+  - 128 BPM tech house drum loop
+  - ambient pad with slow evolving texture
+  - upbeat funk bass and drums groove, 110 BPM
+  - solo piano, gentle classical melody
+  - lofi hip hop beat with mellow keys, 85 BPM
+  - acoustic folk guitar fingerpicking
+  - cinematic orchestral strings
+  - drum and bass breakbeat, 174 BPM
+  - blues electric guitar solo over a shuffle
+  - synthwave arpeggio with retro drums, 100 BPM
+  - string quartet playing a slow waltz
+  - reggae rhythm guitar and bass, 80 BPM
+  - trap beat with 808 bass and hi-hats, 140 BPM
+  - solo cello melody
+  - bossa nova nylon guitar and soft percussion
+  - rock band with electric guitar riff and drums, 120 BPM
+  - deep house chords and four on the floor kick, 122 BPM
+  - marimba and vibraphone pattern
+  - gospel organ and choir
+  - country acoustic guitar and fiddle
+  - minimal techno loop, 130 BPM
+  - harp arpeggios
+  - big band swing with brass section
+  - electric piano neo soul chords, 90 BPM
+  - flamenco guitar with hand claps
+  - dubstep bass drop, 140 BPM
+  - solo flute melody
+  - disco groove with bass, strings and drums, 118 BPM
+  - indie pop with jangly guitars and drums
+  - chillout downtempo electronica, 95 BPM
+  - latin percussion ensemble with congas and timbales
+  - fingerstyle ukulele tune
+  - classical piano sonata, fast passage
+  - hip hop boom bap drums with sampled piano, 92 BPM
+  - celtic fiddle and tin whistle jig
+  - synth bass and drum machine electro, 125 BPM
+  - solo trumpet jazz ballad
+  - music box melody
+  - progressive trance lead and pads, 136 BPM
+  - afrobeat groove with horns and percussion
+  - acoustic singer songwriter guitar strumming
+  - metal guitar riff with double kick drums, 160 BPM
+  - orchestral woodwinds playing a playful theme
+  - garage rock drums and bass
+  - kalimba pattern with soft pads
+  - saxophone solo over a slow jazz trio
+  - modular synthesizer sequence
+eval:
+  - mellow jazz piano trio, brushed drums
+  - 124 BPM house beat with bassline
+  - warm analog synth pad chords
+  - funky clavinet and drums groove, 105 BPM
+  - solo classical guitar etude
+  - chillhop beat with rhodes piano, 80 BPM
+  - bluegrass banjo and acoustic guitar
+  - epic film score with strings and brass
+  - liquid drum and bass with pads, 172 BPM
+  - slow blues piano
+  - retro 80s synth pop instrumental, 112 BPM
+  - chamber ensemble with violin, viola and cello
+  - dub reggae bass and drums with offbeat keys, 75 BPM
+  - electronic pop beat with synth lead, 128 BPM
+  - solo violin melody
+  - samba percussion and cavaquinho
+  - alternative rock guitar and drums, 130 BPM
+  - melodic techno with arpeggiated synth, 126 BPM
+  - vibraphone jazz ballad
+  - church organ hymn
+  - acoustic guitar and mandolin duet
+  - ambient electronic soundscape with soft bells
+  - soul ballad with electric piano and bass, 70 BPM
+  - latin jazz with piano montuno and congas
