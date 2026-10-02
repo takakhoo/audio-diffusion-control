@@ -12,7 +12,7 @@
 
 **[Listen and drag the sliders yourself: live demo](https://takakhoo.github.io/audio-diffusion-control/)** (18 sliders, 5 prompts, 920 loudness-matched clips, with the measured numbers at every position)
 
-**[Download the trained sliders](https://huggingface.co/takakhoo/audio-sliders)**: 25 sliders for ACE-Step 1.5 XL turbo on Hugging Face (MIT), with audio examples and the measured numbers for each.
+**[Download the trained sliders](https://huggingface.co/takakhoo/audio-sliders)**: 29 sliders for ACE-Step 1.5 XL turbo on Hugging Face (MIT), with audio examples and the measured numbers for each.
 
 **[Take the ten-minute listening test](https://takakhoo.github.io/audio-diffusion-control/listen.html)**: 23 questions on the same clips, nothing uploaded, and it shows how your ears line up with the measurements at the end.
 
@@ -20,7 +20,7 @@
 
 ## Headline
 
-Eight sliders on ACE-Step 1.5 XL turbo, each trained from one prompt pair in about 20 minutes. 24 held-out prompts, 3 seeds, 9 slider positions, 648 clips per slider.
+Twelve sliders on ACE-Step 1.5 XL turbo, each trained from one prompt pair in about 20 minutes. 24 held-out prompts, 3 seeds, 9 slider positions, 648 clips per slider. The first eight are in the live demo; the last four were trained later.
 
 | Slider | What rises toward + (CLAP tags) | What falls | Measured descriptor follows? (ρ, ends ordered) | Second model agrees? (MuQ ρ, ordered) | Usable span | Piece kept | Enjoyment at the ends |
 |---|---|---|---|---|---|---:|---:|
@@ -31,11 +31,15 @@ Eight sliders on ACE-Step 1.5 XL turbo, each trained from one prompt pair in abo
 | [**melody**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=melody&prompt=0&x=2) (texture to tune) | romantic, happy, blues | lo-fi, mysterious, calm | key clarity: 0.48, 78% | 0.89, 100% | -1 to +2 | 0.80 | 6.47 |
 | [**tension**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=tension&prompt=0&x=1) (relaxed to tense) | metal, rock, distorted | melancholic, uplifting, sad | no descriptor assigned | 0.86, 100% | -1.5 to +1 | 0.83 | 5.64 |
 | [**brightness**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=brightness&prompt=0&x=2) (dark to bright) | happy, repetitive, romantic | dark-toned, lo-fi, quiet | spectral centroid: 0.97, 100% | 0.80, 100% | -1 to +2 | 0.74 | 6.04 |
+| **energy** (calm to intense) | rock, country, blues | reverberant, melancholic, calm | spectral flux: 0.91, 100% | 0.90, 100% | -1.5 to +1.5 | 0.64 | 6.42 |
+| **tempo** (slow to fast) | latin, playful, fast | calm, lo-fi, reverberant | beat-tracked tempo: 0.55, 84% | 0.77, 100% | -1 to +2 | 0.68 | 6.38 |
+| **electronic** (acoustic to electronic) | techno, electronic dance, rhythmic | acoustic, acoustic guitar, melancholic | no descriptor assigned | 0.79, 97% | -2 to +2 | 0.65 | 6.79 |
+| **vintage** (modern to vintage) | distorted, loud, swung | epic, uplifting, orchestral film score | no descriptor assigned | 0.79, 99% | -2 to +2 | 0.79 | 6.68 |
 | [**density**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=density&prompt=0&x=2) (sparse to dense) | latin, repetitive, romantic | dark-toned, quiet, lo-fi | onset rate: 0.78, 92% | 0.86, 100% | -0.5 to +2 | 0.84 | 6.09 |
 
 **Axes nobody named.** The second set of sliders runs along directions found in 14,985 real recordings: [arousal](https://takakhoo.github.io/audio-diffusion-control/?model=ace&slider=arousal&method=lora&prompt=0&x=-2), [valence](https://takakhoo.github.io/audio-diffusion-control/?model=ace&slider=valence&method=contrast&prompt=0&x=1), [electronic to jazz](https://takakhoo.github.io/audio-diffusion-control/?model=ace&slider=jazz_electronic&method=lora&prompt=1&x=2), [synth to strings](https://takakhoo.github.io/audio-diffusion-control/?model=ace&slider=strings_synth&method=lora&prompt=1&x=2), [piano](https://takakhoo.github.io/audio-diffusion-control/?model=ace&slider=piano_axis&method=lora&prompt=2&x=1). They follow those axes on held-out prompts with rank correlation up to 0.91, and the arousal slider moves a clip 2.4 standard deviations of real music along its axis before quality drops ([section 9](#9-axes-of-real-music)).
 
-Each slider name opens the live demo on that slider. The tag columns and the direction score come from CLAP; the "second model" column repeats the direction test with MuQ-MuLan, a music-text model that shares nothing with CLAP, and it agrees on all eight. For scale: unsteered clips score 6.95 on Audiobox Aesthetics content enjoyment, and 2,000 real recordings from FMA average 6.1. "Usable span" is how far the slider goes before mean enjoyment falls more than 0.5 below the unsteered clips. "Piece kept" is CLAP similarity to the unsteered clip at the ends of that span. Full tables: [`results/ace/`](results/ace/).
+Each slider name opens the live demo on that slider. The tag columns and the direction score come from CLAP; the "second model" column repeats the direction test with MuQ-MuLan, a music-text model that shares nothing with CLAP, and it agrees on all twelve. For scale: unsteered clips score 6.95 on Audiobox Aesthetics content enjoyment, and 2,000 real recordings from FMA average 6.1. "Usable span" is how far the slider goes before mean enjoyment falls more than 0.5 below the unsteered clips. "Piece kept" is CLAP similarity to the unsteered clip at the ends of that span. Full tables: [`results/ace/`](results/ace/).
 
 **Target venue: ISMIR 2027** (London, September 2027; six pages, double-blind). The draft in [`paper/`](paper/) is already on the official ISMIR template and within its limits. Why this venue, its rules, and what the paper still needs to be competitive there are in [`docs/VENUE.md`](docs/VENUE.md).
 

@@ -14,7 +14,7 @@ from pathlib import Path
 
 REPO = "takakhoo/audio-sliders"
 GROUPS = {
-    "ace-step-1.5-xl-turbo/text": "eight named attributes, each trained from a prompt pair",
+    "ace-step-1.5-xl-turbo/text": "twelve named attributes, each trained from a prompt pair",
     "ace-step-1.5-xl-turbo/real-axes": "five axes found in real music, trained from a prompt pair made of the axis's tags",
     "ace-step-1.5-xl-turbo/real-axes-sets": "seven axes found in real music, trained with no text; use between -1 and +1",
     "ace-step-1.5-xl-turbo/measured-sets": "five measurements, trained with no text; use between -1 and +1",

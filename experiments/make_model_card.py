@@ -16,7 +16,7 @@ from audiosliders.hub import REPO
 SITE = "https://takakhoo.github.io/audio-diffusion-control"
 CODE = "https://github.com/takakhoo/audio-diffusion-control"
 RAW = "https://raw.githubusercontent.com/takakhoo/audio-diffusion-control/main"
-TEXT = ["mood", "ensemble", "groove", "harmony", "melody", "tension", "brightness", "density"]
+TEXT = ["mood", "ensemble", "groove", "harmony", "melody", "tension", "brightness", "density", "energy", "tempo", "electronic", "vintage"]
 MEASURED = ["energy", "harmony", "density", "ensemble", "quality"]
 SAMPLES = [("text", "mood", "lora", [-2, 0, 2]), ("real-axes", "arousal", "lora", [-2, 0, 1]),
            ("real-axes", "jazz_electronic", "lora", [-2, 0, 2]), ("real-axes-sets", "arousal", "contrast", [-1, 0, 1]),
@@ -37,7 +37,8 @@ num = lambda v, d=2: "" if v is None else f"{v:.{d}f}"
 ends = lambda n: f"{spec[n]['ends'][0]} → {spec[n]['ends'][1]}"
 span = lambda lo, hi: f"{lo:+g} to {hi:+g}"
 
-lines = ["""---
+count = {25: "Twenty-five", 29: "Twenty-nine"}
+lines = [f"""---
 license: mit
 base_model: ACE-Step/acestep-v15-xl-turbo-diffusers
 pipeline_tag: text-to-audio
@@ -52,7 +53,7 @@ tags:
 
 # Audio Sliders for ACE-Step 1.5 XL turbo
 
-Twenty-five sliders for generated music. Each one is a rank-4 LoRA on the frozen ACE-Step 1.5 XL turbo transformer whose
+{count.get(len(TEXT) + len(pair) + len(sets) + len(MEASURED), len(TEXT) + len(pair) + len(sets) + len(MEASURED))} sliders for generated music. Each one is a rank-4 LoRA on the frozen ACE-Step 1.5 XL turbo transformer whose
 strength is a number you set at sampling time. The prompt and the seed stay fixed and the same piece moves along one
 axis: sad to happy, solo to full ensemble, energetic to quiet and dreamy, electronic to jazz.
 
@@ -73,7 +74,7 @@ for group, name, method, xs in SAMPLES:
     lines.append("")
 
 lines += ["", "## What is in the repository", "",
-          "### `ace-step-1.5-xl-turbo/text`: named attributes, trained from a prompt pair", "",
+          f"### `ace-step-1.5-xl-turbo/text`: {len(TEXT)} named attributes, trained from a prompt pair", "",
           "| Slider | Low → high | Waveform descriptor follows (ρ) | MuQ-MuLan agrees (ρ) | Usable positions | Piece kept | Enjoyment at the ends (6.95 unsteered) |",
           "|---|---|---:|---:|---|---:|---:|"]
 for n in TEXT:
