@@ -8,7 +8,7 @@
 
 *Four real sliders on four held-out prompts. Each panel is one prompt and one seed; only the slider moves. The knob sweeps from the middle to +2, back to -2, and home, while the spectrogram redraws and the readout shows the Audiobox enjoyment score and how close the clip stays to the unsteered one.*
 
-**[Listen and drag the sliders yourself: live demo](https://takakhoo.github.io/audio-diffusion-control/)** (8 sliders, 5 prompts, 360 clips, with the measured numbers at every position)
+**[Listen and drag the sliders yourself: live demo](https://takakhoo.github.io/audio-diffusion-control/)** (18 sliders, 5 prompts, 920 loudness-matched clips, with the measured numbers at every position)
 
 > **Status (2 Oct 2026).** Everything below is measured and reproducible from this repository. Still running: prompt-pair sliders for the real-music axes, the text sliders retrained on 648 prompts, and Stable Audio 3.
 
@@ -27,7 +27,7 @@ Eight sliders on ACE-Step 1.5 XL turbo, each trained from one prompt pair in abo
 | [**brightness**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=brightness&prompt=0&x=2) (dark to bright) | happy, repetitive, romantic | dark-toned, lo-fi, quiet | spectral centroid: 0.97, 100% | 0.80, 100% | -1 to +2 | 0.74 | 6.04 |
 | [**density**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=density&prompt=0&x=2) (sparse to dense) | latin, repetitive, romantic | dark-toned, quiet, lo-fi | onset rate: 0.78, 92% | 0.86, 100% | -0.5 to +2 | 0.84 | 6.09 |
 
-**Axes nobody named.** The second set of sliders runs along directions found in 14,985 real recordings: arousal, valence, jazz to electronic, strings to synth, piano. They follow those axes on held-out prompts with rank correlation up to 0.91, and the arousal slider moves a clip 2.4 standard deviations of real music along its axis before quality drops ([section 9](#9-axes-of-real-music)).
+**Axes nobody named.** The second set of sliders runs along directions found in 14,985 real recordings: [arousal](https://takakhoo.github.io/audio-diffusion-control/?model=ace&slider=arousal&method=lora&prompt=0&x=-2), [valence](https://takakhoo.github.io/audio-diffusion-control/?model=ace&slider=valence&method=contrast&prompt=0&x=1), [electronic to jazz](https://takakhoo.github.io/audio-diffusion-control/?model=ace&slider=jazz_electronic&method=lora&prompt=1&x=2), [synth to strings](https://takakhoo.github.io/audio-diffusion-control/?model=ace&slider=strings_synth&method=lora&prompt=1&x=2), [piano](https://takakhoo.github.io/audio-diffusion-control/?model=ace&slider=piano_axis&method=lora&prompt=2&x=1). They follow those axes on held-out prompts with rank correlation up to 0.91, and the arousal slider moves a clip 2.4 standard deviations of real music along its axis before quality drops ([section 9](#9-axes-of-real-music)).
 
 Each slider name opens the live demo on that slider. The tag columns and the direction score come from CLAP; the "second model" column repeats the direction test with MuQ-MuLan, a music-text model that shares nothing with CLAP, and it agrees on all eight. For scale: unsteered clips score 6.95 on Audiobox Aesthetics content enjoyment, and 2,000 real recordings from FMA average 6.1. "Usable span" is how far the slider goes before mean enjoyment falls more than 0.5 below the unsteered clips. "Piece kept" is CLAP similarity to the unsteered clip at the ends of that span. Full tables: [`results/ace/`](results/ace/).
 
