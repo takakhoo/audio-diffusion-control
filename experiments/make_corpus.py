@@ -54,7 +54,7 @@ def main():
         text = [prompts[i] for i, _ in chunk]
         z = model.generate(text, [s for _, s in chunk], seconds=args.seconds, steps=args.steps,
                            guidance=args.guidance, latents=True)
-        audio = model.decode(z, args.seconds).cpu().numpy()
+        audio = model.fit_peak(model.decode(z, args.seconds)).cpu().numpy()
         emb = clap.audio(audio, model.sample_rate)
         text_emb = clap.text(text)
         latents.append(z.cpu().half().numpy())

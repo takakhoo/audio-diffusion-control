@@ -1,0 +1,12 @@
+corpus_train_00	python experiments/make_corpus.py --out runs/corpus/train --shard 0 4
+corpus_train_01	python experiments/make_corpus.py --out runs/corpus/train --shard 1 4
+corpus_train_02	python experiments/make_corpus.py --out runs/corpus/train --shard 2 4
+corpus_train_03	python experiments/make_corpus.py --out runs/corpus/train --shard 3 4
+train_v1_energy	python -m audiosliders.train energy --out runs/sliders/v1
+train_v1_tempo	python -m audiosliders.train tempo --out runs/sliders/v1
+train_v1_distortion	python -m audiosliders.train distortion --out runs/sliders/v1
+train_v1_lofi	python -m audiosliders.train lofi --out runs/sliders/v1
+train_v1_bass	python -m audiosliders.train bass --out runs/sliders/v1
+train_v1_width	python -m audiosliders.train width --out runs/sliders/v1
+train_v1_mood	python -m audiosliders.train mood --out runs/sliders/v1
+train_v1_electronic	python -m audiosliders.train electronic --out runs/sliders/v1

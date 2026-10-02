@@ -26,15 +26,20 @@ ap.add_argument("--save-audio", action="store_true")
 args = ap.parse_args()
 
 weights = Path(args.weights)
-out = Path(args.out or weights.with_suffix("")) 
+out = Path(args.out or weights.with_suffix(""))
 out.mkdir(parents=True, exist_ok=True)
 prompts = yaml.safe_load(Path("configs/prompts.yaml").read_text())[args.split][: args.prompts]
 model = StableAudio()
 bank = SliderBank(model.dit)
 meta = bank.load("s", weights)
 clap = Clap()
-direction = clap.text([meta["positive"]]) - clap.text([meta["negative"]])
-direction = direction / direction.norm()
+if "direction" in meta:
+    direction = torch.tensor(meta["direction"], device=clap.device, dtype=torch.float32)[None]
+elif "positive" in meta:
+    direction = clap.text([meta["positive"]]) - clap.text([meta["negative"]])
+else:
+    direction = torch.zeros(1, 512, device=clap.device)
+direction = direction / direction.norm().clamp(min=1e-9)
 
 rows = []
 audio0 = None
@@ -50,13 +55,15 @@ for scale in [0.0] + [s for s in args.scales if s != 0]:
         row["clap_dir"] = float((emb[i] @ direction.T).item())
         row["clap_keep"] = float((emb[i] @ emb0[i]).item())
         row.update(content_similarity(audio0[i].numpy(), a, model.sample_rate))
+        row["clipped"] = float((np.abs(a) >= 0.999).mean())
         rows.append(row)
         if args.save_audio:
             sf.write(out / f"p{i:02d}_s{scale:+.1f}.wav", a.T, model.sample_rate)
 (out / f"sweep_start{args.start}.json").write_text(json.dumps(rows))
 
 keys = ["centroid_hz", "rolloff_hz", "bass_ratio", "flatness", "flux", "rms_db", "onset_rate", "pulse_bpm",
-        "percussive_ratio", "decay_s", "side_ratio", "majorness", "clap_dir", "clap_keep", "chroma_sim", "rhythm_sim"]
+        "percussive_ratio", "decay_s", "side_ratio", "majorness", "clap_dir", "clap_keep", "chroma_sim", "rhythm_sim",
+        "clipped"]
 print("scale  " + " ".join(k[:10].rjust(10) for k in keys))
 for scale in sorted(set(r["scale"] for r in rows)):
     sel = [r for r in rows if r["scale"] == scale]

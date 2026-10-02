@@ -204,13 +204,19 @@ class StableAudio:
         return x / torch.sqrt(s_end * s_end + 1.0), sigma_to_t(s_end)
 
     def decode(self, z: Tensor, seconds: float | None = None) -> Tensor:
-        """Latents to stereo waveforms in [-1, 1], shape (B, 2, T). Differentiable."""
+        """Latents to stereo waveforms, shape (B, 2, T). Differentiable. Peaks can exceed 1."""
         chunk = max(1, 2048 // z.shape[-1])
         outs = [self.vae.decode(z[i : i + chunk].float()).sample for i in range(0, len(z), chunk)]
         audio = torch.cat(outs)
         if seconds is not None:
             audio = audio[..., : int(seconds * self.sample_rate)]
-        return audio.clamp(-1, 1)
+        return audio
+
+    @staticmethod
+    def fit_peak(audio: Tensor) -> Tensor:
+        """Scale down any clip whose peak exceeds full scale. Quieter clips are left alone."""
+        peak = audio.abs().amax(dim=(-2, -1), keepdim=True)
+        return audio / peak.clamp(min=1.0)
 
     @torch.no_grad()
     def generate(
@@ -232,4 +238,4 @@ class StableAudio:
             predict = wrap(predict)
         noise = seeded_noise(seeds, (self.channels, self.frames(seconds)), self.device)
         z, _ = self.sample(predict, noise, steps=steps, sde=sde, sde_seeds=seeds)
-        return z if latents else self.decode(z, seconds)
+        return z if latents else self.fit_peak(self.decode(z, seconds))
