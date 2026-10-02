@@ -130,6 +130,25 @@ if cover.exists():
                   covOverlap=f"{100 * m['overlap']['8']:.0f}", covClips=f"{m['clips']:,}".replace(",", "{,}"),
                   covReal=f"{c['real_clips']:,}".replace(",", "{,}"))
 
+axes = RESULTS / "ace_v2" / "real_axes.json"
+if axes.exists():
+    rows = json.loads(axes.read_text())
+    short = {"two sets of the model's clips": "sets", "prompt pair from the axis's tags": "pair"}
+    lines = [r"\begin{table}[t]\centering\small\setlength{\tabcolsep}{3.5pt}", r"\begin{tabular}{llrrrrr}", r"\toprule",
+             r"Axis & From & $\rho$ & $\pm1$ & Ends & Kept & CE$_\text{ends}$ \\", r"\midrule"]
+    for r in sorted(rows, key=lambda r: (r["slider"], r["trained_from"])):
+        lines.append(" & ".join([
+            r["slider"].replace("_", " "), short[r["trained_from"]], fmt(r["rho"]), fmt(r["moved_real_std"][0]),
+            fmt(r["moved_real_std"][1]), fmt(r["kept"]), fmt((r["ce"][0] + r["ce"][2]) / 2)]) + r" \\")
+    lines += [r"\bottomrule", r"\end{tabular}",
+              r"\caption{Sliders along axes of real music on ACE-Step, trained from a prompt pair made of the axis's tags or "
+              r"from two sets of the model's clips. $\rho$: rank correlation between position and the output's projection on "
+              r"the axis. $\pm1$ and Ends: movement along the axis between positions $-1$ and $+1$ and between the extreme "
+              r"positions ($\pm2$ for pairs, $\pm1.5$ for sets), in standard deviations of real recordings. Kept: CLAP "
+              r"similarity to the unsteered clip at $\pm1$. CE at 0 is " + fmt(rows[0]["ce"][1]) + r".}\label{tab:axes}",
+              r"\end{table}"]
+    (PAPER / "tables" / "axes.tex").write_text("\n".join(lines) + "\n")
+
 macros.update(nPrompts="24", nReal="2{,}000", fmaCE="6.12", aceCE="6.92", saoCE="6.16")
 (PAPER / "numbers.tex").write_text("".join(f"\\newcommand{{\\{k}}}{{{v}}}\n" for k, v in sorted(macros.items())))
 print("macros:", macros)

@@ -188,7 +188,7 @@ We found no paper that runs PCA over a music diffusion transformer's activations
 | Work | What is compared | Measure |
 |---|---|---|
 | [Presto!, Novack et al., 2024](https://arxiv.org/abs/2410.05167) | Distilled text-to-music models against a reference set | Density, recall, and coverage in CLAP space, as single numbers. |
-| [Huang et al., 2025](https://arxiv.org/abs/2503.16669) | Many text-to-music metrics against human preference | Recall and coverage hold up as measures; precision and density do less well. |
+| [Huang et al., 2025](https://arxiv.org/abs/2503.16669) | Text-to-music metrics against human preference data | Fréchet Audio Distance is inconsistent with human preference; they propose a MAUVE-based divergence (rank correlation 0.84 against 0.49). |
 | [Slendebroek and Metaxa, 2026](https://arxiv.org/abs/2608.06106) | Suno and Lyria 3 against human music in four genres | 72 hand-built MIR features with dispersion and separability diagnostics. They report homogenisation. |
 
 The existing evidence is either one aggregate number per model, or dispersion of signal features for commercial systems. Our table differs in two ways: the axes are learned from real music and carry musical labels, and the models are open ones that a slider can then be trained on.

@@ -1,44 +1,37 @@
 \section{Results}\label{sec:results}
 
-\smallskip\noindent\textbf{The yardstick.} Audiobox content enjoyment averages \fmaCE{} over \nReal{} real recordings. Unsteered ACE-Step clips average \aceCE{} and unsteered Stable Audio Open clips \saoCE{} (Figure~\ref{fig:yardstick}). A slider that drops a clip well below the real-music mean has left the region in which the change it made is worth having.
-
-\begin{figure}[t]\centering
-\includegraphics[width=\linewidth]{figures/quality_reference.png}
-\caption{Content enjoyment of unsteered model output and of real recordings.}\label{fig:yardstick}
-\end{figure}
-
-\smallskip\noindent\textbf{Musical sliders on ACE-Step.} Table~\ref{tab:ace} and Figure~\ref{fig:ace} report prompt-pair sliders on \nPrompts{} held-out prompts, three seeds, nine positions. Where a descriptor was assigned in advance it rises with the slider: harmonic change rate for harmony, production complexity for ensemble size, key clarity for melody, and major-minus-minor fit for mood. The tag panel agrees in words: the mood slider raises \emph{happy} and lowers \emph{dark-toned}; the groove slider raises \emph{latin} and \emph{funk} and lowers \emph{choir} and \emph{strings}; the ensemble slider raises \emph{orchestral film score} and \emph{choir}. Content enjoyment stays above the real-music mean across the range for all but the tension slider, which collapses past $+1$ and whose usable span ends there. The tags and the direction score both come from CLAP, so we repeat the direction test with MuQ-MuLan, which shares no weights or training data pipeline with it: every slider is monotone under it as well (Table~\ref{tab:ace}).
+\smallskip\noindent\textbf{Prompt-pair sliders.} Content enjoyment averages \fmaCE{} over \nReal{} real recordings, \aceCEzero{} for unsteered ACE-Step clips and \mainCEzero{} for Stable Audio Open. Table~\ref{tab:ace} and Figure~\ref{fig:ace} report eight ACE-Step sliders over nine positions. Where a descriptor was assigned in advance it rises with the slider, and MuQ-MuLan agrees with CLAP on the direction for all eight. Enjoyment stays above the real-music mean across the range for all but tension, whose usable span ends at $+1$. \IfFileExists{tables/songeval.tex}{\input{tables/songeval}}{}Sliders trained on ten-second clips carry over to thirty seconds: brightness stays ordered on every trajectory ($\rho=1.00$), ensemble on 92\%, and unsteered enjoyment is 7.34.
 
 \input{tables/ace}
 
 \begin{figure*}[t]\centering
-\includegraphics[width=0.9\linewidth]{ace/response.png}\\[2pt]
-\includegraphics[width=0.9\linewidth]{ace/quality.png}
-\caption{ACE-Step. Top: change in each slider's descriptor against position, in standard deviations of unsteered clips. Bottom: content enjoyment against position; the dashed line is the mean of real recordings.}\label{fig:ace}
+\includegraphics[width=0.86\linewidth]{ace/response.png}
+\caption{ACE-Step: change in each slider's descriptor against position, in standard deviations of unsteered clips, for prompt-pair sliders and for sliders trained between two sets of clips.}\label{fig:ace}
 \end{figure*}
 
-\smallskip\noindent\textbf{Gating.} On Stable Audio Open a prompt-pair slider at $\pm1$ moves its descriptor a long way and takes the piece with it. Table~\ref{tab:gating} and Figure~\ref{fig:gating} show what happens when the slider is switched on only after the first steps. With the slider on from step \gateSteps{} the brightness slider keeps \gateRangeOn{} of its \gateRangeOff{} standard deviations of range, similarity to the unsteered clip rises from \gateKeepOff{} to \gateKeepOn{}, and the loss in enjoyment falls from \gateLossOff{} to \gateLossOn{} points. The other three sliders tested follow the same curves.
+\smallskip\noindent\textbf{Four ways to move the same attribute.} Table~\ref{tab:methods} runs the alternatives on the same prompts and seeds. The trained slider reproduces prompt-pair guidance, its own training target, with one forward pass per step instead of three: it is higher on brightness and harmony and within the confidence interval elsewhere. Activation steering is within 0.05 of the slider on four of six descriptors and keeps more of the piece (0.83--0.87 against 0.74--0.84), while the slider moves its descriptor further on brightness, ensemble, and harmony. Interpolating the text conditioning has the lowest correlation on every attribute and breaks the audio at the ends.
+
+\input{tables/methods}
+
+\smallskip\noindent\textbf{The embedding says yes, the waveform says no.} On Stable Audio Open, sliders trained from the prompt pairs for note density and percussion move the output along their CLAP direction at every setting, and neither moves its descriptor: the rank correlation with onset rate or percussive share never exceeds \weakRho{}. Scored by embedding alone both would be reported as working. The descriptor has to be sound too: with a tempo estimate prone to octave errors the tempo slider scored $\rho=-0.01$, and with a beat tracker it scores $0.57$ and moves the mean tempo from 90 to 167 BPM.
+
+\smallskip\noindent\textbf{Gating.} On the 50-step model a slider at $\pm1$ takes the piece with it. Switched on from step \gateSteps{}, the brightness slider keeps \gateRangeOn{} of its \gateRangeOff{} standard deviations of range, similarity to the unsteered clip rises from \gateKeepOff{} to \gateKeepOn{}, and the loss in enjoyment falls from \gateLossOff{} to \gateLossOn{} points (Table~\ref{tab:gating}).
 
 \input{tables/gating}
 
-\begin{figure*}[t]\centering
-\includegraphics[width=0.9\linewidth]{figures/gating.png}
-\caption{Timestep gating on Stable Audio Open for four sliders.}\label{fig:gating}
-\end{figure*}
+\smallskip\noindent\textbf{What else moves, and cancelling it.} The mood and melody sliders both raise the spectral centroid by 0.8 standard deviations per unit. Adding the brightness slider at $-0.53$ and $-0.55$ times their position brings the leak to $-0.02$ and $+0.09$, raises similarity to the unsteered clip at $\pm1$ from 0.85 to 0.90 and from 0.87 to 0.92, and lowers the CLAP direction correlation from 0.92 to 0.69 and from 0.93 to 0.72. Part of what the embedding scores as happier or more melodic is brightness.
 
-\smallskip\noindent\textbf{The embedding says yes, the waveform says no.} The same gating runs include two sliders trained from the prompt pairs for note density and for percussion. Both move the output along their CLAP text direction at every gate setting. Neither moves its descriptor: the rank correlation between position and onset rate or percussive energy share never exceeds \weakRho{}, and the range is near zero. Scored by embedding alone, both would be reported as working. The descriptor has to be sound as well: with a tempo estimate prone to octave errors the tempo slider scored $\rho=-0.01$, and with a beat tracker it scores $0.57$ and moves the mean tempo from 90 to 167 BPM.
-
-\IfFileExists{tables/main.tex}{\smallskip\noindent\textbf{Stable Audio Open, all sliders.} Table~\ref{tab:sao} gives the gated evaluation of every prompt-pair slider.\input{tables/main}}{}
-
-\smallskip\noindent\textbf{Discovered axes.} For each of five concepts we generated 1{,}024 ACE-Step clips and took principal components of their CLAP embeddings. The leading component carries between \pcaLow{}\% and \pcaTop{}\% of the variance within a concept (Figure~\ref{fig:pca}), and the tags aligned with each end read as musical contrasts (Table~\ref{tab:pca}).
-
-\input{tables/pca}
+\smallskip\noindent\textbf{Axes of real music.} Fitted on two halves of the recordings and matched one to one, the leading eight axes agree with mean cosine 0.98 (MuQ-MuLan, principal), 0.94 (CLAP, principal), 0.90 (MuQ-MuLan, independent), and 0.83 (CLAP, independent). Of 1{,}024 sparse-autoencoder features on CLAP, only 9 are found by two seeds. The independent components of MuQ-MuLan read most like music: one runs from quiet, minor-key, and dreamy to aggressive, dry, and rhythmic, another from dark and distorted to playful and simple, the arousal and valence of the circumplex model \citep{russell1980circumplex}; others contrast jazz with electronic music, plucked and bowed strings with synthesizer and choir, and piano with organ and rock.
 
 \begin{figure*}[t]\centering
-\includegraphics[width=0.9\linewidth]{figures/discovery.png}
-\caption{Share of within-concept variance carried by the first six components.}\label{fig:pca}
+\includegraphics[width=0.72\linewidth]{figures/coverage.png}
+\caption{Coverage of ten real-music axes by \covClips{} ACE-Step clips. Each axis is labelled by the tags at its two ends.}\label{fig:coverage}
 \end{figure*}
 
-\IfFileExists{tables/found.tex}{\smallskip\noindent\textbf{From axes to sliders.} For three concepts we trained the four leading components into sliders with the set trainer and tested each on 32 fresh seeds of its concept. All \foundN{} follow the axis they were trained on, with rank correlations between \foundLo{} and \foundHi{}, and the tags that move in the output match the labels each axis received from the corpus (Table~\ref{tab:found}). Unlike the prompt-pair sliders these stay usable only to about $\pm1.5$.\input{tables/found}}{}
+\smallskip\noindent\textbf{Coverage.} Along every one of these axes the model's output is narrower than real music (Figure~\ref{fig:coverage}). Over 648 prompts crossing genre, instrument, and mood, ACE-Step spans \covLo{}--\covHi{}\% of the real spread; seeds of one prompt span \covSeedLo{}--\covSeedHi{}\% of what recordings of one genre span. The average generated clip sits 1.35 standard deviations toward the quiet end of the arousal axis and 1.36 toward the playful end of the valence axis. On CLAP's first three principal axes ACE-Step covers 35--39\% and Stable Audio Open 48--52\%. The top eight principal directions of the generated corpus contain \covOverlap{}\% of the top eight of the real one.
 
-\IfFileExists{sections/results_sets.tex}{\input{sections/results_sets}}{}
+\IfFileExists{sections/results_axes.tex}{\input{sections/results_axes}}{}
+
+\smallskip\noindent\textbf{Axes inside the generator.} Eight principal axes carry 90\% of the within-prompt variance of ACE-Step's cross-attention outputs and reproduce across disjoint prompt sets (0.82). Steering along the first two raises level and lowers spectral flatness ($\rho=0.77$ and $-0.64$) and moves tags from lo-fi toward complex and live. The other six leave at least 95\% similarity to the unsteered clip at twelve natural standard deviations and act differently from prompt to prompt (consistency 0.10--0.21). Unlike the image case \citep{haas2023directions}, the leading directions here describe production; arousal, valence, and instrument contrasts appeared only in embeddings of real music.
+
+\smallskip\noindent\textbf{Training between sets of real recordings.} With $H$ and $L$ drawn from the real recordings themselves, the slider damaged the clip equally in both directions. A penalty that ties the mean of its predictions at $\pm1$ to the frozen model removed the damage and left almost no steering: tempo did not move and major-minor fit moved from 0.09 to 0.15. Real music was useful for finding axes and the model's own clips for training along them.
