@@ -155,13 +155,56 @@ All 30 are in [`results/discovery/ace/pca.md`](results/discovery/ace/pca.md) wit
 
 **The axes become working sliders.** For three concepts we trained the four leading components into sliders with the set trainer (top against bottom 30% of clips along the component) and tested each on 32 fresh seeds of its concept. All 12 follow the axis they were trained on: the rank correlation between slider position and the output's projection on the axis is between 0.43 and 0.81. The words agree too. The leading piano axis was labelled "lo-fi, distorted, hip hop" against "acoustic guitar, reggae, happy" from the corpus alone, and in the slider's output the tags that rise are "distorted, dark-toned, lo-fi" and those that fall are "latin, reggae, happy". Full table: [`results/discovery/ace/sliders.md`](results/discovery/ace/sliders.md). These sliders stay usable to about ±1.5; past that they degrade the clip, unlike the prompt-pair sliders, which reach ±2.
 
-### 9. How well a slider learns its target
+### 9. Axes of real music
+
+The axes above come from the model's own clips. The same decomposition was run on real recordings: 24,975 thirty-second tracks from FMA, with the most vocal 40% removed and each genre's mean subtracted, in two embedding spaces and with three methods ([`results/discovery/real/`](results/discovery/real/README.md)).
+
+| Embedding | Method | Reproduced on a second half of the corpus (matched cosine) |
+|---|---|---:|
+| MuQ-MuLan | principal components | 0.98 |
+| CLAP | principal components | 0.94 |
+| MuQ-MuLan | independent components | 0.90 |
+| CLAP | independent components | 0.83 |
+| CLAP | sparse autoencoder, 1,024 features | 9 features found by both of two seeds |
+
+Independent components of MuQ-MuLan give the axes that read most like music. Two of them are the dimensions listener studies keep finding:
+
+| Axis | One end | Other end | Strongest measured correlate |
+|---|---|---|---|
+| arousal | quiet, minor key, dreamy, melancholic | aggressive, dry, rhythmic, energetic | spectral flatness -0.40 |
+| valence | dark, metal, dark-toned, distorted | playful, pop, simple, happy | content enjoyment -0.35 |
+| jazz to electronic | jazz, saxophone, trumpet, improvised | electronic dance, synthesizer, electronic | content enjoyment +0.41 |
+| plucked and bowed to synthetic | acoustic guitar, electric guitar, strings | reverberant, choir, synthesizer | production complexity -0.29 |
+| piano | piano, melancholic, electric piano, slow | organ, rock, folk, metal | production quality +0.33 |
+
+Training the set slider directly between sets of real recordings did not work: the mismatch between real recordings and the model's own output dominates the loss, and once it cancels almost no steering is left ([`results/real_sets/`](results/real_sets/README.md)). What works is to keep the axis from real music and take the two training sets from the model's own clips sorted along it.
+
+### 10. How much of real music the model covers
+
+Projecting 15,552 generated clips (648 prompts) on the real-music axes shows where the model's output sits and how far it spreads ([`results/coverage/`](results/coverage/README.md)).
+
+![Spread of generated clips along each real-music axis](results/figures/coverage.png)
+
+Along every axis the model is narrower than real music. Across all 648 prompts it spans 28 to 83% of the real spread, and with one prompt and many seeds 38 to 69% of what recordings of one genre span. Its average clip sits 1.35 standard deviations toward the quiet end of the arousal axis and 1.36 toward the playful end of the valence axis. Stable Audio Open shows the same pattern on the CLAP axes. The directions along which generated clips differ most are also mostly different ones: the top eight principal directions of the generated corpus contain 31% of the top eight of the real corpus.
+
+This is the case for sliders along real-music axes. Prompts and seeds do not reach the ends of those axes, and an axis the model under-explores is one a control can open up.
+
+### 11. Axes inside the model
+
+The same question can be put to the generator directly, with no embedding model in between. We recorded the mean cross-attention output of each of ACE-Step's 32 blocks for 768 clips, removed each prompt's mean, and took principal components ([`results/discovery/internal/`](results/discovery/internal/README.md)). Eight axes carry 90% of the variance and reproduce across disjoint prompt sets (0.82). Steering along them shows what they are:
+
+- The two strongest raise level and lower spectral flatness, and move tags from lo-fi toward complex and live-sounding. They are production axes.
+- The other six leave 95% or more of the piece in place at twelve natural standard deviations and act differently on different prompts (consistency 0.10 to 0.21).
+
+Arousal, valence, and instrument contrasts did not come out of the model's raw activations. They came out of a music embedding of real recordings. Where the axes are looked for decides what kind is found.
+
+### 12. How well a slider learns its target
 
 ![Share of the guidance target not yet reproduced, by training iteration](results/figures/training_curves.png)
 
 The prompt-pair trainer asks the slider to reproduce a shift in the frozen model's prediction. After 1,000 iterations the Stable Audio sliders reproduce about 62% of that shift on average and the ACE-Step sliders about 31%. The ACE-Step sliders work anyway, as section 2 shows, but they are the ones with the most room left: longer training and higher rank are the obvious next experiments.
 
-### 10. Against other methods
+### 13. Against other methods
 
 Four other ways of moving the same attribute were run through the same protocol on ACE-Step, on the same prompts and seeds. Rank correlation with the waveform descriptor, then with the MuQ-MuLan direction:
 
