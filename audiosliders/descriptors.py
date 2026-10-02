@@ -122,6 +122,56 @@ def majorness(mono: np.ndarray, sr: int) -> float:
     return float(best[0] - best[1])
 
 
+def tonal_features(mono: np.ndarray, sr: int) -> dict[str, float]:
+    """Key and harmony read from chroma.
+
+    majorness: best major-key profile correlation minus best minor-key correlation.
+    key_clarity: the best correlation over all 24 keys; low for atonal or noisy material.
+    harmonic_change: mean cosine distance between chroma of consecutive half-second
+    windows, a rough rate of harmonic movement.
+    """
+    import librosa
+
+    chroma = librosa.feature.chroma_cqt(y=mono, sr=sr, hop_length=HOP)
+    mean = chroma.mean(1)
+    best = [max(np.corrcoef(np.roll(profile, k), mean)[0, 1] for k in range(12)) for profile in (_MAJOR, _MINOR)]
+    win = max(1, int(0.5 * sr / HOP))
+    blocks = np.stack([chroma[:, i : i + win].mean(1) for i in range(0, chroma.shape[1] - win + 1, win)], 1)
+    if blocks.shape[1] > 1:
+        a, b = blocks[:, :-1], blocks[:, 1:]
+        cos = (a * b).sum(0) / np.maximum(np.linalg.norm(a, axis=0) * np.linalg.norm(b, axis=0), 1e-9)
+        change = float(1 - cos.mean())
+    else:
+        change = float("nan")
+    return dict(majorness=float(best[0] - best[1]), key_clarity=float(max(best)), harmonic_change=change)
+
+
+def pulse_clarity(mono: np.ndarray, sr: int) -> float:
+    """Height of the strongest peak in the onset envelope's autocorrelation between 40 and 240 BPM.
+
+    Near 1 for a steady, strongly accented beat; near 0 for free or beatless material.
+    """
+    import librosa
+
+    env = librosa.onset.onset_strength(y=mono, sr=sr, hop_length=HOP)
+    env = env - env.mean()
+    if not np.any(env):
+        return 0.0
+    ac = np.correlate(env, env, mode="full")[len(env) - 1 :]
+    ac = ac / max(ac[0], 1e-12)
+    fps = sr / HOP
+    lo, hi = int(fps * 60 / 240), min(int(fps * 60 / 40), len(ac) - 1)
+    return float(ac[lo:hi].max()) if hi > lo else 0.0
+
+
+def dynamics_db(mono: np.ndarray) -> float:
+    """Standard deviation of the short-term level in dB, over frames within 40 dB of the loudest."""
+    frames = np.lib.stride_tricks.sliding_window_view(mono, 4096)[::2048]
+    level = 10 * np.log10((frames**2).mean(1) + 1e-10)
+    level = level[level > level.max() - 40]
+    return float(level.std()) if len(level) > 1 else 0.0
+
+
 def chroma_frames(mono: np.ndarray, sr: int) -> np.ndarray:
     import librosa
 
@@ -151,8 +201,10 @@ def describe(x: np.ndarray, sr: int) -> dict[str, float]:
         crest_db=_db(float(np.abs(mono).max()) ** 2 / max(rms**2, 1e-12)),
         percussive_ratio=percussive_ratio(mono),
         decay_s=decay_s(mono, sr),
-        majorness=majorness(mono, sr),
+        pulse_clarity=pulse_clarity(mono, sr),
+        dynamics_db=dynamics_db(mono),
     )
+    out.update(tonal_features(mono, sr))
     out.update(onset_features(mono, sr))
     out.update(stereo_features(x))
     return out

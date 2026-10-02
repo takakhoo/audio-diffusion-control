@@ -1,0 +1,12 @@
+corpus_concepts_00	python experiments/make_corpus.py --out runs/corpus/concepts --split concepts --seeds 1024 --seed-offset 50000 --shard 0 4
+corpus_concepts_01	python experiments/make_corpus.py --out runs/corpus/concepts --split concepts --seeds 1024 --seed-offset 50000 --shard 1 4
+corpus_concepts_02	python experiments/make_corpus.py --out runs/corpus/concepts --split concepts --seeds 1024 --seed-offset 50000 --shard 2 4
+corpus_concepts_03	python experiments/make_corpus.py --out runs/corpus/concepts --split concepts --seeds 1024 --seed-offset 50000 --shard 3 4
+train_v1_harmony	python -m audiosliders.train harmony --out runs/sliders/v1
+train_v1_groove	python -m audiosliders.train groove --out runs/sliders/v1
+train_v1_articulation	python -m audiosliders.train articulation --out runs/sliders/v1
+train_v1_ensemble	python -m audiosliders.train ensemble --out runs/sliders/v1
+train_v1_tension	python -m audiosliders.train tension --out runs/sliders/v1
+train_v1_vintage	python -m audiosliders.train vintage --out runs/sliders/v1
+train_v1_melody	python -m audiosliders.train melody --out runs/sliders/v1
+train_v1_dynamics	python -m audiosliders.train dynamics --out runs/sliders/v1

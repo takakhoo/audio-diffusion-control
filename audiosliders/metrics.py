@@ -152,9 +152,10 @@ def summarize(rows: list[dict], key: str | None, sign: float = 1.0) -> dict[str,
         mono = monotonicity(rows, "clap_dir")
         resp = response(rows, "clap_dir")
         out.update(clap_rho=mono["rho"], clap_range=float(resp["level"][-1] - resp["level"][0]))
-    for k in ("clap_keep", "chroma_sim", "rhythm_sim", "clap_prompt"):
+    for k in ("clap_keep", "chroma_sim", "rhythm_sim", "clap_prompt", "ce", "pq"):
         vals = [r[k] for r in ends if k in r and np.isfinite(r[k])]
         out[f"{k}_at_ends"] = float(np.mean(vals)) if vals else np.nan
-    base = [r["clap_prompt"] for r in rows if r["scale"] == 0]
-    out["clap_prompt_at_zero"] = float(np.mean(base)) if base else np.nan
+    for k in ("clap_prompt", "ce", "pq"):
+        base = [r[k] for r in rows if r["scale"] == 0 and k in r]
+        out[f"{k}_at_zero"] = float(np.mean(base)) if base else np.nan
     return out

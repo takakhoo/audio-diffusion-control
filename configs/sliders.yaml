@@ -70,3 +70,46 @@ electronic:
   positive: electronic, synthesizers, drum machine, synthetic
   negative: acoustic, live instruments, organic, unplugged
   measure: null
+
+# Musical axes. Several have no signal-processing descriptor; they are scored by CLAP
+# direction, the tag panel, and the aesthetics predictor.
+harmony:
+  ends: [simple harmony, rich harmony]
+  positive: rich jazz harmony, complex extended chords, colorful chord changes
+  negative: simple harmony, plain triads, one static chord
+  measure: harmonic_change
+groove:
+  ends: [stiff, groovy]
+  positive: groovy, syncopated, funky, danceable rhythm
+  negative: stiff, plain, unsyncopated, mechanical rhythm
+  measure: null
+articulation:
+  ends: [staccato, legato]
+  positive: legato, smooth, flowing, long sustained notes
+  negative: staccato, short, detached, plucked notes
+  measure: decay_s
+ensemble:
+  ends: [solo, full ensemble]
+  positive: full ensemble, lush layered arrangement, many instruments playing together
+  negative: solo instrument, bare, unaccompanied, minimal arrangement
+  measure: pc
+tension:
+  ends: [relaxed, tense]
+  positive: tense, suspenseful, dissonant, ominous
+  negative: relaxed, peaceful, consonant, soothing
+  measure: null
+vintage:
+  ends: [modern, vintage]
+  positive: vintage 1960s recording, old-fashioned, retro
+  negative: modern, contemporary, state of the art production
+  measure: null
+melody:
+  ends: [texture, melody]
+  positive: strong singable lead melody, tuneful, memorable theme
+  negative: no melody, only rhythm and texture, atonal
+  measure: key_clarity
+dynamics:
+  ends: [flat, dynamic]
+  positive: dramatic dynamics, swells and crescendos, wide dynamic range
+  negative: flat constant level, heavily compressed, no dynamics
+  measure: dynamics_db

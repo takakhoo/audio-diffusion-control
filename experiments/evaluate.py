@@ -21,6 +21,7 @@ from audiosliders.clap import Clap
 from audiosliders.descriptors import content_similarity, describe
 from audiosliders.dsp import EFFECTS
 from audiosliders.lora import SliderBank
+from audiosliders.quality import Aesthetics
 
 
 def measure(job):
@@ -60,6 +61,7 @@ def main():
 
     model = StableAudio()
     clap = Clap()
+    aesthetics = Aesthetics()
     sr = model.sample_rate
     bank = None
     if args.method == "lora":
@@ -97,12 +99,13 @@ def main():
             audio = np.stack([fx(a, sr, sc) for a in audio for sc in scales])
         emb = clap.audio(audio, sr)
         text_emb = clap.text([prompts[i] for i, _ in chunk])
+        scores = aesthetics(audio, sr)
         n = len(scales)
         for j, (i, seed) in enumerate(chunk):
             base = audio[j * n + zero]
             for k, scale in enumerate(scales):
                 idx = j * n + k
-                row = dict(prompt_index=i, prompt=prompts[i], seed=seed, scale=scale)
+                row = dict(prompt_index=i, prompt=prompts[i], seed=seed, scale=scale, **scores[idx])
                 row["clap_prompt"] = float(emb[idx] @ text_emb[j])
                 row["clap_keep"] = float(emb[idx] @ emb[j * n + zero])
                 if direction is not None:

@@ -76,3 +76,23 @@ def test_content_similarity_identity_and_mismatch():
     diff = D.content_similarity(a, b, SR)
     assert same["chroma_sim"] > 0.99 and same["rhythm_sim"] > 0.99
     assert diff["chroma_sim"] < same["chroma_sim"] and diff["rhythm_sim"] < 0.9
+
+
+def test_pulse_clarity_separates_steady_beat_from_noise():
+    steady = clicks(2, seconds=6.0)
+    noise = np.random.default_rng(3).standard_normal(SR * 6).astype(np.float32) * 0.1
+    assert D.pulse_clarity(steady, SR) > 0.5 > D.pulse_clarity(noise, SR)
+
+
+def test_harmonic_change_is_higher_when_chords_move():
+    held = tone(261.63, 4.0) + tone(329.63, 4.0) + tone(392.0, 4.0)
+    moving = np.concatenate([tone(f, 0.5) + tone(f * 1.26, 0.5) + tone(f * 1.5, 0.5)
+                             for f in (261.63, 349.23, 293.66, 392.0, 246.94, 329.63, 220.0, 311.13)])
+    assert D.tonal_features(moving, SR)["harmonic_change"] > D.tonal_features(held, SR)["harmonic_change"] + 0.1
+    assert D.tonal_features(held, SR)["key_clarity"] > 0.5
+
+
+def test_dynamics_measures_level_variation():
+    flat = tone(440, 4.0) * 0.3
+    swell = flat * np.linspace(0.05, 1.0, len(flat)).astype(np.float32)
+    assert D.dynamics_db(swell) > D.dynamics_db(flat) + 3

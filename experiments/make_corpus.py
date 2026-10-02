@@ -18,6 +18,7 @@ import yaml
 from audiosliders.backbone import StableAudio, seeded_noise
 from audiosliders.clap import Clap
 from audiosliders.descriptors import describe
+from audiosliders.quality import Aesthetics
 
 
 def measure(job):
@@ -47,6 +48,7 @@ def main():
 
     model = StableAudio()
     clap = Clap()
+    aesthetics = Aesthetics()
     pool = ProcessPoolExecutor(args.workers)
     latents, embeds, rows, pending = [], [], [], []
     for b in range(0, len(jobs), args.batch):
@@ -59,8 +61,10 @@ def main():
         text_emb = clap.text(text)
         latents.append(z.cpu().half().numpy())
         embeds.append(emb.cpu().numpy())
+        scores = aesthetics(audio, model.sample_rate)
         for j, (i, seed) in enumerate(chunk):
-            rows.append(dict(prompt_index=i, prompt=prompts[i], seed=seed, clap_prompt=float(emb[j] @ text_emb[j])))
+            rows.append(dict(prompt_index=i, prompt=prompts[i], seed=seed, clap_prompt=float(emb[j] @ text_emb[j]),
+                             **scores[j]))
             pending.append(pool.submit(measure, (audio[j], model.sample_rate)))
         print(f"{min(b + args.batch, len(jobs))}/{len(jobs)}", flush=True)
     for row, fut in zip(rows, pending):

@@ -135,6 +135,7 @@ def main() -> None:
     ap.add_argument("--corpus", required=True)
     ap.add_argument("--by", required=True, help="descriptor:<key>[:-1] or pca:<index>")
     ap.add_argument("--fraction", type=float, default=0.3)
+    ap.add_argument("--prompt-index", type=int, default=None, help="use only clips of this prompt")
     ap.add_argument("--out", default="runs/sliders")
     for f, typ in [("rank", int), ("alpha", float), ("targets", str), ("lr", float), ("iters", int),
                    ("batch", int), ("seed", int)]:
@@ -142,11 +143,15 @@ def main() -> None:
     args = ap.parse_args()
 
     corpus = load_corpus(args.corpus)
+    if args.prompt_index is not None:
+        keep = np.array([r["prompt_index"] == args.prompt_index for r in corpus["rows"]])
+        corpus = dict(rows=[r for r, k in zip(corpus["rows"], keep) if k], latents=corpus["latents"][keep],
+                      clap=corpus["clap"][keep])
     rows = corpus["rows"]
     groups = np.array([r["prompt_index"] for r in rows])
     prompts = [r["prompt"] for r in rows]
     kind, _, rest = args.by.partition(":")
-    meta = dict(by=args.by, fraction=args.fraction)
+    meta = dict(by=args.by, fraction=args.fraction, concept=rows[0]["prompt"] if args.prompt_index is not None else None)
     if kind == "descriptor":
         key, _, sign = rest.partition(":")
         values = np.array([r[key] for r in rows], dtype=float) * (float(sign) if sign else 1.0)

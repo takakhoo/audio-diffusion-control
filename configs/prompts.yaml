@@ -74,3 +74,10 @@ eval:
   - ambient electronic soundscape with soft bells
   - soul ballad with electric piano and bass, 70 BPM
   - latin jazz with piano montuno and congas
+# Broad concepts for unsupervised discovery: many seeds of one prompt, then PCA.
+concepts:
+  - music
+  - piano music
+  - electronic dance music
+  - orchestral music
+  - guitar music
