@@ -262,9 +262,14 @@ class StableAudio:
 
 
 def load_backbone(name: str = "sao", device: str = "cuda"):
-    """`sao` is Stable Audio Open 1.0; `ace-turbo` and `ace-base` are ACE-Step 1.5 XL."""
+    """`sao` is Stable Audio Open 1.0; `ace-turbo` and `ace-base` are ACE-Step 1.5 XL;
+    `sa3-medium` and `sa3-small` are the Stable Audio 3 base checkpoints."""
     if name == "sao":
         return StableAudio(device)
+    if name.startswith("sa3-"):
+        from .sa3 import StableAudio3
+
+        return StableAudio3(name.split("-", 1)[1], device)
     if name.startswith("ace-"):
         from .ace import AceStep
 

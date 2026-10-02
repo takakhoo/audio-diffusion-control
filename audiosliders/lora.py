@@ -20,12 +20,13 @@ from pathlib import Path
 import torch
 from torch import Tensor, nn
 
-# Layer names differ by backbone: Stable Audio blocks are transformer_blocks.N.{attn1,attn2,ff},
-# ACE-Step blocks are layers.N.{self_attn,cross_attn,mlp}. Each preset matches both.
+# Layer names differ by backbone: Stable Audio Open blocks are transformer_blocks.N.{attn1,attn2,ff},
+# ACE-Step blocks are layers.N.{self_attn,cross_attn,mlp}, and Stable Audio 3 uses fused to_qkv / to_kv
+# projections. Each preset matches all three.
 _BLOCK = r"(transformer_blocks|layers)\.\d+\."
-_ATTN = r"(to_q|to_k|to_v|to_out\.0)$"
+_ATTN = r"(to_q|to_k|to_v|to_qkv|to_kv|to_out(\.0)?)$"
 _SELF, _CROSS = rf"(attn1|self_attn)\.{_ATTN}", rf"(attn2|cross_attn)\.{_ATTN}"
-_FF = r"(ff\.net\.(0\.proj|2)|mlp\.(gate_proj|up_proj|down_proj))$"
+_FF = r"(ff\.(net|ff)\.(0\.proj|2)|mlp\.(gate_proj|up_proj|down_proj))$"
 TARGETS = {
     "xattn": _BLOCK + _CROSS,
     "self": _BLOCK + _SELF,

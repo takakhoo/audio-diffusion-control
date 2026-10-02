@@ -144,3 +144,35 @@ def test_peft_layout_adapter_loads_as_a_slider(tmp_path):
     with bank.at(ext=2.0):
         got = layer(x)
     assert torch.allclose(got, layer.base(x) + 2.0 * x @ a.T @ b.T, atol=1e-5)
+
+
+def test_presets_select_stable_audio_3_layers():
+    class Attn(nn.Module):
+        def __init__(self, cross):
+            super().__init__()
+            if cross:
+                self.to_q, self.to_kv = nn.Linear(8, 16), nn.Linear(6, 18)
+            else:
+                self.to_qkv = nn.Linear(8, 40)
+            self.to_out = nn.Linear(8, 8)
+
+    class FF(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.ff = nn.Sequential(nn.ModuleDict(dict(proj=nn.Linear(8, 64))), nn.Identity(), nn.Linear(32, 8))
+
+    class Layer(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.self_attn, self.cross_attn, self.ff = Attn(False), Attn(True), FF()
+            self.to_local_embed = nn.Sequential(nn.Linear(5, 8), nn.SiLU(), nn.Linear(8, 8))
+
+    class Dit(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.transformer = nn.ModuleDict(dict(layers=nn.ModuleList([Layer(), Layer()]), project_in=nn.Linear(4, 8)))
+
+    for targets, per_layer in [("self", 2), ("xattn", 3), ("ff", 2), ("attn", 5), ("noxattn", 4), ("all", 7)]:
+        bank = SliderBank(Dit())
+        assert len(bank.add("a", rank=2, targets=targets)) == 2 * per_layer * 2
+        assert len(bank.add("b", rank=2, targets=targets)) == 2 * per_layer * 2
