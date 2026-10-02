@@ -69,7 +69,7 @@ def main():
         meta = bank.load("s", args.weights)
         spec = spec or meta
     direction = None
-    if spec:
+    if spec and "positive" in spec:
         direction = clap.text([spec["positive"]]) - clap.text([spec["negative"]])
         direction = (direction / direction.norm())[0]
 
