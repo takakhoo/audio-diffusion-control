@@ -37,7 +37,7 @@ num = lambda v, d=2: "" if v is None else f"{v:.{d}f}"
 ends = lambda n: f"{spec[n]['ends'][0]} → {spec[n]['ends'][1]}"
 span = lambda lo, hi: f"{lo:+g} to {hi:+g}"
 
-count = {25: "Twenty-five", 29: "Twenty-nine"}
+count = {25: "Twenty-five", 29: "Twenty-nine", 35: "Thirty-five"}
 lines = [f"""---
 license: mit
 base_model: ACE-Step/acestep-v15-xl-turbo-diffusers
@@ -53,7 +53,7 @@ tags:
 
 # Audio Sliders for ACE-Step 1.5 XL turbo
 
-{count.get(len(TEXT) + len(pair) + len(sets) + len(MEASURED), len(TEXT) + len(pair) + len(sets) + len(MEASURED))} sliders for generated music. Each one is a rank-4 LoRA on the frozen ACE-Step 1.5 XL turbo transformer whose
+{count.get(len(TEXT) + len(pair) + len(sets) + len(MEASURED) + 6, len(TEXT) + len(pair) + len(sets) + len(MEASURED) + 6)} sliders for generated music. Each one is a rank-4 LoRA on the frozen ACE-Step 1.5 XL turbo transformer whose
 strength is a number you set at sampling time. The prompt and the seed stay fixed and the same piece moves along one
 axis: sad to happy, solo to full ensemble, energetic to quiet and dreamy, electronic to jazz.
 
@@ -111,6 +111,19 @@ for n in MEASURED:
     lines.append(f"| `{n}` | {r['measure'].replace('_', ' ')} | {num(r['rho'])} | {100 * r['consistent']:.0f}% | "
                  f"{num(r.get('selectivity'), 1)} | {num(r.get('usable_clap_keep'))} |")
 
+graded = {r["slider"]: r for r in json.loads(Path("results/ace_g/summary.json").read_text())["summary"]}
+graded_axes = {r["slider"]: r for r in json.loads(Path("results/ace_g/real_axes.json").read_text())}
+lines += ["", "### `ace-step-1.5-xl-turbo/graded`: trained with no text at graded positions, usable from -2 to +2", "",
+          "The set trainer above shows the slider only positions -1 and +1, and its sliders fall apart past ±1. These six "
+          "were trained with every clip at its own position along the measurement or axis. They move slightly less inside "
+          "±1 and keep working out to ±2 with no loss on either quality predictor.", "",
+          "| Slider | Low → high | Follows it, -2 to +2 (ρ) | Ends ordered | Piece kept at ±2 | Enjoyment at the ends |",
+          "|---|---|---:|---:|---:|---:|"]
+for n in ("energy", "harmony", "arousal", "valence", "jazz_electronic", "piano_axis"):
+    r = graded[n]
+    rho = graded_axes[n]["rho_full"] if n in graded_axes else r.get("rho")
+    ordered = graded_axes[n]["ordered"] if n in graded_axes else r.get("consistent")
+    lines.append(f"| `{n}` | {ends(n)} | {num(rho)} | {100 * ordered:.0f}% | {num(r.get('usable_clap_keep'))} | {num(r.get('ce_at_ends'))} |")
 lines += ["", "`axes/` holds the direction vectors of the real-music axes, so new clips can be scored against them.", "",
           "## Use", "", "```bash", f"pip install \"audiosliders[model,demo] @ git+{CODE}\" audiobox_aesthetics", "```", "",
           "A page where you type a prompt and drag the sliders:", "", "```bash",

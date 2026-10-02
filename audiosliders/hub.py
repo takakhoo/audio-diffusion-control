@@ -18,6 +18,7 @@ GROUPS = {
     "ace-step-1.5-xl-turbo/real-axes": "five axes found in real music, trained from a prompt pair made of the axis's tags",
     "ace-step-1.5-xl-turbo/real-axes-sets": "seven axes found in real music, trained with no text; use between -1 and +1",
     "ace-step-1.5-xl-turbo/measured-sets": "five measurements, trained with no text; use between -1 and +1",
+    "ace-step-1.5-xl-turbo/graded": "six sliders trained with no text at graded positions; usable from -2 to +2",
 }
 
 

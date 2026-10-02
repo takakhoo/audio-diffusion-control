@@ -12,7 +12,7 @@
 
 **[Listen and drag the sliders yourself: live demo](https://takakhoo.github.io/audio-diffusion-control/)** (18 sliders, 5 prompts, 920 loudness-matched clips, with the measured numbers at every position)
 
-**[Download the trained sliders](https://huggingface.co/takakhoo/audio-sliders)**: 29 sliders for ACE-Step 1.5 XL turbo on Hugging Face (MIT), with audio examples and the measured numbers for each.
+**[Download the trained sliders](https://huggingface.co/takakhoo/audio-sliders)**: 35 sliders for ACE-Step 1.5 XL turbo on Hugging Face (MIT), with audio examples and the measured numbers for each.
 
 **[Take the ten-minute listening test](https://takakhoo.github.io/audio-diffusion-control/listen.html)**: 23 questions on the same clips, nothing uploaded, and it shows how your ears line up with the measurements at the end.
 
