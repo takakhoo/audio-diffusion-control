@@ -39,4 +39,6 @@
 \caption{Share of within-concept variance carried by the first six components.}\label{fig:pca}
 \end{figure*}
 
+\IfFileExists{tables/found.tex}{\smallskip\noindent\textbf{From axes to sliders.} For three concepts we trained the four leading components into sliders with the set trainer and tested each on 32 fresh seeds of its concept. All \foundN{} follow the axis they were trained on, with rank correlations between \foundLo{} and \foundHi{}, and the tags that move in the output match the labels each axis received from the corpus (Table~\ref{tab:found}). Unlike the prompt-pair sliders these stay usable only to about $\pm1.5$.\input{tables/found}}{}
+
 \IfFileExists{sections/results_sets.tex}{\input{sections/results_sets}}{}

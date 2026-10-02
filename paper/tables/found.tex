@@ -1,0 +1,15 @@
+\begin{table*}[t]\centering\small
+\begin{tabular}{llrrl}
+\toprule
+Concept & Corpus label (toward / away) & $\rho$ & Kept & Tags that rise / fall in the slider's output \\
+\midrule
+music & latin, repetitive / lo-fi, hip hop & 0.76 & 0.74 & latin, repetitive / trumpet, saxophone \\
+music & organ, complex / lo-fi, calm & 0.61 & 0.78 & acoustic, acoustic guitar / trumpet, epic \\
+piano music & lo-fi, distorted / acoustic guitar, reggae & 0.81 & 0.79 & distorted, dark-toned / latin, reggae \\
+piano music & blues, loud / dreamy, ambient & 0.72 & 0.73 & hip hop, lo-fi / orchestral film score, cello \\
+electronic dance music & vocals, techno / melancholic, classical & 0.72 & 0.62 & techno, pop / choir, organ \\
+electronic dance music & swung, hip hop / romantic, complex & 0.61 & 0.69 & cello, vocals / funk, happy \\
+\bottomrule
+\end{tabular}
+\caption{Sliders trained along discovered axes (two leading components per concept). $\rho$: rank correlation between slider position and the output's projection on the axis, over 32 fresh seeds. Kept: CLAP similarity to the unsteered clip at the ends of the usable span.}\label{tab:found}
+\end{table*}

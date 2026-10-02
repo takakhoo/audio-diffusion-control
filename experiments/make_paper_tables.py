@@ -82,6 +82,23 @@ if pca.exists():
               r"each), labelled by the tags they align with.}\label{tab:pca}", r"\end{table*}"]
     (PAPER / "tables" / "pca.tex").write_text("\n".join(lines) + "\n")
 
+found = RESULTS / "discovery" / "ace" / "sliders.json"
+if found.exists():
+    sl = json.loads(found.read_text())["sliders"]
+    macros.update(foundN=str(len(sl)), foundLo=f"{min(x['follows'] for x in sl):.2f}", foundHi=f"{max(x['follows'] for x in sl):.2f}")
+    lines = [r"\begin{table*}[t]\centering\small", r"\begin{tabular}{llrrl}", r"\toprule",
+             r"Concept & Corpus label (toward / away) & $\rho$ & Kept & Tags that rise / fall in the slider's output \\", r"\midrule"]
+    for x in sl:
+        if x["component"] > 1:
+            continue
+        lines.append(f"{x['concept']} & {', '.join(x['corpus_toward'][:2])} / {', '.join(x['corpus_away'][:2])} & {x['follows']:.2f} & "
+                     f"{x['kept']:.2f} & {', '.join(x['rises'][:2])} / {', '.join(x['falls'][:2])} \\\\")
+    lines += [r"\bottomrule", r"\end{tabular}",
+              r"\caption{Sliders trained along discovered axes (two leading components per concept). $\rho$: rank correlation "
+              r"between slider position and the output's projection on the axis, over 32 fresh seeds. Kept: CLAP similarity to "
+              r"the unsteered clip at the ends of the usable span.}\label{tab:found}", r"\end{table*}"]
+    (PAPER / "tables" / "found.tex").write_text("\n".join(lines) + "\n")
+
 macros.update(nPrompts="24", nReal="2{,}000", fmaCE="6.12", aceCE="6.92", saoCE="6.16")
 (PAPER / "numbers.tex").write_text("".join(f"\\newcommand{{\\{k}}}{{{v}}}\n" for k, v in sorted(macros.items())))
 print("macros:", macros)
