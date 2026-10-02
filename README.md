@@ -27,6 +27,8 @@ Eight sliders on ACE-Step 1.5 XL turbo, each trained from one prompt pair in abo
 | [**brightness**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=brightness&prompt=0&x=2) (dark to bright) | happy, repetitive, romantic | dark-toned, lo-fi, quiet | spectral centroid: 0.97, 100% | 0.80, 100% | -1 to +2 | 0.74 | 6.04 |
 | [**density**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=density&prompt=0&x=2) (sparse to dense) | latin, repetitive, romantic | dark-toned, quiet, lo-fi | onset rate: 0.78, 92% | 0.86, 100% | -0.5 to +2 | 0.84 | 6.09 |
 
+**Axes nobody named.** The second set of sliders runs along directions found in 14,985 real recordings: arousal, valence, jazz to electronic, strings to synth, piano. They follow those axes on held-out prompts with rank correlation up to 0.91, and the arousal slider moves a clip 2.4 standard deviations of real music along its axis before quality drops ([section 9](#9-axes-of-real-music)).
+
 Each slider name opens the live demo on that slider. The tag columns and the direction score come from CLAP; the "second model" column repeats the direction test with MuQ-MuLan, a music-text model that shares nothing with CLAP, and it agrees on all eight. For scale: unsteered clips score 6.95 on Audiobox Aesthetics content enjoyment, and 2,000 real recordings from FMA average 6.1. "Usable span" is how far the slider goes before mean enjoyment falls more than 0.5 below the unsteered clips. "Piece kept" is CLAP similarity to the unsteered clip at the ends of that span. Full tables: [`results/ace/`](results/ace/).
 
 **Target venue: ISMIR 2027** (London, September 2027; six pages, double-blind). The draft in [`paper/`](paper/) is already on the official ISMIR template and within its limits. Why this venue, its rules, and what the paper still needs to be competitive there are in [`docs/VENUE.md`](docs/VENUE.md).
@@ -199,19 +201,26 @@ Independent components of MuQ-MuLan give the axes that read most like music. Two
 
 Training the set slider directly between sets of real recordings did not work: the mismatch between real recordings and the model's own output dominates the loss, and once it cancels almost no steering is left ([`results/real_sets/`](results/real_sets/README.md)). What works is to keep the axis from real music and take the two training sets from the model's own clips sorted along it.
 
-**Sliders along those axes.** Seven were trained that way and tested on 24 held-out prompts ([`results/ace_v2/`](results/ace_v2/README.md)):
+**Sliders along those axes, trained two ways** ([`results/ace_v2/`](results/ace_v2/README.md)). One route sorts the model's own clips along the axis and trains between the two ends, with no text. The other reads the tags at the two ends of the axis and uses them as a prompt pair. Either way the output is scored by its projection on the axis from real recordings, in standard deviations of those recordings. 24 held-out prompts, positions -1 to +1:
 
-| Slider | ρ with the axis | Ends ordered | Moved between -1 and +1, in std of real music | Piece kept | Enjoyment at -1 / 0 / +1 | Musicality at -1 / 0 / +1 |
-|---|---:|---:|---:|---:|---|---|
-| arousal | 0.82 | 99% | 1.19 | 0.84 | 7.09 / 6.95 / 7.16 | 2.72 / 2.77 / 2.68 |
-| classical to funk | 0.64 | 96% | 0.77 | 0.85 | 7.16 / 6.95 / 7.09 | 2.72 / 2.77 / 2.67 |
-| piano | 0.63 | 96% | 0.75 | 0.87 | 7.10 / 6.95 / 7.06 | 2.66 / 2.77 / 2.72 |
-| jazz to electronic | 0.61 | 94% | 0.61 | 0.87 | 7.08 / 6.95 / 7.09 | 2.77 / 2.77 / 2.63 |
-| acoustic to electronic | 0.55 | 93% | 0.64 | 0.86 | 7.08 / 6.95 / 7.14 | 2.68 / 2.77 / 2.69 |
-| valence | 0.50 | 93% | 0.62 | 0.87 | 7.10 / 6.95 / 7.05 | 2.78 / 2.77 / 2.67 |
-| strings to synth | 0.40 | 82% | 0.44 | 0.87 | 7.15 / 6.95 / 7.03 | 2.68 / 2.77 / 2.69 |
+| Axis | Trained from | ρ with the axis | Ends ordered | Moved, in std of real music | Piece kept | Enjoyment at -1 / 0 / +1 | Musicality at -1 / 0 / +1 |
+|---|---|---:|---:|---:|---:|---|---|
+| arousal | prompt pair | 0.91 | 100% | 1.85 | 0.80 | 7.11 / 6.95 / 6.57 | 2.87 / 2.77 / 2.55 |
+| arousal | two sets | 0.82 | 99% | 1.19 | 0.84 | 7.09 / 6.95 / 7.16 | 2.72 / 2.77 / 2.68 |
+| jazz to electronic | prompt pair | 0.86 | 97% | 1.86 | 0.82 | 6.77 / 6.95 / 7.35 | 2.68 / 2.77 / 2.75 |
+| jazz to electronic | two sets | 0.61 | 94% | 0.61 | 0.87 | 7.08 / 6.95 / 7.09 | 2.77 / 2.77 / 2.63 |
+| strings to synth | prompt pair | 0.80 | 97% | 1.78 | 0.73 | 5.97 / 6.95 / 7.43 | 2.42 / 2.77 / 2.87 |
+| strings to synth | two sets | 0.40 | 82% | 0.44 | 0.87 | 7.15 / 6.95 / 7.03 | 2.68 / 2.77 / 2.69 |
+| piano | prompt pair | 0.78 | 97% | 1.56 | 0.80 | 6.80 / 6.95 / 6.76 | 2.77 / 2.77 / 2.71 |
+| piano | two sets | 0.63 | 96% | 0.75 | 0.87 | 7.10 / 6.95 / 7.06 | 2.66 / 2.77 / 2.72 |
+| valence | prompt pair | 0.42 | 75% | 0.86 | 0.85 | 6.96 / 6.95 / 6.55 | 2.82 / 2.77 / 2.52 |
+| valence | two sets | 0.50 | 93% | 0.62 | 0.87 | 7.10 / 6.95 / 7.05 | 2.78 / 2.77 / 2.67 |
+| classical to funk | two sets | 0.64 | 96% | 0.77 | 0.85 | 7.16 / 6.95 / 7.09 | 2.72 / 2.77 / 2.67 |
+| acoustic to electronic | two sets | 0.55 | 93% | 0.64 | 0.86 | 7.08 / 6.95 / 7.14 | 2.68 / 2.77 / 2.69 |
 
-The projection is measured on the axis from real recordings and expressed in standard deviations of those recordings. All seven follow their axis. The arousal slider carries one prompt and seed 1.19 real-music standard deviations along the arousal axis with 84% of the piece kept and no loss on either quality predictor.
+- Every one of the twelve follows its axis. The prompt pair is the stronger route on four of five axes and stays usable beyond ±1: over its usable span of -2 to +1 the arousal slider moves a clip 2.4 standard deviations of real music.
+- The set-trained sliders move less, keep more of the piece, and hold both quality scores level at both ends.
+- Nobody chose these prompt pairs. "Quiet, dreamy, melancholic, minor key" against "aggressive, energetic, rhythmic, dry" is what an independent component of real-music embeddings looks like when its two ends are put into words.
 
 ### 10. How much of real music the model covers
 
@@ -221,7 +230,17 @@ Projecting 15,552 generated clips (648 prompts) on the real-music axes shows whe
 
 Along every axis the model is narrower than real music. Across all 648 prompts it spans 28 to 83% of the real spread, and with one prompt and many seeds 38 to 69% of what recordings of one genre span. Its average clip sits 1.35 standard deviations toward the quiet end of the arousal axis and 1.36 toward the playful end of the valence axis. Stable Audio Open shows the same pattern on the CLAP axes. The directions along which generated clips differ most are also mostly different ones: the top eight principal directions of the generated corpus contain 31% of the top eight of the real corpus.
 
-This is the case for sliders along real-music axes. Prompts and seeds do not reach the ends of those axes, and an axis the model under-explores is one a control can open up.
+This is the case for sliders along real-music axes, and the sliders of the previous section deliver on it. Where the same 24 prompts and seeds land on each axis, with 0 the average real recording and the unit one standard deviation of real music:
+
+| Axis (positive end) | Slider at -2 | at -1 | unsteered | at +1 | at +2 |
+|---|---:|---:|---:|---:|---:|
+| arousal (quiet, dreamy) | -0.26 | 0.31 | 1.21 | 2.16 | 2.63 |
+| jazz to electronic (jazz) | -0.51 | -0.12 | 0.60 | 1.74 | 2.29 |
+| strings to synth (guitars, strings) | -1.21 | -0.77 | 0.23 | 1.01 | 1.19 |
+| piano (piano) | -0.90 | -0.51 | 0.23 | 1.05 | 1.38 |
+| valence (dark, distorted) | -1.86 | -1.67 | -1.26 | -0.81 | 0.30 |
+
+Unsteered, the model's clips sit 1.21 standard deviations on the quiet side of the arousal axis. One slider takes them across the mean of real music to -0.26. For comparison, across 648 different prompts the model's clips have a standard deviation of 0.83 on this axis.
 
 ### 11. Axes inside the model
 
