@@ -55,11 +55,23 @@ def monotonicity(rows: Iterable[dict], key: str, sign: float = 1.0) -> dict[str,
     rho = np.array([_spearman(scales, sign * v) for v in values])
     ends = sign * (values[:, -1] - values[:, 0])
     ends = ends[np.isfinite(ends)]
+    ok = rho[np.isfinite(rho)]
     return dict(
-        rho=float(np.nanmean(rho)) if np.isfinite(rho).any() else np.nan,
+        rho=float(ok.mean()) if len(ok) else np.nan,
+        rho_ci=float(1.96 * ok.std(ddof=1) / np.sqrt(len(ok))) if len(ok) > 1 else np.nan,
         consistent=float((ends > 0).mean()) if len(ends) else np.nan,
         n=int(len(values)),
     )
+
+
+def end_to_end(rows: Iterable[dict], key: str, sign: float = 1.0, unit: float | None = None) -> dict[str, float]:
+    """Mean change in the descriptor from the lowest to the highest position, with a 95% interval over trajectories."""
+    _, values = trajectories(rows, key)
+    diff = sign * (values[:, -1] - values[:, 0])
+    diff = diff[np.isfinite(diff)] / (unit or 1.0)
+    if len(diff) < 2:
+        return dict(mean=np.nan, ci=np.nan)
+    return dict(mean=float(diff.mean()), ci=float(1.96 * diff.std(ddof=1) / np.sqrt(len(diff))))
 
 
 def natural_std(rows: Iterable[dict], key: str) -> float:
@@ -166,6 +178,7 @@ def summarize(rows: list[dict], key: str | None, sign: float = 1.0) -> dict[str,
         std = natural_std(rows, key)
         out.update(
             rho=mono["rho"],
+            rho_ci=mono["rho_ci"],
             consistent=mono["consistent"],
             range=float(sign * (resp["level"][-1] - resp["level"][0])),
             range_in_std=float(sign * (resp["level"][-1] - resp["level"][0]) / std) if std else np.nan,
@@ -186,8 +199,9 @@ def summarize(rows: list[dict], key: str | None, sign: float = 1.0) -> dict[str,
         out.update(usable_lo=lo, usable_hi=hi)
         inside = within(rows, lo, hi)
         if key and hi > lo:
-            resp, std = response(inside, key), natural_std(rows, key)
-            out["usable_range_in_std"] = float(sign * (resp["level"][-1] - resp["level"][0]) / std) if std else np.nan
+            std = natural_std(rows, key)
+            moved = end_to_end(inside, key, sign, std) if std else dict(mean=np.nan, ci=np.nan)
+            out["usable_range_in_std"], out["usable_range_ci"] = moved["mean"], moved["ci"]
         if hi > lo and any("clap_dir" in r for r in rows):
             resp = response(inside, "clap_dir")
             out["usable_clap_range"] = float(resp["level"][-1] - resp["level"][0])

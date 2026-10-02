@@ -253,8 +253,12 @@ def main():
         cells = []
         for key, _, digits in cols:
             v = r.get(key)
-            cells.append("" if v is None or (isinstance(v, float) and not np.isfinite(v)) else
-                         (f"{v:.{digits}f}" if digits is not None else str(v)))
+            cell = "" if v is None or (isinstance(v, float) and not np.isfinite(v)) else (
+                f"{v:.{digits}f}" if digits is not None else str(v))
+            ci = r.get({"rho": "rho_ci", "usable_range_in_std": "usable_range_ci"}.get(key, ""))
+            if cell and ci is not None and np.isfinite(ci):
+                cell += f" ± {ci:.{digits}f}"
+            cells.append(cell)
         lines.append("| " + " | ".join(cells) + " |")
     (out / "summary.md").write_text("\n".join(lines) + "\n")
     (out / "summary.json").write_text(json.dumps(dict(

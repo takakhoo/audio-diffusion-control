@@ -80,3 +80,11 @@ def test_usable_span_stops_where_quality_drops():
     assert out["usable_range_in_std"] == pytest.approx(300 / M.natural_std(rows, "target"))
     assert out["usable_clap_range"] == pytest.approx(0.03)
     assert out["usable_clap_keep"] == pytest.approx(0.85)
+
+
+def test_intervals_shrink_with_more_trajectories_and_cover_the_truth():
+    few, many = make_rows(effect=100, noise=60, n_prompts=4), make_rows(effect=100, noise=60, n_prompts=40)
+    a, b = M.end_to_end(few, "target"), M.end_to_end(many, "target")
+    assert b["ci"] < a["ci"]
+    assert abs(b["mean"] - 400) < b["ci"] * 1.5
+    assert M.monotonicity(many, "target")["rho_ci"] < M.monotonicity(few, "target")["rho_ci"]
