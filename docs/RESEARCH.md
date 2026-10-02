@@ -195,4 +195,4 @@ The existing evidence is either one aggregate number per model, or dispersion of
 
 ### Open models noted for later (from the search pass; check each model card before use)
 
-`ACE-Step/acestep-v15-xl-sft-diffusers` (MIT, same pipeline class as the turbo model used here), `ASLP-lab/DiffRhythm2` (Apache-2.0), `declare-lab/JAM-0.5` (non-commercial, flow transformer), `HeartMuLa/HeartMuLa-oss-3B` (Apache-2.0, language model plus codec).
+`ACE-Step/acestep-v15-xl-sft-diffusers` (MIT, same pipeline class as the turbo model used here), `ASLP-lab/DiffRhythm2` (Apache-2.0), `declare-lab/JAM-0.5` (non-commercial, flow transformer), `HeartMuLa/HeartMuLa-oss-3B-happy-new-year` (Apache-2.0, language model plus codec).
