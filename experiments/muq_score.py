@@ -43,7 +43,7 @@ for run in map(Path, args.runs):
             meta = json.loads((f.metadata() or {}).get("slider", "{}"))
         if meta.get("emb") == "muq" and meta.get("by", "").startswith("direction:"):
             axis = torch.tensor(np.load(meta["source"])[meta["index"]], dtype=torch.float32).cuda()
-    if axis is None and name not in spec:
+    if axis is None and not (name in spec and "positive" in spec[name]):
         print("skip", run)
         continue
     rows = [json.loads(line) for line in (run / "rows.jsonl").read_text().splitlines() if line]
@@ -53,7 +53,8 @@ for run in map(Path, args.runs):
         continue
     prompts = sorted({r["prompt"] for r in rows})
     with torch.no_grad():
-        ends = [spec[name]["positive"], spec[name]["negative"]] if name in spec else ["music", "music"]
+        named = name in spec and "positive" in spec[name]
+        ends = [spec[name]["positive"], spec[name]["negative"]] if named else ["music", "music"]
         text = model(texts=ends + prompts)
     out = []
     for b in range(0, len(files), args.batch):
