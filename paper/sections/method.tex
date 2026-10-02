@@ -1,23 +1,27 @@
 \section{Method}
 
-\paragraph{Backbones.} We use two frozen text-to-music models behind one interface. Stable Audio Open 1.0 \citep{evans2024sao} is a latent diffusion transformer with a $v$-prediction objective: $z_t = \alpha_t x_0 + \sigma_t \epsilon$ with $\alpha_t=\cos(\pi t/2)$, $\sigma_t=\sin(\pi t/2)$, and the network predicts $v=\alpha_t\epsilon-\sigma_t x_0$. We sample with DPM-Solver++(2M) for 50 steps and classifier-free guidance 7. ACE-Step 1.5 XL turbo \citep{gong2026acestep} is a rectified-flow transformer, $x_t=(1-t)x_0+t\epsilon$ with the network predicting $\epsilon-x_0$, distilled to 8 Euler steps without guidance. Everything below is written for a generic prediction $f_\theta(z_t,t,c)$ and applies to both.
+\smallskip\noindent\textbf{Backbones.} We use two frozen text-to-music models behind one interface. Stable Audio Open 1.0 \citep{evans2024sao} is a latent diffusion transformer with a $v$-prediction objective: $z_t = \alpha_t x_0 + \sigma_t \epsilon$ with $\alpha_t=\cos(\pi t/2)$, $\sigma_t=\sin(\pi t/2)$, and the network predicts $v=\alpha_t\epsilon-\sigma_t x_0$. We sample with DPM-Solver++(2M) for 50 steps and classifier-free guidance 7. ACE-Step 1.5 XL turbo \citep{gong2026acestep} is a rectified-flow transformer, $x_t=(1-t)x_0+t\epsilon$ with the network predicting $\epsilon-x_0$, distilled to 8 Euler steps without guidance. Everything below is written for a generic prediction $f_\theta(z_t,t,c)$ and applies to both.
 
-\paragraph{A slider.} A slider is a set of low-rank updates, one per linear layer in the self-attention, cross-attention, and feed-forward blocks of the transformer. With slider position $s\in\mathbb{R}$ a layer computes
-\[
+\smallskip\noindent\textbf{A slider.} A slider is a set of low-rank updates, one per linear layer in the self-attention, cross-attention, and feed-forward blocks of the transformer. With slider position $s\in\mathbb{R}$ a layer computes
+\begin{equation}
   y = Wx + s\,\frac{\alpha}{r}\,BAx ,
-\]
+\end{equation}
 with rank $r=4$ and $\alpha=1$. $s$ is read at every forward pass and can differ per sample, so one batch can hold one clip at several positions. Several sliders can be attached at once and their updates add.
 
-\paragraph{Training from a prompt pair.} Given a base prompt $c$ and two phrases describing the ends of an attribute, let $c^+$ and $c^-$ be $c$ with each phrase appended. Following Concept Sliders we train the slider so that, for $s\in\{+1,-1\}$,
-\[
-  f_{\theta,s}(z_t,t,c) \;\approx\; f_\theta(z_t,t,c) + s\,\eta\,\bigl(f_\theta(z_t,t,c^+)-f_\theta(z_t,t,c^-)\bigr),
-\]
+\smallskip\noindent\textbf{Training from a prompt pair.} Given a base prompt $c$ and two phrases describing the ends of an attribute, let $c^+$ and $c^-$ be $c$ with each phrase appended. Following Concept Sliders we train the slider so that, for $s\in\{+1,-1\}$,
+\begin{equation}
+\begin{split}
+  f_{\theta,s}(z_t,t,c) \approx{}& f_\theta(z_t,t,c) \\ &+ s\,\eta\,\bigl(f_\theta(z_t,t,c^+)-f_\theta(z_t,t,c^-)\bigr),
+\end{split}
+\end{equation}
 with all right-hand terms from the frozen model and a squared-error loss. Both signs are trained in every batch. $z_t$ is obtained by sampling from noise for a random number of steps with the slider active, so the slider is trained on states it will visit. We use $\eta=4$ for Stable Audio Open and $\eta=2$ for ACE-Step, 1{,}000 iterations, batch 4, and 48 training prompts that share no prompt with the evaluation set.
 
-\paragraph{Training from two sets of clips.} The second trainer uses no text. Let $H$ and $L$ be two sets of latents. We minimise the ordinary denoising loss of the model with the slider at $s=+1$ on $H$ and at $s=-1$ on $L$:
-\[
-  \mathbb{E}_{x_0\in H}\,\bigl\|f_{\theta,+1}(z_t,t,c)-u\bigr\|^2 \;+\; \mathbb{E}_{x_0\in L}\,\bigl\|f_{\theta,-1}(z_t,t,c)-u\bigr\|^2 ,
-\]
+\smallskip\noindent\textbf{Training from two sets of clips.} The second trainer uses no text. Let $H$ and $L$ be two sets of latents. We minimise the ordinary denoising loss of the model with the slider at $s=+1$ on $H$ and at $s=-1$ on $L$:
+\begin{equation}
+\begin{split}
+  &\mathbb{E}_{x_0\in H}\,\bigl\|f_{\theta,+1}(z_t,t,c)-u\bigr\|^2 \\ &+ \mathbb{E}_{x_0\in L}\,\bigl\|f_{\theta,-1}(z_t,t,c)-u\bigr\|^2 ,
+\end{split}
+\end{equation}
 where $u$ is the model's regression target for $(x_0,\epsilon,t)$. One update serves both ends with opposite sign. To first order, anything the two sets share pulls the update in opposite directions and cancels, and what remains is the difference between the conditional mean predictions of the two sets, which is the direction classifier guidance toward $H$ and away from $L$ would take. We build $H$ and $L$ from the model's own output: generate a corpus of clips, measure something on each clip, and take the top and bottom 30\% \emph{within each prompt} so that prompts are balanced across the two sets. The measured quantity can be a signal descriptor, an aesthetics score, or the projection on a principal direction of CLAP embeddings. The last choice is unsupervised discovery in the sense of SliderSpace, without requiring a differentiable path through the decoder and the embedding model.
 
-\paragraph{Timestep gating.} At inference the slider can be switched on only for $t\le t_0$. The earliest steps decide the layout of the piece; leaving them unsteered keeps it. Section~\ref{sec:results} measures the effect.
+\smallskip\noindent\textbf{Timestep gating.} At inference the slider can be switched on only for $t\le t_0$. The earliest steps decide the layout of the piece; leaving them unsteered keeps it. Section~\ref{sec:results} measures the effect.

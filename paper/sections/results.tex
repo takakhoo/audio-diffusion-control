@@ -1,42 +1,42 @@
 \section{Results}\label{sec:results}
 
-\paragraph{The yardstick.} Audiobox content enjoyment averages \fmaCE{} over \nReal{} real recordings. Unsteered ACE-Step clips average \aceCE{} and unsteered Stable Audio Open clips \saoCE{} (Figure~\ref{fig:yardstick}). A slider that drops a clip well below the real-music mean has left the region in which the change it made is worth having.
+\smallskip\noindent\textbf{The yardstick.} Audiobox content enjoyment averages \fmaCE{} over \nReal{} real recordings. Unsteered ACE-Step clips average \aceCE{} and unsteered Stable Audio Open clips \saoCE{} (Figure~\ref{fig:yardstick}). A slider that drops a clip well below the real-music mean has left the region in which the change it made is worth having.
 
 \begin{figure}[t]\centering
-\includegraphics[width=0.7\linewidth]{figures/quality_reference.png}
+\includegraphics[width=\linewidth]{figures/quality_reference.png}
 \caption{Content enjoyment of unsteered model output and of real recordings.}\label{fig:yardstick}
 \end{figure}
 
-\paragraph{Musical sliders on ACE-Step.} Table~\ref{tab:ace} and Figure~\ref{fig:ace} report prompt-pair sliders on \nPrompts{} held-out prompts, three seeds, nine positions. Where a descriptor was assigned in advance it rises with the slider: harmonic change rate for harmony, production complexity for ensemble size, key clarity for melody, and major-minus-minor fit for mood. The tag panel agrees in words: the mood slider raises \emph{happy} and lowers \emph{dark-toned}; the groove slider raises \emph{latin} and \emph{funk} and lowers \emph{choir} and \emph{strings}; the ensemble slider raises \emph{orchestral film score} and \emph{choir}. Content enjoyment stays above the real-music mean across the range for all but the tension slider, which collapses past $+1$ and whose usable span ends there.
+\smallskip\noindent\textbf{Musical sliders on ACE-Step.} Table~\ref{tab:ace} and Figure~\ref{fig:ace} report prompt-pair sliders on \nPrompts{} held-out prompts, three seeds, nine positions. Where a descriptor was assigned in advance it rises with the slider: harmonic change rate for harmony, production complexity for ensemble size, key clarity for melody, and major-minus-minor fit for mood. The tag panel agrees in words: the mood slider raises \emph{happy} and lowers \emph{dark-toned}; the groove slider raises \emph{latin} and \emph{funk} and lowers \emph{choir} and \emph{strings}; the ensemble slider raises \emph{orchestral film score} and \emph{choir}. Content enjoyment stays above the real-music mean across the range for all but the tension slider, which collapses past $+1$ and whose usable span ends there.
 
 \input{tables/ace}
 
-\begin{figure}[t]\centering
-\includegraphics[width=\linewidth]{ace/response.png}\\[4pt]
-\includegraphics[width=\linewidth]{ace/quality.png}
+\begin{figure*}[t]\centering
+\includegraphics[width=0.9\linewidth]{ace/response.png}\\[2pt]
+\includegraphics[width=0.9\linewidth]{ace/quality.png}
 \caption{ACE-Step. Top: change in each slider's descriptor against position, in standard deviations of unsteered clips. Bottom: content enjoyment against position; the dashed line is the mean of real recordings.}\label{fig:ace}
-\end{figure}
+\end{figure*}
 
-\paragraph{Gating.} On Stable Audio Open a prompt-pair slider at $\pm1$ moves its descriptor a long way and takes the piece with it. Table~\ref{tab:gating} and Figure~\ref{fig:gating} show what happens when the slider is switched on only after the first steps. With the slider on from step \gateSteps{} the brightness slider keeps \gateRangeOn{} of its \gateRangeOff{} standard deviations of range, similarity to the unsteered clip rises from \gateKeepOff{} to \gateKeepOn{}, and the loss in enjoyment falls from \gateLossOff{} to \gateLossOn{} points. The other three sliders tested follow the same curves.
+\smallskip\noindent\textbf{Gating.} On Stable Audio Open a prompt-pair slider at $\pm1$ moves its descriptor a long way and takes the piece with it. Table~\ref{tab:gating} and Figure~\ref{fig:gating} show what happens when the slider is switched on only after the first steps. With the slider on from step \gateSteps{} the brightness slider keeps \gateRangeOn{} of its \gateRangeOff{} standard deviations of range, similarity to the unsteered clip rises from \gateKeepOff{} to \gateKeepOn{}, and the loss in enjoyment falls from \gateLossOff{} to \gateLossOn{} points. The other three sliders tested follow the same curves.
 
 \input{tables/gating}
 
-\begin{figure}[t]\centering
-\includegraphics[width=\linewidth]{figures/gating.png}
+\begin{figure*}[t]\centering
+\includegraphics[width=0.9\linewidth]{figures/gating.png}
 \caption{Timestep gating on Stable Audio Open for four sliders.}\label{fig:gating}
-\end{figure}
+\end{figure*}
 
-\paragraph{The embedding says yes, the waveform says no.} The same gating runs include two sliders trained from the prompt pairs for note density and for percussion. Both move the output along their CLAP text direction at every gate setting. Neither moves its descriptor: the rank correlation between position and onset rate or percussive energy share never exceeds \weakRho{}, and the range is near zero. Scored by embedding alone, both would be reported as working.
+\smallskip\noindent\textbf{The embedding says yes, the waveform says no.} The same gating runs include two sliders trained from the prompt pairs for note density and for percussion. Both move the output along their CLAP text direction at every gate setting. Neither moves its descriptor: the rank correlation between position and onset rate or percussive energy share never exceeds \weakRho{}, and the range is near zero. Scored by embedding alone, both would be reported as working.
 
-\IfFileExists{tables/main.tex}{\paragraph{Stable Audio Open, all sliders.} Table~\ref{tab:sao} gives the gated evaluation of every prompt-pair slider.\input{tables/main}}{}
+\IfFileExists{tables/main.tex}{\smallskip\noindent\textbf{Stable Audio Open, all sliders.} Table~\ref{tab:sao} gives the gated evaluation of every prompt-pair slider.\input{tables/main}}{}
 
-\paragraph{Discovered axes.} For each of five concepts we generated 1{,}024 ACE-Step clips and took principal components of their CLAP embeddings. The leading component carries between \pcaLow{}\% and \pcaTop{}\% of the variance within a concept (Figure~\ref{fig:pca}), and the tags aligned with each end read as musical contrasts (Table~\ref{tab:pca}).
+\smallskip\noindent\textbf{Discovered axes.} For each of five concepts we generated 1{,}024 ACE-Step clips and took principal components of their CLAP embeddings. The leading component carries between \pcaLow{}\% and \pcaTop{}\% of the variance within a concept (Figure~\ref{fig:pca}), and the tags aligned with each end read as musical contrasts (Table~\ref{tab:pca}).
 
 \input{tables/pca}
 
-\begin{figure}[t]\centering
-\includegraphics[width=\linewidth]{figures/discovery.png}
+\begin{figure*}[t]\centering
+\includegraphics[width=0.9\linewidth]{figures/discovery.png}
 \caption{Share of within-concept variance carried by the first six components.}\label{fig:pca}
-\end{figure}
+\end{figure*}
 
 \IfFileExists{sections/results_sets.tex}{\input{sections/results_sets}}{}

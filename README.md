@@ -29,6 +29,8 @@ Eight sliders on ACE-Step 1.5 XL turbo, each trained from one prompt pair in abo
 
 Each slider name opens the live demo on that slider. For scale: unsteered clips score 6.95 on Audiobox Aesthetics content enjoyment, and 2,000 real recordings from FMA average 6.1. "Usable span" is how far the slider goes before mean enjoyment falls more than 0.5 below the unsteered clips. "Piece kept" is CLAP similarity to the unsteered clip at the ends of that span. Full tables: [`results/ace/`](results/ace/).
 
+**Target venue: ISMIR 2027** (London, September 2027; six pages, double-blind). The draft in [`paper/`](paper/) is already on the official ISMIR template and within its limits. Why this venue, its rules, and what the paper still needs to be competitive there are in [`docs/VENUE.md`](docs/VENUE.md).
+
 ## Contents
 
 - [How it works](#how-it-works)
@@ -160,7 +162,7 @@ The first version of this repository never ran a model. Its sampling script wrot
 - [`configs/`](configs/): 20 slider definitions, the 48/24 train/eval prompt split, discovery concepts
 - [`experiments/`](experiments/): scripts and job lists behind each number
 - [`results/`](results/): tables and figures
-- [`paper/`](paper/): draft write-up
+- [`paper/`](paper/): draft on the ISMIR template (`tectonic -X compile paper/audiosliders.tex`)
 - [`docs/`](docs/): demo page and the [research map](docs/RESEARCH.md) of prior work
 - [`tests/`](tests/): CPU tests
 

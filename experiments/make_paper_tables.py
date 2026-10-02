@@ -24,7 +24,7 @@ def slider_table(name, caption, label, methods=("LoRA slider",)):
     if not path.exists():
         return
     rows = [r for r in json.loads(path.read_text())["summary"] if r["method"] in methods]
-    lines = [r"\begin{table}[t]\centering\small", r"\begin{tabular}{llrrrrrrr}", r"\toprule",
+    lines = [r"\begin{table*}[t]\centering\small", r"\begin{tabular}{llrrrrrrr}", r"\toprule",
              r"Slider & Descriptor & $\rho$ & Ordered & Span & Moved & Kept & CE$_0$ & CE$_\text{ends}$ \\", r"\midrule"]
     for r in rows:
         span = f"{r.get('usable_lo', 0):+.1f} to {r.get('usable_hi', 0):+.1f}" if "usable_lo" in r else "--"
@@ -32,7 +32,7 @@ def slider_table(name, caption, label, methods=("LoRA slider",)):
             r["slider"], (r.get("measure") or "--").replace("_", r"\_"), fmt(r.get("rho")), fmt(r.get("consistent")),
             span, fmt(r.get("usable_range_in_std")), fmt(r.get("usable_clap_keep")), fmt(r.get("ce_at_zero")),
             fmt(r.get("ce_at_ends"))]) + r" \\")
-    lines += [r"\bottomrule", r"\end{tabular}", rf"\caption{{{caption}}}\label{{{label}}}", r"\end{table}"]
+    lines += [r"\bottomrule", r"\end{tabular}", rf"\caption{{{caption}}}\label{{{label}}}", r"\end{table*}"]
     (PAPER / "tables" / f"{name}.tex").write_text("\n".join(lines) + "\n")
     if rows:
         macros[f"{name}CEzero"] = fmt(rows[0].get("ce_at_zero"))
@@ -48,13 +48,13 @@ slider_table("main", "Prompt-pair sliders on Stable Audio Open 1.0 with the slid
 gate = RESULTS / "gating" / "summary.csv"
 if gate.exists():
     rows = [r for r in csv.DictReader(gate.open()) if r["slider"] == "brightness"]
-    lines = [r"\begin{table}[t]\centering\small", r"\begin{tabular}{rrrrr}", r"\toprule",
-             r"On after step & Moved (std) & CLAP sim. & Chroma sim. & CE \\", r"\midrule"]
+    lines = [r"\begin{table}[t]\centering\small\setlength{\tabcolsep}{4pt}", r"\begin{tabular}{rrrrr}", r"\toprule",
+             r"On after & Moved & CLAP & Chroma & CE \\", r"\midrule"]
     for r in rows:
         lines.append(f"{r['skipped_steps']} & {float(r['range_in_std']):.2f} & {float(r['clap_keep']):.2f} & "
                      f"{float(r['chroma_sim']):.2f} & {float(r['ce_at_ends']):.2f} \\\\")
     lines += [r"\bottomrule", r"\end{tabular}",
-              r"\caption{Timestep gating for the brightness slider on Stable Audio Open at positions $\pm1$. "
+              r"\caption{Timestep gating for the brightness slider on Stable Audio Open at positions $\pm1$: descriptor moved (std), CLAP and chroma similarity to the unsteered clip, content enjoyment. "
               rf"Unsteered CE is {float(rows[0]['ce_at_zero']):.2f}.}}\label{{tab:gating}}", r"\end{table}"]
     (PAPER / "tables" / "gating.tex").write_text("\n".join(lines) + "\n")
     by = {int(r["skipped_steps"]): r for r in rows}
@@ -70,7 +70,7 @@ if pca.exists():
     data = json.loads(pca.read_text())
     macros["pcaTop"] = f"{100 * max(c['components'][0]['variance_share'] for c in data.values()):.0f}"
     macros["pcaLow"] = f"{100 * min(c['components'][0]['variance_share'] for c in data.values()):.0f}"
-    lines = [r"\begin{table}[t]\centering\small", r"\begin{tabular}{lrll}", r"\toprule",
+    lines = [r"\begin{table*}[t]\centering\small", r"\begin{tabular}{lrll}", r"\toprule",
              r"Concept & Var. & Toward & Away \\", r"\midrule"]
     for concept, info in data.items():
         for c in info["components"][:2]:
@@ -78,7 +78,7 @@ if pca.exists():
                          f"{', '.join(c['away'][:3])} \\\\")
     lines += [r"\bottomrule", r"\end{tabular}",
               r"\caption{The two leading principal components of CLAP embeddings for each concept (1{,}024 ACE-Step clips "
-              r"each), labelled by the tags they align with.}\label{tab:pca}", r"\end{table}"]
+              r"each), labelled by the tags they align with.}\label{tab:pca}", r"\end{table*}"]
     (PAPER / "tables" / "pca.tex").write_text("\n".join(lines) + "\n")
 
 macros.update(nPrompts="24", nReal="2{,}000", fmaCE="6.12", aceCE="6.92", saoCE="6.16")

@@ -1,25 +1,27 @@
-\documentclass[11pt]{article}
-\usepackage[margin=1in]{geometry}
+% ISMIR template (2026v1, the latest official release; the 2027 template is not out yet).
+% Rules this file follows: at most six pages of technical content plus references, A4, double-blind
+% with line numbers for submission, 150-200 word abstract, numbered references in order of citation.
+\documentclass{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{lmodern}
-\usepackage{microtype}
-\usepackage{amsmath,amsfonts}
-\usepackage{booktabs}
+\usepackage[submission]{ismir} % remove "submission" for the camera-ready version
+\usepackage{amsmath,amsfonts,cite,url}
 \usepackage{graphicx}
-\usepackage[numbers,sort&compress]{natbib}
-\usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=black]{hyperref}
-\usepackage{url}
+\usepackage{color}
+\usepackage{booktabs}
 \graphicspath{{../results/}}
 
 \title{Audio Sliders: Measuring What a Slider Does to Music}
-\author{Taka Khoo\\[2pt]
-Thayer School of Engineering, Dartmouth College\\
-\texttt{taka.khoo.th@dartmouth.edu}}
-\date{October 2026}
 
+\oneauthor
+  {Anonymous Authors}
+  {Anonymous Affiliations\\\texttt{anonymous@ismir.net}}
+\def\authorname{Anonymous Authors}
+
+\newcommand{\citep}[1]{\cite{#1}}
 \input{numbers}
 
+\sloppy
 \begin{document}
 \maketitle
 
@@ -31,6 +33,5 @@ Thayer School of Engineering, Dartmouth College\\
 \input{sections/results}
 \input{sections/limits}
 
-\bibliographystyle{plainnat}
 \bibliography{refs}
 \end{document}
