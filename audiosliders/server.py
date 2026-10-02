@@ -92,13 +92,16 @@ def main() -> None:
     import uvicorn
 
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("--sliders", required=True, help="directory of .safetensors sliders")
+    ap.add_argument("--sliders", required=True,
+                    help="directory of .safetensors sliders, or hf:<group> to download a published group")
     ap.add_argument("--static", default="docs")
     ap.add_argument("--backbone", default="ace-turbo")
     ap.add_argument("--host", default="127.0.0.1")
     ap.add_argument("--port", type=int, default=7860)
     args = ap.parse_args()
-    uvicorn.run(build(Path(args.sliders), Path(args.static), args.backbone), host=args.host, port=args.port)
+    from .hub import resolve
+
+    uvicorn.run(build(resolve(args.sliders), Path(args.static), args.backbone), host=args.host, port=args.port)
 
 
 if __name__ == "__main__":

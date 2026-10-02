@@ -65,6 +65,11 @@ for run in sorted(Path(args.eval).iterdir()):
     ce = {x: float(np.mean([r["ce"] for r in rows if r["scale"] == x])) for x in (-1.0, 0.0, 1.0)}
     music = {x: float(np.mean([r["se_musicality"] for r in rows if r["scale"] == x])) for x in (-1.0, 0.0, 1.0)} \
         if "se_musicality" in rows[0] else {}
+    # Usable where both quality predictors stay near the unsteered clips.
+    usable = list(M.usable_span(rows))
+    if music:
+        second = M.usable_span(rows, "se_musicality", 0.25)
+        usable = [max(usable[0], second[0]), min(usable[1], second[1])]
     table.append(dict(
         slider=name, trained_from=METHODS[method], embedding=declared["emb"], axis=index, toward=axis["toward"][:3], away=axis["away"][:3],
         rho=mono["rho"], rho_ci=mono["rho_ci"], ordered=mono["consistent"], rho_full=full["rho"],
@@ -74,7 +79,7 @@ for run in sorted(Path(args.eval).iterdir()):
         position=[float((resp["level"][scales.index(x)] - model["real_mean"][index]) / model["real_std"][index])
                   for x in (scales[0], -1.0, 0.0, 1.0, scales[-1])] if "real_mean" in model else [],
         kept=float(np.mean([r["clap_keep"] for r in rows if abs(r["scale"]) == 1.0])), ce=list(ce.values()),
-        musicality=list(music.values()),
+        musicality=list(music.values()), usable=usable,
         rises=[t for t, _ in up], falls=[t for t, _ in down],
         descriptors={k: leak[k] for k in top}, n=len({(r["prompt_index"], r["seed"]) for r in rows}),
     ))

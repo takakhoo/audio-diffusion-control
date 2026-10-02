@@ -1,6 +1,8 @@
 # Audio Sliders
 
 [![tests](https://github.com/takakhoo/audio-diffusion-control/actions/workflows/tests.yml/badge.svg)](https://github.com/takakhoo/audio-diffusion-control/actions/workflows/tests.yml)
+[![weights on Hugging Face](https://img.shields.io/badge/weights-Hugging%20Face-ffcc4d)](https://huggingface.co/takakhoo/audio-sliders)
+[![live demo](https://img.shields.io/badge/demo-live-c2410c)](https://takakhoo.github.io/audio-diffusion-control/)
 
 **Sliders for generated music that are measured, and that keep it sounding like music.** A slider is a small LoRA on a frozen text-to-music model. Drag it and the same piece, same prompt and same seed, moves along one axis: sad to happy, solo to full ensemble, stiff to groovy, plain harmony to rich harmony, dark to bright. The model is untouched and the slider adds no extra sampling passes.
 
@@ -9,6 +11,8 @@
 *Four real sliders on four held-out prompts. Each panel is one prompt and one seed; only the slider moves. The knob sweeps from the middle to +2, back to -2, and home, while the spectrogram redraws and the readout shows the Audiobox enjoyment score and how close the clip stays to the unsteered one.*
 
 **[Listen and drag the sliders yourself: live demo](https://takakhoo.github.io/audio-diffusion-control/)** (18 sliders, 5 prompts, 920 loudness-matched clips, with the measured numbers at every position)
+
+**[Download the trained sliders](https://huggingface.co/takakhoo/audio-sliders)**: 25 sliders for ACE-Step 1.5 XL turbo on Hugging Face (MIT), with audio examples and the measured numbers for each.
 
 **[Take the ten-minute listening test](https://takakhoo.github.io/audio-diffusion-control/listen.html)**: 23 questions on the same clips, nothing uploaded, and it shows how your ears line up with the measurements at the end.
 
@@ -339,13 +343,31 @@ Most of them do what their names say; the drum slider moves the percussive share
 
 ```bash
 pip install -e ".[dev]"
-python -m pytest -q          # 57 CPU tests, no model download
+python -m pytest -q          # 58 CPU tests, no model download
 ```
 
-With a GPU:
+With a GPU, using the published sliders (no training):
 
 ```bash
 pip install -e ".[model,experiments,demo]" audiobox_aesthetics
+python -m audiosliders.server --sliders hf:ace-step-1.5-xl-turbo/text --backbone ace-turbo   # live page: type a prompt, drag sliders
+```
+
+```python
+from audiosliders.backbone import load_backbone
+from audiosliders.hub import fetch
+from audiosliders.lora import SliderBank
+
+model = load_backbone("ace-turbo")
+bank = SliderBank(model.dit)
+bank.load("arousal", fetch("ace-step-1.5-xl-turbo/real-axes") / "arousal.safetensors")
+audio = model.generate(["mellow jazz piano trio, brushed drums"], [0], seconds=10,
+                       wrap=lambda p: bank.gated(p, {"arousal": -2.0}))   # -2 is the energetic end
+```
+
+The four published groups are `text`, `real-axes`, `real-axes-sets`, and `measured-sets` ([`hub.py`](audiosliders/hub.py)). Training your own:
+
+```bash
 python -m audiosliders.train mood --backbone ace-turbo --eta 2 --out runs/sliders/ace   # about 20 minutes
 python experiments/sweep.py runs/sliders/ace/mood.safetensors --backbone ace-turbo      # descriptor table per position
 python -m audiosliders.server --sliders runs/sliders/ace --backbone ace-turbo           # live page: type a prompt, drag sliders

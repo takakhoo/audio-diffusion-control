@@ -176,3 +176,10 @@ def test_presets_select_stable_audio_3_layers():
         bank = SliderBank(Dit())
         assert len(bank.add("a", rank=2, targets=targets)) == 2 * per_layer * 2
         assert len(bank.add("b", rank=2, targets=targets)) == 2 * per_layer * 2
+
+
+def test_hub_resolve_leaves_local_paths_alone(tmp_path):
+    from audiosliders.hub import GROUPS, resolve
+
+    assert resolve(tmp_path) == tmp_path and resolve(str(tmp_path)) == tmp_path
+    assert all(g.startswith("ace-step-1.5-xl-turbo/") for g in GROUPS)
