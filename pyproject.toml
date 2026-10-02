@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "audiosliders"
+version = "1.0.0.dev0"
+description = "Continuous slider controls for text-to-music diffusion, measured against signal descriptors"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.26", "librosa>=0.10", "soundfile>=0.12", "scipy>=1.11", "pyyaml>=6"]
+
+[project.optional-dependencies]
+model = ["torch>=2.4", "torchaudio>=2.4", "diffusers>=0.30", "transformers>=4.44", "safetensors", "sentencepiece", "accelerate"]
+experiments = ["scikit-learn>=1.4", "matplotlib>=3.8", "pandas>=2"]
+demo = ["fastapi", "uvicorn"]
+dev = ["pytest>=8", "torch>=2.4", "safetensors"]
+
+[tool.setuptools]
+packages = ["audiosliders"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
