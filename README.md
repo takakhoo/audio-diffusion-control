@@ -315,7 +315,7 @@ A slider with no text, along an axis found in real music:
 
 ```bash
 python experiments/make_corpus.py --backbone ace-turbo --split large --seeds 24 --save-audio --out runs/corpus/ace_large
-venv-muq/bin/python experiments/muq_embed.py runs/corpus/ace_large          # MuQ embeddings, in their own environment
+venv-muq/bin/python experiments/muq_embed.py --corpus runs/corpus/ace_large --music runs/corpus/ace_large/audio --offset 0
 python experiments/discover.py --corpus runs/corpus/real_ace --method ica --emb muq --max-vocal 0.6 \
     --vocab runs/reference/vocab_muq.npz --out runs/discovery/real_muq_ica
 python -m audiosliders.contrast arousal --backbone ace-turbo --corpus runs/corpus/ace_large --emb muq \
