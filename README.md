@@ -124,7 +124,7 @@ The prompt-pair trainer asks the slider to reproduce a shift in the frozen model
 
 ```bash
 pip install -e ".[dev]"
-python -m pytest -q          # 41 CPU tests, no model download
+python -m pytest -q          # 44 CPU tests, no model download
 ```
 
 With a GPU:
