@@ -1,0 +1,430 @@
+{
+ "_stability": {
+  "all prompts, per-prompt mean removed": 0.900210874896791
+ },
+ "all prompts, per-prompt mean removed": {
+  "n_clips": 14985,
+  "components": [
+   {
+    "component": 0,
+    "variance_share": 3.831587844428066,
+    "correlations": {
+     "beat_bpm": 0.17662000044469808,
+     "centroid_hz": 0.11575990893612555,
+     "bass_ratio": -0.10742002492629635,
+     "flatness": 0.04321801763098924,
+     "flux": -0.05317326377388839,
+     "rms_db": -0.11028195854112516,
+     "onset_rate": 0.03644109566958194,
+     "pulse_bpm": 0.07695334241851405,
+     "pulse_clarity": 0.11484849131124639,
+     "percussive_ratio": 0.03953675366799153,
+     "decay_s": 0.05980931546919435,
+     "side_ratio": -0.027912298402625338,
+     "majorness": 0.038989891094626854,
+     "key_clarity": 0.08201334568484933,
+     "harmonic_change": -0.0076189323950039065,
+     "dynamics_db": -0.10787143773287156,
+     "ce": -0.03384008183278862,
+     "pq": 0.017485037580782594,
+     "pc": 0.009244687381764052
+    },
+    "strongest": [
+     "beat_bpm",
+     "centroid_hz",
+     "pulse_clarity"
+    ],
+    "toward": [
+     "latin",
+     "tense",
+     "synthesizer",
+     "brass"
+    ],
+    "away": [
+     "hip hop",
+     "loud",
+     "ambient",
+     "bass guitar"
+    ]
+   },
+   {
+    "component": 1,
+    "variance_share": 1.8672299542025348,
+    "correlations": {
+     "beat_bpm": 0.005431180209346205,
+     "centroid_hz": 0.03745329736719639,
+     "bass_ratio": -0.04255751462427953,
+     "flatness": 0.02348454210755999,
+     "flux": 0.010320541908615895,
+     "rms_db": 0.07434862726732752,
+     "onset_rate": 0.0391401881258977,
+     "pulse_bpm": 0.008275547416841299,
+     "pulse_clarity": -0.014369272734528796,
+     "percussive_ratio": -0.04121697315996821,
+     "decay_s": -0.026421883351173337,
+     "side_ratio": -0.050793237060917665,
+     "majorness": 0.07138641221953868,
+     "key_clarity": 0.042161155744270304,
+     "harmonic_change": -0.028384391096337593,
+     "dynamics_db": -0.03309412888677676,
+     "ce": 0.07550221869207907,
+     "pq": 0.08396863672718452,
+     "pc": -0.29366891610520873
+    },
+    "strongest": [
+     "pc",
+     "pq",
+     "ce"
+    ],
+    "toward": [
+     "acoustic guitar",
+     "electric guitar",
+     "strings",
+     "acoustic"
+    ],
+    "away": [
+     "reverberant",
+     "choir",
+     "synthesizer",
+     "straight"
+    ]
+   },
+   {
+    "component": 2,
+    "variance_share": 1.8000862484409588,
+    "correlations": {
+     "beat_bpm": -0.19732090698711657,
+     "centroid_hz": -0.06490819502911599,
+     "bass_ratio": 0.021171107643711964,
+     "flatness": -0.13657243575656863,
+     "flux": -0.012299113003774707,
+     "rms_db": -0.1226743880968548,
+     "onset_rate": 0.00027438825733844025,
+     "pulse_bpm": -0.061403996638973786,
+     "pulse_clarity": -0.09730456513617966,
+     "percussive_ratio": -0.1612230398154036,
+     "decay_s": -0.022401073356100087,
+     "side_ratio": 0.012531044713987477,
+     "majorness": -0.06737413708706251,
+     "key_clarity": -0.08231026756491686,
+     "harmonic_change": 0.07540519300926933,
+     "dynamics_db": 0.12083382767634876,
+     "ce": -0.12628111459784916,
+     "pq": 0.01953140368729612,
+     "pc": -0.3729104924391988
+    },
+    "strongest": [
+     "pc",
+     "beat_bpm",
+     "percussive_ratio"
+    ],
+    "toward": [
+     "hip hop",
+     "rhythmic",
+     "mysterious",
+     "organ"
+    ],
+    "away": [
+     "rock",
+     "bass guitar",
+     "metal",
+     "bright"
+    ]
+   },
+   {
+    "component": 3,
+    "variance_share": 1.4436217053253397,
+    "correlations": {
+     "beat_bpm": -0.10240067907201805,
+     "centroid_hz": -0.06870832425068281,
+     "bass_ratio": -0.2538089821121767,
+     "flatness": -0.4013364883179716,
+     "flux": -0.32158648650514976,
+     "rms_db": -0.17876107153335208,
+     "onset_rate": 0.022186248546225987,
+     "pulse_bpm": -0.005568412343191393,
+     "pulse_clarity": -0.1810994280522923,
+     "percussive_ratio": -0.3406270051720757,
+     "decay_s": 0.31637056845252776,
+     "side_ratio": 0.14504998442095832,
+     "majorness": 0.08118489605050434,
+     "key_clarity": 0.27128223966608817,
+     "harmonic_change": 0.016777075211271152,
+     "dynamics_db": -0.1758377419284684,
+     "ce": -0.06938882871125449,
+     "pq": -0.09596165380688586,
+     "pc": -0.26978711528302624
+    },
+    "strongest": [
+     "flatness",
+     "percussive_ratio",
+     "flux"
+    ],
+    "toward": [
+     "quiet",
+     "minor key",
+     "dreamy",
+     "melancholic"
+    ],
+    "away": [
+     "aggressive",
+     "dry",
+     "rhythmic",
+     "energetic"
+    ]
+   },
+   {
+    "component": 4,
+    "variance_share": 0.8107888609296889,
+    "correlations": {
+     "beat_bpm": -0.07619573675819408,
+     "centroid_hz": -0.06656301217500576,
+     "bass_ratio": 0.11954075346368656,
+     "flatness": 0.018679264505861704,
+     "flux": -0.003248916012999867,
+     "rms_db": 0.14068577995894163,
+     "onset_rate": -0.11530569820756732,
+     "pulse_bpm": -0.010704456218795197,
+     "pulse_clarity": 0.2247728966670586,
+     "percussive_ratio": -0.07446636534869469,
+     "decay_s": 0.08324808699177887,
+     "side_ratio": 0.07937563805796914,
+     "majorness": 0.06946058048409613,
+     "key_clarity": 0.21100304653496568,
+     "harmonic_change": 0.06617640245066059,
+     "dynamics_db": -0.04550484266975864,
+     "ce": 0.29969511524849596,
+     "pq": 0.3313284175918666,
+     "pc": 0.047918241461639595
+    },
+    "strongest": [
+     "pq",
+     "ce",
+     "pulse_clarity"
+    ],
+    "toward": [
+     "piano",
+     "melancholic",
+     "electric piano",
+     "slow"
+    ],
+    "away": [
+     "organ",
+     "rock",
+     "folk",
+     "metal"
+    ]
+   },
+   {
+    "component": 5,
+    "variance_share": 0.8097285521873512,
+    "correlations": {
+     "beat_bpm": -0.05615161016928105,
+     "centroid_hz": -0.1241716041842831,
+     "bass_ratio": 0.1269241672649058,
+     "flatness": -0.06958866955001713,
+     "flux": -0.009388923111271881,
+     "rms_db": -0.19537765611744476,
+     "onset_rate": -0.18161827509713083,
+     "pulse_bpm": -0.02374842503150359,
+     "pulse_clarity": 0.12979633829911472,
+     "percussive_ratio": -0.022298116582869447,
+     "decay_s": -0.05444969918592356,
+     "side_ratio": 0.04206047547902127,
+     "majorness": -0.00964532741946691,
+     "key_clarity": 0.09533183902149296,
+     "harmonic_change": 0.2087413760549991,
+     "dynamics_db": 0.16271996368985822,
+     "ce": 0.4073189015349348,
+     "pq": 0.2992099498459063,
+     "pc": 0.12273575093528062
+    },
+    "strongest": [
+     "ce",
+     "pq",
+     "harmonic_change"
+    ],
+    "toward": [
+     "jazz",
+     "saxophone",
+     "trumpet",
+     "improvised"
+    ],
+    "away": [
+     "electronic dance",
+     "synthesizer",
+     "electronic",
+     "vocals"
+    ]
+   },
+   {
+    "component": 6,
+    "variance_share": 0.6142291858008271,
+    "correlations": {
+     "beat_bpm": -0.28840244088345135,
+     "centroid_hz": 0.0032754322788247775,
+     "bass_ratio": -0.19547876877040116,
+     "flatness": -0.11666011807152796,
+     "flux": -0.08676185390789919,
+     "rms_db": -0.10157870702254292,
+     "onset_rate": -0.23434809547530913,
+     "pulse_bpm": -0.03300922901264143,
+     "pulse_clarity": -0.16316038162320046,
+     "percussive_ratio": -0.03167140229898731,
+     "decay_s": 0.00715253442281551,
+     "side_ratio": -0.06394768136927703,
+     "majorness": 0.057740575293686314,
+     "key_clarity": 0.10745065923873752,
+     "harmonic_change": 0.26312150710029747,
+     "dynamics_db": 0.23064054677369764,
+     "ce": 0.22752266017144773,
+     "pq": 0.16855647115596425,
+     "pc": 0.10183558573774074
+    },
+    "strongest": [
+     "beat_bpm",
+     "harmonic_change",
+     "onset_rate"
+    ],
+    "toward": [
+     "vocals",
+     "sad",
+     "country",
+     "slow"
+    ],
+    "away": [
+     "electronic dance",
+     "techno",
+     "organ",
+     "sparse"
+    ]
+   },
+   {
+    "component": 7,
+    "variance_share": 0.1908339758182538,
+    "correlations": {
+     "beat_bpm": 0.03899471325862813,
+     "centroid_hz": 0.05440664871690577,
+     "bass_ratio": 0.019129305549797047,
+     "flatness": 0.109888652711607,
+     "flux": -0.0894029202186533,
+     "rms_db": 0.0292738781021338,
+     "onset_rate": 0.17777038004359902,
+     "pulse_bpm": 0.008253748317813536,
+     "pulse_clarity": -0.2900632710703691,
+     "percussive_ratio": 0.021724482702074888,
+     "decay_s": 0.1261510404223627,
+     "side_ratio": 0.05631731362290166,
+     "majorness": -0.14546472668049537,
+     "key_clarity": -0.20131493999067016,
+     "harmonic_change": -0.20374604767174034,
+     "dynamics_db": -0.12091487546590991,
+     "ce": -0.34844353503814685,
+     "pq": -0.28827513340112493,
+     "pc": -0.021337619512758796
+    },
+    "strongest": [
+     "ce",
+     "pulse_clarity",
+     "pq"
+    ],
+    "toward": [
+     "dark",
+     "metal",
+     "dark-toned",
+     "distorted"
+    ],
+    "away": [
+     "playful",
+     "pop",
+     "simple",
+     "happy"
+    ]
+   },
+   {
+    "component": 8,
+    "variance_share": -0.3129833860793103,
+    "correlations": {
+     "beat_bpm": 0.23143970917220097,
+     "centroid_hz": 0.23601732288936744,
+     "bass_ratio": -0.19892074790485154,
+     "flatness": 0.19802110099320638,
+     "flux": 0.05843310439147115,
+     "rms_db": -0.05341291251072989,
+     "onset_rate": 0.18076233466384353,
+     "pulse_bpm": -0.06266263297967463,
+     "pulse_clarity": 0.033627005988196026,
+     "percussive_ratio": 0.22422888882227923,
+     "decay_s": -0.1223715733889725,
+     "side_ratio": -0.10759183337622565,
+     "majorness": 0.03948048159617655,
+     "key_clarity": -0.061584362843949456,
+     "harmonic_change": -0.07184008886307662,
+     "dynamics_db": 0.021055813787369877,
+     "ce": -0.059135221675302274,
+     "pq": -0.02061941187784707,
+     "pc": 0.0709472586822178
+    },
+    "strongest": [
+     "centroid_hz",
+     "beat_bpm",
+     "percussive_ratio"
+    ],
+    "toward": [
+     "happy",
+     "simple",
+     "calm",
+     "bright"
+    ],
+    "away": [
+     "tense",
+     "dark",
+     "sad",
+     "dense"
+    ]
+   },
+   {
+    "component": 9,
+    "variance_share": -0.4387657483335232,
+    "correlations": {
+     "beat_bpm": 0.011971450694913654,
+     "centroid_hz": -0.021121079440447624,
+     "bass_ratio": -0.003803306095567986,
+     "flatness": -0.028206017754337166,
+     "flux": -0.15573072153861303,
+     "rms_db": -0.19049390585185108,
+     "onset_rate": 0.034812768694958,
+     "pulse_bpm": -0.0005308974813530259,
+     "pulse_clarity": 0.004833927105307512,
+     "percussive_ratio": 0.0031682364951450557,
+     "decay_s": -0.04873307020657909,
+     "side_ratio": 0.0008415379325374794,
+     "majorness": 0.008203233366749357,
+     "key_clarity": -0.01645467582797628,
+     "harmonic_change": -0.07629605438173363,
+     "dynamics_db": 0.026036519311069112,
+     "ce": -0.06754986813091898,
+     "pq": -0.079720636540517,
+     "pc": -0.11985854839316264
+    },
+    "strongest": [
+     "rms_db",
+     "flux",
+     "pc"
+    ],
+    "toward": [
+     "vocals",
+     "straight",
+     "techno",
+     "electronic dance"
+    ],
+    "away": [
+     "slow",
+     "jazz",
+     "organ",
+     "country"
+    ]
+   }
+  ]
+ }
+}

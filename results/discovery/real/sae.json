@@ -1,0 +1,259 @@
+{
+ "all prompts, per-prompt mean removed": {
+  "n_clips": 14985,
+  "components": [
+   {
+    "component": 758,
+    "variance_share": 0.03817150741815567,
+    "correlations": {
+     "beat_bpm": -0.2161866600730919,
+     "centroid_hz": -0.1692486569485976,
+     "bass_ratio": 0.012421093117482256,
+     "flatness": -0.22591891780381612,
+     "flux": -0.06356239579149599,
+     "rms_db": -0.21473468376604105,
+     "onset_rate": -0.209812819684574,
+     "pulse_bpm": -0.02989055922987134,
+     "pulse_clarity": 0.12425627518484851,
+     "percussive_ratio": -0.2087925071369418,
+     "decay_s": 0.11622871555150764,
+     "side_ratio": 0.13789348847218083,
+     "majorness": 0.04560451167168092,
+     "key_clarity": 0.2403408390477951,
+     "harmonic_change": 0.14925308515268992,
+     "dynamics_db": 0.09734593815712941,
+     "ce": 0.3826591168244853,
+     "pq": 0.4481545791390948,
+     "pc": -0.18291944883950256
+    },
+    "strongest": [
+     "pq",
+     "ce",
+     "key_clarity"
+    ],
+    "toward": [
+     "orchestral film score",
+     "strings",
+     "major key",
+     "cello"
+    ],
+    "away": [
+     "bass guitar",
+     "aggressive",
+     "swung",
+     "playful"
+    ]
+   },
+   {
+    "component": 91,
+    "variance_share": 0.02022022008895874,
+    "correlations": {
+     "beat_bpm": 0.030320363927596246,
+     "centroid_hz": 0.21928772001928032,
+     "bass_ratio": -0.24727813721243294,
+     "flatness": 0.05403833106429917,
+     "flux": -0.1716943121844806,
+     "rms_db": 0.029784059811111575,
+     "onset_rate": -0.02467319084006295,
+     "pulse_bpm": 0.009314339199431388,
+     "pulse_clarity": -0.14280460139415196,
+     "percussive_ratio": -0.00606736657287777,
+     "decay_s": -0.033339071755466645,
+     "side_ratio": -0.0724406565822431,
+     "majorness": 0.0002115657561826265,
+     "key_clarity": -0.02946871651749484,
+     "harmonic_change": 0.004929653787246497,
+     "dynamics_db": 0.05135981830050232,
+     "ce": -0.0954034605820969,
+     "pq": -0.09417879811283855,
+     "pc": -0.26144258876590654
+    },
+    "strongest": [
+     "pc",
+     "bass_ratio",
+     "centroid_hz"
+    ],
+    "toward": [
+     "blues",
+     "electric guitar",
+     "dry",
+     "rock"
+    ],
+    "away": [
+     "improvised",
+     "piano",
+     "cello",
+     "orchestral film score"
+    ]
+   },
+   {
+    "component": 766,
+    "variance_share": 0.07781114429235458,
+    "correlations": {
+     "beat_bpm": 0.16855287974907346,
+     "centroid_hz": 0.24604081340795003,
+     "bass_ratio": -0.17222561508811685,
+     "flatness": 0.22291056759255054,
+     "flux": 0.017096402676288893,
+     "rms_db": -0.16577174761169333,
+     "onset_rate": 0.11698832092336224,
+     "pulse_bpm": 0.015358289854153918,
+     "pulse_clarity": -0.04666840288128182,
+     "percussive_ratio": 0.23940909728145232,
+     "decay_s": -0.07835813473041206,
+     "side_ratio": -0.06965600500698585,
+     "majorness": -0.0001157092987397546,
+     "key_clarity": -0.1255864538726014,
+     "harmonic_change": -0.15058858328696892,
+     "dynamics_db": 0.01142601378187048,
+     "ce": -0.17386516627562437,
+     "pq": -0.22127513593054032,
+     "pc": 0.266181992646591
+    },
+    "strongest": [
+     "pc",
+     "centroid_hz",
+     "percussive_ratio"
+    ],
+    "toward": [
+     "folk",
+     "energetic",
+     "acoustic",
+     "choir"
+    ],
+    "away": [
+     "sad",
+     "simple",
+     "brass",
+     "slow"
+    ]
+   },
+   {
+    "component": 294,
+    "variance_share": 0.02195528894662857,
+    "correlations": {
+     "beat_bpm": -0.010261622258373038,
+     "centroid_hz": 0.03903702786601286,
+     "bass_ratio": -0.03549588429434301,
+     "flatness": 0.04854188812511312,
+     "flux": -0.17345531358279345,
+     "rms_db": -0.20637454385420137,
+     "onset_rate": 0.0346802999635701,
+     "pulse_bpm": -0.051684318403187275,
+     "pulse_clarity": -0.04081366273677659,
+     "percussive_ratio": 0.04492650942149966,
+     "decay_s": -0.09915494898890741,
+     "side_ratio": -0.07152433086001785,
+     "majorness": -0.050937705565818565,
+     "key_clarity": -0.12220539490021576,
+     "harmonic_change": -0.06954687102764172,
+     "dynamics_db": 0.10752087025888542,
+     "ce": -0.19456675585377087,
+     "pq": -0.10570594332567816,
+     "pc": -0.21861820633164866
+    },
+    "strongest": [
+     "pc",
+     "rms_db",
+     "ce"
+    ],
+    "toward": [
+     "classical",
+     "choir",
+     "mysterious",
+     "ambient"
+    ],
+    "away": [
+     "reggae",
+     "funk",
+     "happy",
+     "blues"
+    ]
+   },
+   {
+    "component": 62,
+    "variance_share": 0.06393060088157654,
+    "correlations": {
+     "beat_bpm": -0.02960104252386833,
+     "centroid_hz": 0.012766219561126854,
+     "bass_ratio": -0.09611935140166987,
+     "flatness": -0.07214681673142181,
+     "flux": -0.05263765349105501,
+     "rms_db": 0.22657779101263822,
+     "onset_rate": 0.020260188916958723,
+     "pulse_bpm": 0.00013149115262482472,
+     "pulse_clarity": -0.09841104166514666,
+     "percussive_ratio": -0.15808951121242443,
+     "decay_s": 0.018801417649752548,
+     "side_ratio": -0.028476096152059625,
+     "majorness": 0.015408072767094457,
+     "key_clarity": 0.01322527507748659,
+     "harmonic_change": 0.05885315715791799,
+     "dynamics_db": 0.03841359540002114,
+     "ce": 0.07274848949468012,
+     "pq": 0.049755183262931844,
+     "pc": -0.03211205303133309
+    },
+    "strongest": [
+     "rms_db",
+     "percussive_ratio",
+     "pulse_clarity"
+    ],
+    "toward": [
+     "major key",
+     "clean",
+     "violin",
+     "uplifting"
+    ],
+    "away": [
+     "aggressive",
+     "synthesizer",
+     "sparse",
+     "organ"
+    ]
+   },
+   {
+    "component": 475,
+    "variance_share": 0.02769436128437519,
+    "correlations": {
+     "beat_bpm": -0.03521185943295327,
+     "centroid_hz": -0.022425799979562833,
+     "bass_ratio": 0.016981341358617296,
+     "flatness": -0.03272722690445949,
+     "flux": -0.16202483977652068,
+     "rms_db": -0.2728622437653498,
+     "onset_rate": 0.06335943975220693,
+     "pulse_bpm": -0.009614939639850623,
+     "pulse_clarity": 0.06529166035336799,
+     "percussive_ratio": 0.005379723769378897,
+     "decay_s": -0.013833737030941068,
+     "side_ratio": 0.1187688439688051,
+     "majorness": 0.00838998751441169,
+     "key_clarity": 0.029373907628063623,
+     "harmonic_change": 0.00042987798046503604,
+     "dynamics_db": 0.06640330742348823,
+     "ce": 0.21036218096168238,
+     "pq": 0.17883294673993405,
+     "pc": 0.12136547264824521
+    },
+    "strongest": [
+     "rms_db",
+     "ce",
+     "pq"
+    ],
+    "toward": [
+     "orchestral film score",
+     "staccato",
+     "major key",
+     "repetitive"
+    ],
+    "away": [
+     "bass guitar",
+     "loud",
+     "tense",
+     "playful"
+    ]
+   }
+  ]
+ }
+}
