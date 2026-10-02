@@ -208,7 +208,7 @@ The axes above come from the model's own clips. The same decomposition was run o
 | CLAP | independent components | 0.83 |
 | CLAP | sparse autoencoder, 1,024 features | 9 features found by both of two seeds |
 
-**Do they come back in a different sample?** Partly ([`results/discovery/replication/`](results/discovery/replication/README.md)). On 47,942 further recordings that share nothing with the first corpus, the leading subspace is the same (the top 32 directions overlap 97%), and the individual axes rotate inside it: the matched cosine falls from 0.90 between two halves of one corpus to 0.61 between the two corpora. Of the seven axes turned into sliders below, arousal, valence, jazz to electronic, and classical to funk come back with the same meaning (0.65 to 0.78), piano half comes back, and strings to synth and acoustic to electronic do not come back as single axes.
+**Do they come back in a different sample?** Partly ([`results/discovery/replication/`](results/discovery/replication/README.md)). On 47,942 further recordings that share nothing with the first corpus, the leading subspace is the same (the top 32 directions overlap 97%), and the individual axes rotate inside it: the matched cosine falls from 0.90 between two halves of one corpus to 0.61 between the two corpora. Of the seven axes turned into sliders below, arousal, valence, jazz to electronic, and classical to funk come back with the same meaning (0.65 to 0.78), piano comes back at one end only, and strings to synth and acoustic to electronic do not come back as single axes.
 
 Independent components of MuQ-MuLan give the axes that read most like music. Two of them are the dimensions listener studies keep finding:
 

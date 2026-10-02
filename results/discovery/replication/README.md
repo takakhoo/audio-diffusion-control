@@ -37,7 +37,7 @@ The directions along which recordings of one genre differ span nearly the same s
 ## Reading
 
 - **Four of the seven come back as their own axis with the same meaning**: classical to funk, arousal, jazz to electronic, and valence, with cosines of 0.65 to 0.78 and matching tags at both ends.
-- **Piano half comes back.** B has an axis with piano and electric piano at one end; its other end is different.
+- **Piano comes back at one end.** B has an axis with piano and electric piano at one end; its other end is different.
 - **Strings to synth and acoustic to electronic do not come back as single axes.** Both still lie mostly inside the span of B's axes (0.84 and 0.90), so the direction exists in B and is not one that B's decomposition isolates.
 - **Split-half stability overstates how well a single axis generalises.** It tests resampling from one corpus. Against a different slice of real music the matched cosine falls from 0.90 to 0.61 for the independent components used here.
 - **The coverage result does not depend on which corpus defines "real".** Coverage divides by the spread of real music along an axis, and that spread differs by at most 18% between the two corpora.
