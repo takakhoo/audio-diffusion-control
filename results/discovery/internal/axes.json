@@ -1,0 +1,282 @@
+[
+ {
+  "name": "axis0",
+  "usable_lo": -12.0,
+  "usable_hi": 12.0,
+  "consistency": 0.34035391558427364,
+  "rises": [
+   "complex",
+   "improvised",
+   "jazz",
+   "staccato"
+  ],
+  "falls": [
+   "vocals",
+   "hip hop",
+   "lo-fi",
+   "pop"
+  ],
+  "descriptors": {
+   "flatness": {
+    "slope": -0.05560702496504779,
+    "rho": -0.6398809523809524
+   },
+   "rms_db": {
+    "slope": 0.052577904400085904,
+    "rho": 0.7678571428571429
+   },
+   "flux": {
+    "slope": 0.03143947645626582,
+    "rho": 0.7946428571428572
+   }
+  },
+  "kept": 0.9035350823154052,
+  "ce_zero": 6.976986765861511,
+  "ce_ends": 6.78647134701411
+ },
+ {
+  "name": "axis1",
+  "usable_lo": -12.0,
+  "usable_hi": 12.0,
+  "consistency": 0.37652281621315825,
+  "rises": [
+   "complex",
+   "electric guitar",
+   "acoustic",
+   "blues"
+  ],
+  "falls": [
+   "lo-fi",
+   "hip hop",
+   "pop",
+   "vocals"
+  ],
+  "descriptors": {
+   "rms_db": {
+    "slope": 0.049099667480511325,
+    "rho": 0.7864583333333335
+   },
+   "flatness": {
+    "slope": -0.04823189072040073,
+    "rho": -0.6376488095238096
+   },
+   "flux": {
+    "slope": 0.031638747698748984,
+    "rho": 0.7418154761904763
+   }
+  },
+  "kept": 0.9250948280096054,
+  "ce_zero": 6.976986765861511,
+  "ce_ends": 6.835322226087253
+ },
+ {
+  "name": "axis2",
+  "usable_lo": -12.0,
+  "usable_hi": 12.0,
+  "consistency": 0.16610794032749254,
+  "rises": [
+   "rhythmic",
+   "techno",
+   "bells",
+   "choir"
+  ],
+  "falls": [
+   "dry",
+   "slow",
+   "major key",
+   "clean"
+  ],
+  "descriptors": {
+   "rms_db": {
+    "slope": 0.022194198312234844,
+    "rho": 0.6034226190476191
+   },
+   "flux": {
+    "slope": 0.013938158679817484,
+    "rho": 0.7016369047619048
+   },
+   "onset_rate": {
+    "slope": 0.011952116448863029,
+    "rho": 0.3456877870908888
+   }
+  },
+  "kept": 0.9568796629707018,
+  "ce_zero": 6.976986765861511,
+  "ce_ends": 6.905733083685239
+ },
+ {
+  "name": "axis3",
+  "usable_lo": -12.0,
+  "usable_hi": 12.0,
+  "consistency": 0.17282737478308263,
+  "rises": [
+   "electronic dance",
+   "techno",
+   "pop",
+   "funk"
+  ],
+  "falls": [
+   "trumpet",
+   "improvised",
+   "orchestral film score",
+   "harp"
+  ],
+  "descriptors": {
+   "decay_s": {
+    "slope": -0.01184155464876136,
+    "rho": -0.32261959802867485
+   },
+   "beat_bpm": {
+    "slope": 0.01099582025368319,
+    "rho": 0.12827475699739882
+   },
+   "centroid_oct": {
+    "slope": -0.009186288339492574,
+    "rho": -0.3467261904761905
+   }
+  },
+  "kept": 0.9661912793914477,
+  "ce_zero": 6.976986765861511,
+  "ce_ends": 6.952317376931508
+ },
+ {
+  "name": "axis4",
+  "usable_lo": -12.0,
+  "usable_hi": 12.0,
+  "consistency": 0.16218448084691772,
+  "rises": [
+   "melancholic",
+   "lo-fi",
+   "epic",
+   "calm"
+  ],
+  "falls": [
+   "cello",
+   "hand percussion",
+   "staccato",
+   "brass"
+  ],
+  "descriptors": {
+   "centroid_oct": {
+    "slope": 0.016395868998574342,
+    "rho": 0.5855654761904763
+   },
+   "decay_s": {
+    "slope": 0.01216456486831295,
+    "rho": 0.026409258862221088
+   },
+   "side_ratio": {
+    "slope": 0.006935500997957108,
+    "rho": 0.2879464285714286
+   }
+  },
+  "kept": 0.9600856453180313,
+  "ce_zero": 6.976986765861511,
+  "ce_ends": 6.908107777436574
+ },
+ {
+  "name": "axis5",
+  "usable_lo": -12.0,
+  "usable_hi": 12.0,
+  "consistency": 0.119809344575818,
+  "rises": [
+   "distorted",
+   "pop",
+   "dark",
+   "straight"
+  ],
+  "falls": [
+   "acoustic guitar",
+   "acoustic",
+   "uplifting",
+   "orchestral film score"
+  ],
+  "descriptors": {
+   "majorness": {
+    "slope": -0.007729612500139563,
+    "rho": -0.21205357142857148
+   },
+   "centroid_oct": {
+    "slope": 0.006061144336724109,
+    "rho": 0.33482142857142866
+   },
+   "side_ratio": {
+    "slope": 0.004151358228934211,
+    "rho": 0.41517857142857145
+   }
+  },
+  "kept": 0.9726125001907349,
+  "ce_zero": 6.976986765861511,
+  "ce_ends": 6.932946349183719
+ },
+ {
+  "name": "axis6",
+  "usable_lo": -12.0,
+  "usable_hi": 12.0,
+  "consistency": 0.20850648804722974,
+  "rises": [
+   "dark-toned",
+   "reverberant",
+   "lo-fi",
+   "choir"
+  ],
+  "falls": [
+   "latin",
+   "happy",
+   "playful",
+   "funk"
+  ],
+  "descriptors": {
+   "centroid_oct": {
+    "slope": -0.014841334598009457,
+    "rho": -0.6019345238095238
+   },
+   "flatness": {
+    "slope": -0.008791283826182826,
+    "rho": -0.40997023809523814
+   },
+   "side_ratio": {
+    "slope": -0.008566869656395148,
+    "rho": -0.4821428571428572
+   }
+  },
+  "kept": 0.9656392987817526,
+  "ce_zero": 6.976986765861511,
+  "ce_ends": 6.943305100003879
+ },
+ {
+  "name": "axis7",
+  "usable_lo": -12.0,
+  "usable_hi": 12.0,
+  "consistency": 0.09925226320531995,
+  "rises": [
+   "latin",
+   "funk",
+   "techno",
+   "rhythmic"
+  ],
+  "falls": [
+   "quiet",
+   "dark-toned",
+   "piano",
+   "minor key"
+  ],
+  "descriptors": {
+   "centroid_oct": {
+    "slope": 0.01317094872368183,
+    "rho": 0.4486607142857144
+   },
+   "pc": {
+    "slope": 0.010964404427856364,
+    "rho": 0.3876488095238096
+   },
+   "percussive_ratio": {
+    "slope": 0.010647472907871849,
+    "rho": 0.36979166666666674
+   }
+  },
+  "kept": 0.948747131973505,
+  "ce_zero": 6.976986765861511,
+  "ce_ends": 6.906516616543134
+ }
+]

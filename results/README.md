@@ -12,6 +12,7 @@ What each file is and which script wrote it. Raw audio and per-clip rows live on
 | [`main/summary.md`](main/summary.md) | The same table for 20 text sliders on Stable Audio Open 1.0 | `experiments/report.py` |
 | [`ace30/summary.md`](ace30/summary.md) | ACE-Step sliders trained on 10 s clips, measured on 30 s clips | `experiments/report.py` |
 | [`discovery/real/`](discovery/real/README.md) | Axes found in 14,985 FMA recordings with PCA, ICA, and a sparse autoencoder, in CLAP and MuQ-MuLan | `experiments/discover.py` |
+| [`discovery/internal/`](discovery/internal/README.md) | Principal axes of ACE-Step's own cross-attention activations and what steering along them does | `experiments/discover_internal.py`, `experiments/report_axes.py` |
 | [`coverage/`](coverage/README.md) | How much of each real-music axis the generated corpora span | `experiments/axis_coverage.py` |
 | [`real_sets/`](real_sets/README.md) | Negative result: training the set slider directly on real recordings | `audiosliders.contrast` |
 | [`sa3/`](sa3/README.md) | Stable Audio 3 pilot | `experiments/evaluate.py` |

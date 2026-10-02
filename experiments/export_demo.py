@@ -31,6 +31,7 @@ METHODS = dict(
     lora=("Text slider", "A LoRA trained from a prompt pair, scaled by the slider position. Same cost as plain generation."),
     contrast=("Descriptor slider", "A LoRA trained without text, from the model's own clips sorted by a measurement."),
     discovered=("Discovered axis", "A LoRA trained along a principal direction of the model's own output for this concept. Nobody named it in advance; the labels come from the tags it moves."),
+    internal=("The model's own axis", "A principal direction of the transformer's own activations across seeds of the same prompt, added back at sampling time. No text, no embedding model, and no training chose it; the labels come from the tags it moves."),
     guidance=("Prompt-pair guidance", "The text slider's training target applied directly at every step. Two extra forward passes per step."),
     embed=("Prompt interpolation", "The text conditioning is moved toward the positive or negative prompt. No training."),
     dsp=("Signal processing", "The unsteered clip run through a conventional effect. Shown where one exists."),
@@ -44,6 +45,8 @@ CONTRAST_MEASURE = dict(quality="ce", production="pq", ensemble="pc", harmony="h
 ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
 ap.add_argument("--source", action="append", default=[], metavar="MODEL=DIR")
 ap.add_argument("--discovered", action="append", default=[], metavar="MODEL=EVALDIR:SLIDERS_JSON")
+ap.add_argument("--axes", action="append", default=[], metavar="MODEL=EVALDIR:AXES_JSON",
+                help="unnamed axes described by experiments/report_axes.py")
 ap.add_argument("--out", default="docs")
 ap.add_argument("--prompts", type=int, nargs="+", default=None, help="eval prompt indices to publish")
 ap.add_argument("--discovered-seeds", type=int, default=3)
@@ -146,6 +149,29 @@ for item in args.discovered:
                 c.pop("row")
                 c["v"] = None
             manifest["clips"][f"{model}/discovered/{name}/{slot}"] = clips
+
+for item in args.axes:
+    model, _, rest = item.partition("=")
+    root, _, table = rest.partition(":")
+    prompts = manifest["models"][model]["prompts"]
+    manifest["methods"]["internal"] = dict(label=METHODS["internal"][0], note=METHODS["internal"][1])
+    for k, a in enumerate(json.loads(Path(table).read_text())):
+        run = Path(root) / a["name"]
+        rows = metrics.load_rows(run)
+        name = f"own-axis-{k + 1}"
+        entry = entry_for(model, name, f"Own axis {k + 1}", ", ".join(a["falls"][:2]), ", ".join(a["rises"][:2]), "ce")
+        entry["methods"].append("internal")
+        for pid in args.prompts or sorted({r["prompt_index"] for r in rows}):
+            mine = [r for r in rows if r["prompt_index"] == pid]
+            if not mine:
+                continue
+            if mine[0]["prompt"] not in prompts:
+                prompts.append(mine[0]["prompt"])
+            slot = prompts.index(mine[0]["prompt"])
+            clips = publish(model, "internal", name, run, rows, pid, min(r["seed"] for r in mine), slot)
+            for c in clips:
+                c["v"] = c.pop("row").get("ce")
+            manifest["clips"][f"{model}/internal/{name}/{slot}"] = clips
 
 if args.summary:
     manifest.update(json.loads(Path(args.summary).read_text()))
