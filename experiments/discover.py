@@ -16,7 +16,7 @@ from pathlib import Path
 import numpy as np
 from scipy.stats import spearmanr
 
-from audiosliders.contrast import independent_directions, load_corpus, principal_directions
+from audiosliders.contrast import axis_stability, independent_directions, load_corpus, principal_directions
 from audiosliders.tags import label_direction
 
 KEYS = ["beat_bpm", "centroid_hz", "bass_ratio", "flatness", "flux", "rms_db", "onset_rate", "pulse_bpm", "pulse_clarity",
@@ -32,8 +32,35 @@ def zscore(values: np.ndarray, groups: np.ndarray) -> np.ndarray:
     return out
 
 
-def analyse(rows, clap, groups, n, vocab, method="pca"):
-    if method == "ica":
+def sae_axes(emb, n, vocab, out):
+    """Train two sparse autoencoders with different seeds and keep features that both found,
+    that fire on 2 to 30% of clips, ordered by how sharply one tag stands out along their atom."""
+    from audiosliders import sae
+
+    a, stats = sae.fit(emb, features=1024, k=16, steps=15_000, seed=0)
+    b, _ = sae.fit(emb, features=1024, k=16, steps=15_000, seed=1)
+    atoms = sae.directions(a)
+    stable = np.abs(atoms @ sae.directions(b).T).max(1)
+    rate = stats["firing_rate"]
+    keep = np.nonzero((stable > 0.8) & (rate > 0.02) & (rate < 0.3))[0]
+    if vocab is not None:
+        centred = vocab - vocab.mean(0)
+        centred /= np.linalg.norm(centred, axis=1, keepdims=True)
+        clarity = (atoms[keep] @ centred.T).max(1)
+        keep = keep[np.argsort(-clarity)]
+    keep = keep[:n]
+    sae.save(a, emb, str(out / "sae.npz"))
+    np.save(out / "sae_features.npy", keep)
+    print(f"sparse autoencoder: {100 * stats['explained']:.1f}% variance explained, {100 * stats['alive']:.0f}% of features "
+          f"alive, {int((stable > 0.8).sum())} of {len(stable)} reproduced by a second seed", flush=True)
+    return atoms[keep], rate[keep], keep
+
+
+def analyse(rows, clap, groups, n, vocab, method="pca", out=None):
+    ids = None
+    if method == "sae":
+        directions, share, ids = sae_axes(clap, n, vocab, out)
+    elif method == "ica":
         directions, share = independent_directions(clap, groups, n)
     else:
         directions, share = principal_directions(clap, groups, n)
@@ -47,7 +74,7 @@ def analyse(rows, clap, groups, n, vocab, method="pca"):
         for k, v in desc.items():
             ok = np.isfinite(v)
             corr[k] = float(spearmanr(p[ok], v[ok]).statistic) if ok.sum() > 10 else float("nan")
-        entry = dict(component=i, variance_share=float(share[i]), correlations=corr,
+        entry = dict(component=int(ids[i]) if ids is not None else i, variance_share=float(share[i]), correlations=corr,
                      strongest=sorted((k for k in corr if np.isfinite(corr[k])), key=lambda k: -abs(corr[k]))[:3])
         if vocab is not None:
             entry["toward"], entry["away"] = label_direction(directions[i], vocab, k=4)
@@ -62,7 +89,7 @@ def main():
     ap.add_argument("--vocab", default="runs/reference/vocab.npz")
     ap.add_argument("--n", type=int, default=12)
     ap.add_argument("--per-prompt", action="store_true")
-    ap.add_argument("--method", default="pca", choices=["pca", "ica"])
+    ap.add_argument("--method", default="pca", choices=["pca", "ica", "sae"])
     ap.add_argument("--emb", default="clap", choices=["clap", "muq"],
                     help="embedding space; with muq pass the MuQ vocabulary file as --vocab")
     ap.add_argument("--max-vocal", type=float, default=None)
@@ -84,7 +111,11 @@ def main():
         else [("all prompts, per-prompt mean removed", np.ones(len(rows), dtype=bool))]
     for name, mask in sets:
         sub = [r for r, m in zip(rows, mask) if m]
-        directions, table = analyse(sub, clap[mask], groups[mask], args.n, vocab, args.method)
+        directions, table = analyse(sub, clap[mask], groups[mask], args.n, vocab, args.method, out)
+        if args.method in ("pca", "ica"):
+            stability = axis_stability(clap[mask], groups[mask], args.method, min(args.n, 8))
+            report.setdefault("_stability", {})[name] = stability
+            lines.append(f"Stability of the first {min(args.n, 8)} axes across two halves of the corpus: {stability:.2f}\n")
         report[name] = dict(n_clips=int(mask.sum()), components=table)
         np.save(out / f"directions_{name.replace(' ', '_').replace(',', '')[:40]}.npy", directions)
         if not args.per_prompt:
@@ -93,7 +124,7 @@ def main():
                   "| Axis | Variance share or kurtosis | Toward | Away | Strongest measured correlates |", "|---:|---:|---|---|---|"]
         for e in table:
             corr = ", ".join(f"{k} {e['correlations'][k]:+.2f}" for k in e["strongest"])
-            size = f"{100 * e['variance_share']:.1f}%" if args.method == "pca" else f"{e['variance_share']:.1f}"
+            size = f"{100 * e['variance_share']:.1f}%" if args.method != "ica" else f"{e['variance_share']:.1f}"
             lines.append(f"| {e['component']} | {size} | {', '.join(e.get('toward', []))} | "
                          f"{', '.join(e.get('away', []))} | {corr} |")
         lines.append("")
