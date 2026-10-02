@@ -78,6 +78,8 @@ First the yardstick. Audiobox Aesthetics scores 2,000 real recordings from FMA a
 
 The dashed line is the mean of real recordings. Seven of the eight sliders stay at or above it across their usable span. Tension collapses past +1, which is why its usable span ends there. The negative ends (sadder, sparser, plainer) cost a little enjoyment; the positive ends cost almost none.
 
+**A second predictor agrees.** Audiobox is one learned model, so every clip was also scored with SongEval, a head on MuQ features trained on human ratings of generated songs (musicality, 1 to 5). It shares no data or weights with Audiobox. Unsteered ACE-Step clips score 2.77 and the 2,000 real recordings 2.78. The usable span it implies is the same for six of the eight sliders and half a step wider for the other two, and over individual clips the two predictors correlate at 0.52 to 0.67. Where they disagree is on the first-generation set-trained sliders, which Audiobox rates as flat out to ±1.5 and SongEval marks down past ±1. All methods side by side: [`results/ace/quality_check.md`](results/ace/quality_check.md).
+
 ### 4. Leaving the first steps alone keeps the piece
 
 On Stable Audio Open the slider can be switched on only after the earliest, noisiest sampling steps, the ones that decide the layout of the piece. For the brightness slider at positions ±1 on 24 held-out prompts:
