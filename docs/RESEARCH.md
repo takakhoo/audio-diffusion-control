@@ -118,3 +118,40 @@ What we take: MuQ-MuLan as a second, CLAP-independent scorer (done, `experiments
 ### Other open backbones worth a slider study
 
 Stable Audio 3 (flow matching, open base checkpoints, official LoRA documentation, in diffusers) is the obvious third backbone. MiniMax Music 3, YuE2, DiffRhythm 2, and Magenta RealTime 2 have open weights but are autoregressive or hybrid, so the trainers here would need more than a wrapper.
+
+## Third pass (2 October 2026): discovery methods, embedding spaces, and how axes are judged
+
+### The image-side analogue of our descriptor sliders
+
+[Measured Sliders](https://arxiv.org/abs/2609.05234), Chen, Wei, and Yin, September 2026. Sliders for image models defined by closed-form *differentiable* image measurements, trained with an objective that moves the target and holds the others still. Reports 98.9% monotone sweeps, a selectivity score (own effect over drift), and composition success for pairs and triples. Our descriptors are not differentiable through the audio decoder, so we reach the same goal by sorting clips on the measurement and training between the two ends, and by balancing the two sets on the measurements that should stay still. We adopt their selectivity and monotone-share metrics.
+
+### Discovery beyond PCA
+
+| Method | Idea | What we took |
+|---|---|---|
+| SliderSpace | PCA on CLIP embeddings, one LoRA per component. Never measures whether the trained sliders are distinct; relies on PCA orthogonality in the encoder. | Our leakage matrix and selectivity score measure what it assumes. |
+| ICA on embeddings ([Yamagiwa et al., EMNLP 2023](https://arxiv.org/abs/2305.13175)) | Whiten with PCA, then rotate to maximise non-Gaussianity; components are more interpretable than principal ones. | `independent_directions` in `audiosliders/contrast.py`. |
+| Sparse autoencoders on music embeddings ([Guinot et al., 2026](https://arxiv.org/abs/2608.08757)) | Sparse features of CLAP and MuQ embeddings of real music, used to steer retrieval. Nobody trains generator sliders from them. | `audiosliders/sae.py`. At 1,024 features on our corpus only 9 reproduce across seeds, so they need a stability filter. |
+| NoiseCLR, LatentCLR, pullback-metric and Jacobian methods | Discover directions inside the generator with contrastive or spectral objectives. | Not used yet; the cost is a joint training run per set of directions. |
+
+No paper was found that runs PCA or ICA over CLAP or MuQ embeddings of a real music corpus to name musical dimensions, or that trains sliders from such axes.
+
+### How people claim a set of axes is good
+
+- **Selectivity**: own effect over drift on other measurements (Measured Sliders). Implemented in `audiosliders/metrics.py`.
+- **Monotone share**: fraction of sweeps with rank correlation above 0.8 (same source). Implemented.
+- **Stability**: matched cosine between axes fitted on different data or seeds. Implemented as `axis_stability`.
+- **Composition**: whether two or three sliders applied together each still move their own measurement. `experiments/compose.py`.
+- **Human**: SliderSpace asked raters which of two image grids was more diverse, useful, and creative; TADA used three Likert questions on an interactive strength slider.
+
+### Perceptual dimensions to relate discovered axes to
+
+Listener studies repeatedly reduce perceived musical attributes to arousal, valence, and depth ([Fricke, Greenberg, Rentfrow, and Herzberg](https://www.repository.cam.ac.uk/handle/1810/302164)). The independent components of MuQ-MuLan embeddings of FMA include an arousal axis and a valence axis (see [`results/discovery/real/`](../results/discovery/real/)).
+
+### Quality predictors
+
+Audiobox Aesthetics is the quality signal used here and by TADA. Its correlation with human preference on generated music is reported as weak by the MuQ-Eval authors, so results that depend on it (the usable span, the quality slider) should be re-checked with a second predictor such as MuQ-Eval before submission.
+
+### Larger real-music corpora
+
+MTG-Jamendo (55,000 full tracks with genre, instrument, and mood tags) is the cleanest step up from FMA and is the corpus other recent work uses. FMA-large (106,574 clips) is already on disk here.
