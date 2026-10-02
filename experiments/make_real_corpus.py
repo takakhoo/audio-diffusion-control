@@ -52,6 +52,9 @@ def main():
     ap.add_argument("--workers", type=int, default=10)
     ap.add_argument("--tag-offset", type=int, default=0, help="added to the shard index in output file names")
     ap.add_argument("--skip", default=None, help="an existing corpus directory whose tracks are left out")
+    ap.add_argument("--embed-only", action="store_true",
+                    help="store only CLAP embeddings, genre, and vocal score: enough for axis discovery and coverage, "
+                         "and several times faster than encoding latents and measuring every clip")
     args = ap.parse_args()
 
     out = Path(args.out)
@@ -68,16 +71,19 @@ def main():
         tracks = pd.read_csv(args.metadata, index_col=0, header=[0, 1])
         genre = tracks[("track", "genre_top")].dropna().to_dict()
 
-    model = load_backbone(args.backbone)
-    clap, aesthetics = Clap(), Aesthetics()
-    from beat_this.inference import Audio2Beats
+    clap = Clap()
+    if args.embed_only:
+        model, sr, args.seconds = None, 48_000, 20.0
+    else:
+        from beat_this.inference import Audio2Beats
 
-    beats = Audio2Beats(checkpoint_path="final0", device="cuda", dbn=False)
+        model, aesthetics = load_backbone(args.backbone), Aesthetics()
+        beats = Audio2Beats(checkpoint_path="final0", device="cuda", dbn=False)
+        sr = model.sample_rate
     vocab = vocabulary()
     text = clap.text([t for _, _, t in vocab])
     by_group = {g: [i for i, (gg, _, _) in enumerate(vocab) if gg == g] for g in ("genre", "instrument", "mood")}
     vocal = [i for i, (_, t, _) in enumerate(vocab) if t == "vocals"][0]
-    sr = model.sample_rate
     mid = slice(int(10 * sr), int(20 * sr))  # descriptors and embeddings use the middle ten seconds
 
     pool = ProcessPoolExecutor(args.workers)
@@ -89,9 +95,20 @@ def main():
             if not got:
                 continue
             audio = np.stack([a for _, a in got])
-            z = torch.cat([model.encode_audio(torch.from_numpy(audio[i : i + 4])) for i in range(0, len(audio), 4)])
             emb = clap.audio(audio[..., mid], sr)
             sims = (emb @ text.T).cpu().numpy()
+            embeds.append(emb.cpu().numpy())
+            if (b // args.batch) % 20 == 0:
+                print(f"{b + len(chunk)}/{len(files)}", flush=True)
+            if args.embed_only:
+                for j, (f, _) in enumerate(got):
+                    track = int(Path(f).stem)
+                    top = {g: vocab[idx[int(np.argmax(sims[j, idx]))]][1] for g, idx in by_group.items()}
+                    label = str(genre.get(track, top["genre"]))
+                    rows.append(dict(file=Path(f).name, track=track, genre=label, prompt_index=label,
+                                     vocal_score=float(sims[j, vocal])))
+                continue
+            z = torch.cat([model.encode_audio(torch.from_numpy(audio[i : i + 4])) for i in range(0, len(audio), 4)])
             scores = aesthetics(audio[..., mid], sr)
             for j, (f, a) in enumerate(got):
                 track = int(Path(f).stem)
@@ -104,13 +121,11 @@ def main():
                                  vocal_score=float(sims[j, vocal]), beat_bpm=bpm, n_beats=int(len(found)), **scores[j]))
                 pending.append(pool.submit(measure, (a[..., mid], sr)))
             latents.append(z.cpu().half().numpy())
-            embeds.append(emb.cpu().numpy())
-            if (b // args.batch) % 20 == 0:
-                print(f"{b + len(chunk)}/{len(files)}", flush=True)
     for row, fut in zip(rows, pending):
         row.update(fut.result())
     tag = f"{args.shard[0] + args.tag_offset:02d}"
-    np.save(out / f"latents_{tag}.npy", np.concatenate(latents))
+    if latents:
+        np.save(out / f"latents_{tag}.npy", np.concatenate(latents))
     np.save(out / f"clap_{tag}.npy", np.concatenate(embeds))
     (out / f"rows_{tag}.jsonl").write_text("\n".join(json.dumps(r) for r in rows) + "\n")
     print(f"wrote {len(rows)} clips to {out}")

@@ -1,0 +1,5 @@
+# Embeddings only for every FMA-large recording that is not in the 25k corpus: a larger, disjoint
+# sample of real music for checking that the axes come back.
+real_embed_00	python experiments/make_real_corpus.py --music ../data/fma/fma_large --metadata ../data/fma/fma_metadata/tracks.csv --out runs/corpus/real_large --skip runs/corpus/real_ace --embed-only --batch 32 --shard 0 3
+real_embed_01	python experiments/make_real_corpus.py --music ../data/fma/fma_large --metadata ../data/fma/fma_metadata/tracks.csv --out runs/corpus/real_large --skip runs/corpus/real_ace --embed-only --batch 32 --shard 1 3
+real_embed_02	python experiments/make_real_corpus.py --music ../data/fma/fma_large --metadata ../data/fma/fma_metadata/tracks.csv --out runs/corpus/real_large --skip runs/corpus/real_ace --embed-only --batch 32 --shard 2 3
