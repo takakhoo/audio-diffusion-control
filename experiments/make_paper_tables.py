@@ -106,7 +106,7 @@ if ace.exists():
                ("Prompt interpolation", "Interp.")]
     by = {(r["slider"], r["method"]): r for r in rows}
     sliders = [s for s in dict.fromkeys(r["slider"] for r in rows) if all((s, m) in by for m, _ in methods)]
-    lines = [r"\begin{table}[t]\centering\small\setlength{\tabcolsep}{3pt}", r"\begin{tabular}{l" + "rr" * len(methods) + "}",
+    lines = [r"\begin{table}[t]\centering\footnotesize\setlength{\tabcolsep}{2.5pt}", r"\begin{tabular}{l" + "rr" * len(methods) + "}",
              r"\toprule", " & " + " & ".join(rf"\multicolumn{{2}}{{c}}{{{short}}}" for _, short in methods) + r" \\",
              "Slider & " + " & ".join(r"$\rho$ & MuQ" for _ in methods) + r" \\", r"\midrule"]
     for name in sliders:
@@ -135,11 +135,11 @@ if axes.exists():
     rows = json.loads(axes.read_text())
     short = {"two sets of the model's clips": "sets", "prompt pair from the axis's tags": "pair"}
     mean = lambda v: fmt((v[0] + v[2]) / 2) if v else "--"
-    lines = [r"\begin{table}[t]\centering\small\setlength{\tabcolsep}{3pt}", r"\begin{tabular}{llrrrrrrr}", r"\toprule",
+    lines = [r"\begin{table}[t]\centering\footnotesize\setlength{\tabcolsep}{2.5pt}", r"\begin{tabular}{llrrrrrrr}", r"\toprule",
              r"Axis & From & $\rho$ & Ord. & Real & Seeds & Kept & CE & Mus. \\", r"\midrule"]
     for r in sorted(rows, key=lambda r: (r["slider"], r["trained_from"])):
         lines.append(" & ".join([
-            r["slider"].replace("_axis", "").replace("_", "/"), short[r["trained_from"]], fmt(r["rho"]), fmt(r["ordered"]),
+            r["slider"].replace("_axis", "").replace("acoustic_electronic", "acoustic/electr.").replace("_", "/"), short[r["trained_from"]], fmt(r["rho"]), fmt(r["ordered"]),
             fmt(r["moved_real_std"][0]), fmt(r["moved_seed_std"][0]), fmt(r["kept"]), mean(r["ce"]),
             mean(r.get("musicality"))]) + r" \\")
     lines += [r"\bottomrule", r"\end{tabular}",
