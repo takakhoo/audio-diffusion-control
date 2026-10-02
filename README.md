@@ -10,7 +10,7 @@
 
 **[Listen and drag the sliders yourself: live demo](https://takakhoo.github.io/audio-diffusion-control/)** (8 sliders, 5 prompts, 360 clips, with the measured numbers at every position)
 
-> **Status (2 Oct 2026): evaluation still running.** Everything below is measured and reproducible from this repository. Tables will grow as the remaining runs finish.
+> **Status (2 Oct 2026).** Everything below is measured and reproducible from this repository. Still running: prompt-pair sliders for the real-music axes, the text sliders retrained on 648 prompts, and Stable Audio 3.
 
 ## Headline
 
@@ -136,7 +136,25 @@ The leak goes away and more of the piece survives. The CLAP score for the concep
 
 ### 7. A slider trained with no text
 
-Sorting the model's own clips by measured spectral centroid and training between the two ends gives a brightness slider that moves the mean centroid from 408 Hz at -2 to 1,488 Hz at +1 (899 Hz unsteered) on 8 held-out prompts in a pilot run, with stereo width, loudness, and low-end energy nearly unchanged. The text slider for brightness drags all three along. The same trainer, sorting by aesthetics score, gives a quality slider. Full evaluation of these is in the running queue.
+The second trainer never sees a prompt pair. Generate a corpus with the model (15,552 clips from 648 prompts), measure something on every clip, and train one update with opposite signs on the top and bottom 20% within each prompt. Before the cut, whatever a linear fit on loudness, brightness, and enjoyment explains is removed from the measurement, so the two sets differ in the target and little else ([`results/ace_v2/`](results/ace_v2/README.md)).
+
+![Descriptor response of the set-trained sliders](results/ace_v2/response.png)
+
+Same attributes, both trainers, positions -1 to +1:
+
+| Attribute | Trained from | ρ with the waveform descriptor | Ends ordered | Selectivity | ρ with the MuQ text direction |
+|---|---|---:|---:|---:|---:|
+| harmony | prompt pair | 0.27 | 65% | 0.8 | 0.63 |
+| harmony | two sets | 0.72 | 99% | 6.6 | -0.07 |
+| density | prompt pair | 0.74 | 90% | 1.5 | 0.73 |
+| density | two sets | 0.63 | 90% | 4.7 | 0.24 |
+| ensemble | prompt pair | 0.50 | 82% | 1.5 | 0.65 |
+| ensemble | two sets | 0.60 | 94% | 2.4 | 0.03 |
+| energy | two sets | 0.83 | 99% | 3.8 | 0.16 |
+
+Selectivity is how far a slider moves its own descriptor relative to the average bystander descriptor. The set-trained sliders are the selective ones, and for harmony they are far better at moving the thing itself. They also show the limits of each kind of score: the set-trained harmony slider moves harmonic change rate and leaves the text-embedding score flat, and the prompt-pair slider does the reverse. Each trainer moves what it was trained on.
+
+Two of these fail (tempo, and mood sorted by a tag score), and all of them stop at ±1: past that the piece is lost and SongEval musicality drops, while Audiobox enjoyment stays flat. The prompt-pair sliders reach ±2.
 
 ### 8. Axes nobody named
 
@@ -180,6 +198,20 @@ Independent components of MuQ-MuLan give the axes that read most like music. Two
 | piano | piano, melancholic, electric piano, slow | organ, rock, folk, metal | production quality +0.33 |
 
 Training the set slider directly between sets of real recordings did not work: the mismatch between real recordings and the model's own output dominates the loss, and once it cancels almost no steering is left ([`results/real_sets/`](results/real_sets/README.md)). What works is to keep the axis from real music and take the two training sets from the model's own clips sorted along it.
+
+**Sliders along those axes.** Seven were trained that way and tested on 24 held-out prompts ([`results/ace_v2/`](results/ace_v2/README.md)):
+
+| Slider | ρ with the axis | Ends ordered | Moved between -1 and +1, in std of real music | Piece kept | Enjoyment at -1 / 0 / +1 | Musicality at -1 / 0 / +1 |
+|---|---:|---:|---:|---:|---|---|
+| arousal | 0.82 | 99% | 1.19 | 0.84 | 7.09 / 6.95 / 7.16 | 2.72 / 2.77 / 2.68 |
+| classical to funk | 0.64 | 96% | 0.77 | 0.85 | 7.16 / 6.95 / 7.09 | 2.72 / 2.77 / 2.67 |
+| piano | 0.63 | 96% | 0.75 | 0.87 | 7.10 / 6.95 / 7.06 | 2.66 / 2.77 / 2.72 |
+| jazz to electronic | 0.61 | 94% | 0.61 | 0.87 | 7.08 / 6.95 / 7.09 | 2.77 / 2.77 / 2.63 |
+| acoustic to electronic | 0.55 | 93% | 0.64 | 0.86 | 7.08 / 6.95 / 7.14 | 2.68 / 2.77 / 2.69 |
+| valence | 0.50 | 93% | 0.62 | 0.87 | 7.10 / 6.95 / 7.05 | 2.78 / 2.77 / 2.67 |
+| strings to synth | 0.40 | 82% | 0.44 | 0.87 | 7.15 / 6.95 / 7.03 | 2.68 / 2.77 / 2.69 |
+
+The projection is measured on the axis from real recordings and expressed in standard deviations of those recordings. All seven follow their axis. The arousal slider carries one prompt and seed 1.19 real-music standard deviations along the arousal axis with 84% of the piece kept and no loss on either quality predictor.
 
 ### 10. How much of real music the model covers
 
