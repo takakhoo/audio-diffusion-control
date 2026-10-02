@@ -163,7 +163,28 @@ The prompt-pair trainer asks the slider to reproduce a shift in the frozen model
 
 ### 10. Against other methods
 
-Two outside approaches were run through the same protocol on ACE-Step, on the same prompts and seeds.
+Four other ways of moving the same attribute were run through the same protocol on ACE-Step, on the same prompts and seeds. Rank correlation with the waveform descriptor, then with the MuQ-MuLan direction:
+
+| Slider | Trained slider | Prompt-pair guidance | Activation steering | Prompt interpolation |
+|---|---:|---:|---:|---:|
+| brightness | 0.97 / 0.80 | 0.89 / 0.81 | 0.93 / 0.81 | 0.49 / 0.35 |
+| density | 0.78 / 0.86 | 0.74 / 0.81 | 0.71 / 0.86 | 0.10 / 0.38 |
+| ensemble | 0.60 / 0.77 | 0.55 / 0.75 | 0.58 / 0.67 | 0.25 / 0.25 |
+| melody | 0.48 / 0.89 | 0.51 / 0.83 | 0.53 / 0.83 | 0.31 / 0.38 |
+| harmony | 0.41 / 0.73 | 0.08 / 0.68 | 0.24 / 0.72 | -0.01 / 0.23 |
+| mood | 0.39 / 0.88 | 0.45 / 0.87 | 0.41 / 0.88 | 0.25 / 0.63 |
+| groove (MuQ only) | 0.56 | 0.71 | 0.58 | 0.12 |
+| tension (MuQ only) | 0.86 | 0.88 | 0.91 | 0.69 |
+| Forward passes per sampling step | 1 | 3 | 1 | 1 |
+| Training | 10 min per slider | none | none | none |
+
+![Descriptor response of four methods on six sliders](results/ace/compare_response.png)
+
+- **The trained slider reproduces prompt-pair guidance at a third of the sampling cost.** Guidance is the slider's own training target applied directly at every step (the FreeSliders recipe), and it needs two extra forward passes per step. The slider matches it within the confidence interval on five of six descriptors and beats it on harmony (0.41 against 0.08).
+- **Prompt interpolation does not work on this model.** Moving the text conditioning toward the positive or negative prompt gives the lowest correlation on every attribute, and enjoyment at the ends falls to between 4.2 and 5.9 (unsteered: 6.96).
+- **Activation steering is a real competitor**, covered next.
+
+Full table with confidence intervals: [`results/ace/summary.md`](results/ace/summary.md).
 
 **Activation steering** (the training-free approach TADA argues for: add the mean difference in cross-attention output between the positive and the negative prompt, times the slider position). It needs no training at all.
 

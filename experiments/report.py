@@ -41,6 +41,16 @@ def style(plt):
     })
 
 
+def legend(fig, axes, y):
+    """One legend for the figure, collecting every method that appears in any panel."""
+    seen = {}
+    for ax in axes.flat:
+        for h, l in zip(*ax.get_legend_handles_labels()):
+            seen.setdefault(l, h)
+    order = [LABELS[m] for m in COLORS if LABELS[m] in seen]
+    fig.legend([seen[l] for l in order], order, loc="lower center", ncol=len(order), frameon=False, bbox_to_anchor=(0.5, y))
+
+
 def load(root: Path):
     runs = {}
     for d in sorted(root.iterdir()):
@@ -50,7 +60,7 @@ def load(root: Path):
     return runs
 
 
-def response_figure(runs, spec, out, plt):
+def response_figure(runs, spec, out, plt, file="response.png"):
     sliders = [s for s in spec if spec[s].get("measure") and any(k[1] == s for k in runs)]
     cols = min(4, len(sliders))
     rows_n = int(np.ceil(len(sliders) / cols))
@@ -72,11 +82,10 @@ def response_figure(runs, spec, out, plt):
     for ax in axes.flat[len(sliders):]:
         ax.axis("off")
     axes[0, 0].set_ylabel("change in descriptor\n(std of unsteered clips)")
-    handles, labels = axes[0, 0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="lower center", ncol=len(handles), frameon=False, bbox_to_anchor=(0.5, -0.02))
+    legend(fig, axes, -0.02)
     fig.suptitle("Does the measured descriptor follow the slider?", x=0.01, ha="left", fontweight="bold", fontsize=13)
     fig.tight_layout(rect=(0, 0.04, 1, 0.96))
-    fig.savefig(out / "response.png", bbox_inches="tight")
+    fig.savefig(out / file, bbox_inches="tight")
     plt.close(fig)
 
 
@@ -101,8 +110,7 @@ def tradeoff_figure(runs, spec, out, plt):
     for ax in axes.flat[len(sliders):]:
         ax.axis("off")
     axes[0, 0].set_ylabel("CLAP similarity to unsteered clip")
-    handles, labels = axes[0, 0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="lower center", ncol=len(handles), frameon=False, bbox_to_anchor=(0.5, -0.02))
+    legend(fig, axes, -0.02)
     fig.suptitle("How much of the clip survives a given amount of change?", x=0.01, ha="left", fontweight="bold",
                  fontsize=13)
     fig.tight_layout(rect=(0, 0.04, 1, 0.96))
@@ -136,7 +144,7 @@ def leakage_figure(runs, spec, method, out, plt):
     return names, table
 
 
-def quality_figure(runs, spec, out, plt, real_mean=None):
+def quality_figure(runs, spec, out, plt, real_mean=None, file="quality.png"):
     """Aesthetics content-enjoyment at each slider position: a flat line means the music survives."""
     sliders = [s for s in spec if any(k[1] == s and any("ce" in r for r in v) for k, v in runs.items())]
     if not sliders:
@@ -158,13 +166,12 @@ def quality_figure(runs, spec, out, plt, real_mean=None):
     for ax in axes.flat[len(sliders):]:
         ax.axis("off")
     axes[0, 0].set_ylabel("content enjoyment (1-10)")
-    handles, labels = axes[0, 0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="lower center", ncol=len(handles), frameon=False, bbox_to_anchor=(0.5, -0.03))
+    legend(fig, axes, -0.03)
     note = "  Dashed: mean of 2,000 real recordings (FMA)." if real_mean is not None else ""
     fig.suptitle("Does it still sound like music as the slider moves?" + note, x=0.01, ha="left", fontweight="bold",
                  fontsize=12)
     fig.tight_layout(rect=(0, 0.04, 1, 0.95))
-    fig.savefig(out / "quality.png", bbox_inches="tight")
+    fig.savefig(out / file, bbox_inches="tight")
     plt.close(fig)
 
 
@@ -197,6 +204,10 @@ def main():
     ap.add_argument("--max-scale", type=float, default=None, help="ignore scales beyond this magnitude")
     ap.add_argument("--real", default=None, help="directory with clap.npy and rows.jsonl of real recordings")
     ap.add_argument("--vocab", default=None, help="vocab.npz with tag text embeddings")
+    ap.add_argument("--figure-methods", nargs="+", default=None,
+                    help="methods drawn in response.png, tradeoff.png and quality.png; default all")
+    ap.add_argument("--compare", nargs="+", default=None,
+                    help="also draw compare_response.png and compare_quality.png for these methods, on sliders that have them all")
     args = ap.parse_args()
 
     import matplotlib
@@ -269,9 +280,14 @@ def main():
         summary_columns=[dict(key=k, label=l, digits=d) for k, l, d in cols],
     ), default=lambda o: None if isinstance(o, float) and not np.isfinite(o) else o))
 
-    response_figure(runs, spec, out, plt)
-    tradeoff_figure(runs, spec, out, plt)
-    quality_figure(runs, spec, out, plt, real_ce)
+    shown = {k: v for k, v in runs.items() if args.figure_methods is None or k[0] in args.figure_methods}
+    response_figure(shown, spec, out, plt)
+    tradeoff_figure(shown, spec, out, plt)
+    quality_figure(shown, spec, out, plt, real_ce)
+    if args.compare:
+        both = {k: v for k, v in runs.items() if k[0] in args.compare and all((m, k[1]) in runs for m in args.compare)}
+        response_figure(both, spec, out, plt, "compare_response.png")
+        quality_figure(both, spec, out, plt, real_ce, "compare_quality.png")
     if args.vocab:
         tag_table(Path(args.eval), runs, spec, args.vocab, out)
     with (out / "leakage.csv").open("w", newline="") as f:
