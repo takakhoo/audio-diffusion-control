@@ -34,3 +34,23 @@ The centroid and the CLAP direction are monotone across all five positions. Afte
 - The official package was run without flash-attn, on its fallback attention.
 - Only the prompt-pair trainer and the sweep were exercised; the set trainer, activation steering, and the full evaluation have not been run on this backbone.
 - Weights are under the Stability AI Community License. LoRA weights count as derivative works that may be shared for research and non-commercial use with the license and notice attached.
+
+## Six sliders on the small checkpoint
+
+`stabilityai/stable-audio-3-small-music-base`, six prompt-pair sliders at 600 iterations each (about 25 minutes on a shared GPU), 24 held-out prompts, 2 seeds, positions -1.5 to +1.5, no gating. Figures and the full table are in this directory ([`summary.md`](summary.md)).
+
+| Slider | Descriptor | ρ | Ends ordered | Descriptor moved in the usable span (std) | Usable span | Piece kept at ±1 | Enjoyment at -1 / 0 / +1 |
+|---|---|---:|---:|---:|---|---:|---|
+| brightness | spectral centroid | 0.84 ± 0.08 | 98% | 0.87 | 0 to +1.5 | 0.63 | 4.83 / 6.57 / 6.58 |
+| energy | spectral flux | 0.70 ± 0.08 | 98% | 1.53 | -1 to +1 | 0.63 | 6.23 / 6.57 / 6.10 |
+| harmony | harmonic change rate | 0.68 ± 0.09 | 98% | 0.80 | -0.5 to +1.5 | 0.74 | 5.74 / 6.57 / 6.92 |
+| ensemble | production complexity | 0.67 ± 0.10 | 96% | 0.70 | 0 to +1.5 | 0.69 | 5.38 / 6.57 / 6.96 |
+| tempo | beat-tracked tempo | 0.43 ± 0.13 | 72% | 1.24 | -0.5 to +1.5 | 0.72 | 5.77 / 6.57 / 6.79 |
+| mood | major-minus-minor fit | 0.34 ± 0.14 | 77% | 0.95 | -1.5 to +1.5 | 0.76 | 6.33 / 6.57 / 6.82 |
+
+- **The same recipe transfers to a third backbone with no change.** Every descriptor follows its slider, and four of six have 96% or more of trajectories ordered. Harmony follows its descriptor better here (0.68) than on ACE-Step (0.41).
+- **The cost is quality on the negative side.** Unsteered clips score 6.57, and the dark, sparse, and solo ends drop to 4.8 to 5.4 by position -1, so brightness and ensemble are usable only upward. This is the pattern Stable Audio Open showed before timestep gating ([`../gating`](../gating/)), and these sliders were run without it. The usable spans here are the ungated ones.
+- **Less of the piece survives** (0.63 to 0.76 at ±1, against 0.80 to 0.90 on ACE-Step), again as on the other 50-step model before gating.
+- The tags move the right way: energy lowers *reverberant, calm, dreamy, minor key*; mood raises *happy* and lowers *dark-toned, mysterious*.
+
+The next step for this backbone is the gated evaluation that fixed Stable Audio Open, and more than 600 iterations.

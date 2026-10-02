@@ -16,7 +16,7 @@
 
 **[Take the ten-minute listening test](https://takakhoo.github.io/audio-diffusion-control/listen.html)**: 23 questions on the same clips, nothing uploaded, and it shows how your ears line up with the measurements at the end.
 
-> **Status (2 Oct 2026).** Everything below is measured and reproducible from this repository. Still running: graded set training and Stable Audio 3.
+> **Status (2 Oct 2026).** Everything below is measured and reproducible from this repository. Still running: graded set training.
 
 ## Headline
 
@@ -69,7 +69,7 @@ Each slider name opens the live demo on that slider. The tag columns and the dir
 3. **Or trained from two sets of clips, with no text.** Generate a corpus with the model, measure something on every clip, and train the slider with the plain denoising loss at +1 on the top 20 to 30% and at -1 on the bottom 20 to 30%. One update serves both ends with opposite sign, so what the sets share cancels. The measurement can be a signal descriptor, a quality score, or the projection on a discovered direction ([`contrast.py`](audiosliders/contrast.py)).
 ![How a slider is used and the two ways to train one](results/figures/pipeline.png)
 
-4. **Two backbones, one interface.** ACE-Step 1.5 XL turbo (48 kHz, 8 steps, 0.4 s per 10 s clip) and Stable Audio Open 1.0 (44.1 kHz, 50 steps, 0.65 s per clip) ([`ace.py`](audiosliders/ace.py), [`backbone.py`](audiosliders/backbone.py)).
+4. **Three backbones, one interface.** ACE-Step 1.5 XL turbo (48 kHz, 8 steps, 0.4 s per 10 s clip), Stable Audio Open 1.0 (44.1 kHz, 50 steps, 0.65 s per clip), and Stable Audio 3 ([`ace.py`](audiosliders/ace.py), [`backbone.py`](audiosliders/backbone.py), [`sa3.py`](audiosliders/sa3.py)). Six sliders trained on Stable Audio 3 small with no change to the recipe all move their descriptor (ρ 0.34 to 0.84), with the ungated quality cost the other 50-step model showed ([`results/sa3/`](results/sa3/README.md)).
 
 ## The science, step by step
 

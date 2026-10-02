@@ -22,7 +22,7 @@ Status on 2 October 2026:
 3. **Non-CLAP evidence. Done.** Every direction score is repeated in MuQ-MuLan, and quality is scored by SongEval as well as Audiobox Aesthetics.
 4. **Confidence intervals. Done** for rank correlations and effect sizes in the summary tables.
 5. **A tighter story. Done in the current draft**: protocol and method comparison first, then axes of real music, coverage, and sliders along them. Six pages including references, 200-word abstract.
-6. **A third backbone.** Stable Audio 3 sliders are training. A result on a second diffusion model with different training data would answer "is this specific to ACE-Step".
+6. **A third backbone. Done for six sliders** on Stable Audio 3 small ([`results/sa3`](../results/sa3/README.md)); the gated evaluation is still to run.
 7. **A bigger and cleaner sample of real music** for the axes and the coverage numbers. FMA-large is on disk; MTG-Jamendo is the corpus other recent work uses.
 
 ## Backup and fallbacks
