@@ -118,3 +118,19 @@ def test_axis_coverage_finds_the_axis_a_model_lacks():
     assert cover["total"][2] > 1.5 and cover["within"][2] < 0.01
     assert subspace_overlap(real, real, 2) > 0.99
     assert subspace_overlap(real, generated, 2) < 0.6
+
+
+def test_internal_axes_recover_a_planted_direction_at_natural_scale():
+    from audiosliders.steer import internal_axes
+
+    rng = np.random.default_rng(7)
+    planted = rng.normal(size=(3, 10))
+    planted /= np.linalg.norm(planted)
+    groups = np.repeat(np.arange(6), 100)
+    amount = rng.normal(size=600) * 2.0
+    acts = amount[:, None, None] * planted + rng.normal(size=(600, 3, 10)) * 0.1 + groups[:, None, None] * 5.0
+    axes, share = internal_axes(acts, groups, 2)
+    assert axes.shape == (2, 3, 10) and share[0] > 0.9
+    unit = axes[0] / np.linalg.norm(axes[0])
+    assert abs((unit * planted).sum()) > 0.99
+    assert abs(np.linalg.norm(axes[0]) - 2.0) < 0.2

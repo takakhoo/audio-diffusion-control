@@ -36,6 +36,8 @@ def main():
     ap.add_argument("--backbone", default="sao")
     ap.add_argument("--method", required=True, choices=["lora", "guidance", "embed", "dsp", "base", "caa"])
     ap.add_argument("--caa-layers", type=int, nargs="+", default=None, help="restrict activation steering to these blocks")
+    ap.add_argument("--vectors", default=None, help="with --method caa: axes saved by experiments/discover_internal.py")
+    ap.add_argument("--axis", type=int, default=0)
     ap.add_argument("--slider", default=None)
     ap.add_argument("--weights", default=None)
     ap.add_argument("--out", required=True)
@@ -89,8 +91,12 @@ def main():
     if args.method == "caa":
         from audiosliders import steer
 
-        train = yaml.safe_load(Path("configs/prompts.yaml").read_text())["train"][:16]
-        vectors = steer.collect(model, train, spec["positive"], spec["negative"], args.seconds, args.caa_layers)
+        if args.vectors:
+            saved = torch.load(args.vectors)
+            vectors = {n: saved["axes"][args.axis, b].to(model.device) for b, n in enumerate(saved["names"])}
+        else:
+            train = yaml.safe_load(Path("configs/prompts.yaml").read_text())["train"][:16]
+            vectors = steer.collect(model, train, spec["positive"], spec["negative"], args.seconds, args.caa_layers)
     direction = None
     if spec and "direction" in spec:
         # A discovered slider carries the CLAP direction it was trained along.

@@ -1,0 +1,10 @@
+# Steering along the first eight principal axes of ACE-Step's own cross-attention activations.
+# Needs runs/discovery/internal_ace/axes.pt from experiments/discover_internal.py.
+internal_eval_a0	python experiments/evaluate.py --backbone ace-turbo --method caa --vectors runs/discovery/internal_ace/axes.pt --axis 0 --out runs/eval/internal_ace/axis0 --scales -12 -8 -4 4 8 12 --seeds 2 --save-audio --workers 6
+internal_eval_a1	python experiments/evaluate.py --backbone ace-turbo --method caa --vectors runs/discovery/internal_ace/axes.pt --axis 1 --out runs/eval/internal_ace/axis1 --scales -12 -8 -4 4 8 12 --seeds 2 --save-audio --workers 6
+internal_eval_a2	python experiments/evaluate.py --backbone ace-turbo --method caa --vectors runs/discovery/internal_ace/axes.pt --axis 2 --out runs/eval/internal_ace/axis2 --scales -12 -8 -4 4 8 12 --seeds 2 --save-audio --workers 6
+internal_eval_a3	python experiments/evaluate.py --backbone ace-turbo --method caa --vectors runs/discovery/internal_ace/axes.pt --axis 3 --out runs/eval/internal_ace/axis3 --scales -12 -8 -4 4 8 12 --seeds 2 --save-audio --workers 6
+internal_eval_a4	python experiments/evaluate.py --backbone ace-turbo --method caa --vectors runs/discovery/internal_ace/axes.pt --axis 4 --out runs/eval/internal_ace/axis4 --scales -12 -8 -4 4 8 12 --seeds 2 --save-audio --workers 6
+internal_eval_a5	python experiments/evaluate.py --backbone ace-turbo --method caa --vectors runs/discovery/internal_ace/axes.pt --axis 5 --out runs/eval/internal_ace/axis5 --scales -12 -8 -4 4 8 12 --seeds 2 --save-audio --workers 6
+internal_eval_a6	python experiments/evaluate.py --backbone ace-turbo --method caa --vectors runs/discovery/internal_ace/axes.pt --axis 6 --out runs/eval/internal_ace/axis6 --scales -12 -8 -4 4 8 12 --seeds 2 --save-audio --workers 6
+internal_eval_a7	python experiments/evaluate.py --backbone ace-turbo --method caa --vectors runs/discovery/internal_ace/axes.pt --axis 7 --out runs/eval/internal_ace/axis7 --scales -12 -8 -4 4 8 12 --seeds 2 --save-audio --workers 6
