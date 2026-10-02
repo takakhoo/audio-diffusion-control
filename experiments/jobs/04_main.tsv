@@ -86,3 +86,6 @@ eval_guidance_mood	python experiments/evaluate.py --method guidance --slider moo
 eval_embed_mood	python experiments/evaluate.py --method embed --slider mood --out runs/eval/main/embed_mood --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
 eval_guidance_electronic	python experiments/evaluate.py --method guidance --slider electronic --out runs/eval/main/guidance_electronic --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio --start 0.97
 eval_embed_electronic	python experiments/evaluate.py --method embed --slider electronic --out runs/eval/main/embed_electronic --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
+compose_brightness_reverb	python experiments/compose.py brightness reverb --weights runs/sliders/v1 --out runs/eval/compose/brightness_reverb
+compose_mood_energy	python experiments/compose.py mood energy --weights runs/sliders/v1 --out runs/eval/compose/mood_energy
+compose_bass_width	python experiments/compose.py bass width --weights runs/sliders/v1 --out runs/eval/compose/bass_width
