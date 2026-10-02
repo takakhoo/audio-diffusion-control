@@ -218,6 +218,10 @@ Training the set slider directly between sets of real recordings did not work: t
 | classical to funk | two sets | 0.64 | 96% | 0.77 | 0.85 | 7.16 / 6.95 / 7.09 | 2.72 / 2.77 / 2.67 |
 | acoustic to electronic | two sets | 0.55 | 93% | 0.64 | 0.86 | 7.08 / 6.95 / 7.14 | 2.68 / 2.77 / 2.69 |
 
+![Four sliders along axes found in real music, sweeping across their range](results/demo/axes.gif)
+
+*Four axes from real recordings as sliders, one prompt and seed per panel, swept from the middle to +2, back to -2, and home.*
+
 - Every one of the twelve follows its axis. The prompt pair is the stronger route on four of five axes and stays usable beyond ±1: over its usable span of -2 to +1 the arousal slider moves a clip 2.4 standard deviations of real music.
 - The set-trained sliders move less, keep more of the piece, and hold both quality scores level at both ends.
 - Nobody chose these prompt pairs. "Quiet, dreamy, melancholic, minor key" against "aggressive, energetic, rhythmic, dry" is what an independent component of real-music embeddings looks like when its two ends are put into words.

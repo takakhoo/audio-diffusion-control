@@ -8,6 +8,7 @@ per argument; all panels move through the slider positions together.
 """
 
 import argparse
+import textwrap
 from pathlib import Path
 
 import librosa
@@ -69,7 +70,8 @@ for k, p in enumerate(panels):
     ax.set_xticks([]); ax.set_yticks([])
     for s in ax.spines.values():
         s.set_visible(False)
-    ax.set_title(f"{p['name']}", loc="left", fontsize=13, fontweight="bold", color=INK, pad=4)
+    title = spec.get(p["name"], {}).get("label", p["name"]).lower()
+    ax.set_title(title, loc="left", fontsize=13, fontweight="bold", color=INK, pad=4)
     ax.text(1.0, 1.03, p["prompt"][:46], transform=ax.transAxes, ha="right", va="bottom", fontsize=9, color=MUTED)
     sl = fig.add_subplot(inner[1])
     scales = [r["scale"] for r in p["rows"]]
@@ -78,8 +80,9 @@ for k, p in enumerate(panels):
     sl.plot([scales[0], scales[-1]], [0, 0], color=TRACK, linewidth=6, solid_capstyle="round")
     sl.scatter(scales, [0] * n, s=14, color=MUTED, zorder=2)
     knob = sl.scatter([0], [0], s=260, color=ACCENT, edgecolor=SURFACE, linewidth=2, zorder=3)
-    sl.text(scales[0] - 0.25, 0, p["ends"][0], ha="right", va="center", fontsize=10, color=INK)
-    sl.text(scales[-1] + 0.25, 0, p["ends"][1], ha="left", va="center", fontsize=10, color=INK)
+    wrap = lambda t: "\n".join(textwrap.wrap(t, 14))
+    sl.text(scales[0] - 0.25, 0, wrap(p["ends"][0]), ha="right", va="center", fontsize=9.5, color=INK, linespacing=1.1)
+    sl.text(scales[-1] + 0.25, 0, wrap(p["ends"][1]), ha="left", va="center", fontsize=9.5, color=INK, linespacing=1.1)
     tx = fig.add_subplot(inner[2]); tx.axis("off")
     label = tx.text(0.5, 0.5, "", ha="center", va="center", fontsize=10, color=MUTED, family="DejaVu Sans Mono")
     artists.append((im, knob, label))
