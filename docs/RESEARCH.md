@@ -155,3 +155,44 @@ Audiobox Aesthetics is the quality signal used here and by TADA. Its correlation
 ### Larger real-music corpora
 
 MTG-Jamendo (55,000 full tracks with genre, instrument, and mood tags) is the cleanest step up from FMA and is the corpus other recent work uses. FMA-large (106,574 clips) is already on disk here.
+
+## Fourth pass (2 October 2026): axes inside the generator, and coverage of real music
+
+Two experiments were added after this pass: principal axes of ACE-Step's own cross-attention activations ([`experiments/discover_internal.py`](../experiments/discover_internal.py)), and how much of each real-music axis a model's output spans ([`results/coverage/`](../results/coverage/README.md)). This is what already exists for each.
+
+### Unsupervised directions inside image diffusion models
+
+| Work | What they decompose | What they report |
+|---|---|---|
+| [Kwon et al., 2022](https://arxiv.org/abs/2210.10960) | The U-Net bottleneck ("h-space"), edited with a small learned module | Edits there are close to linear and consistent across timesteps. |
+| [Haas et al., 2023](https://arxiv.org/abs/2303.11073) | PCA of h-space activations, and spectral directions of the Jacobian | Interpretable directions with no text model and no fine-tuning. The closest image analogue to our internal axes. |
+| [Park et al., 2023](https://arxiv.org/abs/2307.12868) | Local basis from the pullback metric | Directions are local: they depend on the sample and the timestep. |
+| [NoiseCLR, Dalva and Yanardag, 2023](https://arxiv.org/abs/2312.05390) | Contrastive directions learned from unlabelled images | Directions compose and stay disentangled. |
+| [LOCO Edit, Chen et al., 2024](https://arxiv.org/abs/2409.02374) | Singular vectors of the Jacobian | Local linearity holds only in a band of noise levels. |
+| [Surkov et al., 2024](https://arxiv.org/abs/2410.22366) | Sparse autoencoders on SDXL Turbo block updates | Features are causal and different blocks do different jobs. |
+| [STRIDE, Yadav et al., 2026](https://arxiv.org/abs/2605.11494) | PCA of a diffusion transformer's own activations | Used to shape noise that restores diversity in one-step models. The axes are not named or offered as controls. |
+| [ELROND, Skierś et al., 2026](https://arxiv.org/abs/2602.10216) | PCA or a sparse autoencoder on gradients of the differences between seeds of one prompt | Steering directions in the text-embedding input. Their "fixed prompt, vary the seed" setup matches our removal of the prompt mean. |
+
+### Inside music generators
+
+| Work | Model | Method | Difference from ours |
+|---|---|---|---|
+| [TADA](https://arxiv.org/abs/2602.11910), section 3 | ACE-Step | TopK sparse autoencoders on cross-attention outputs; features for a concept are chosen with positive and negative prompts | Same activations. Their features are picked per named concept from prompt pairs; ours are principal axes with the prompt mean removed and no label at any point. |
+| [Singh, Cherep, and Maes, 2025](https://arxiv.org/abs/2505.18186) | Autoregressive transformer music generators | Sparse autoencoders on the residual stream with automated labelling | Autoregressive models. |
+| [SMITIN, Koo et al., 2024](https://arxiv.org/abs/2404.02252) | MusicGen | Probes on attention heads steer toward an instrument | Supervised. |
+
+We found no paper that runs PCA over a music diffusion transformer's activations and steers along the unnamed components. The claim to make is that narrow one.
+
+### Diversity and coverage against real music
+
+| Work | What is compared | Measure |
+|---|---|---|
+| [Presto!, Novack et al., 2024](https://arxiv.org/abs/2410.05167) | Distilled text-to-music models against a reference set | Density, recall, and coverage in CLAP space, as single numbers. |
+| [Huang et al., 2025](https://arxiv.org/abs/2503.16669) | Many text-to-music metrics against human preference | Recall and coverage hold up as measures; precision and density do less well. |
+| [Slendebroek and Metaxa, 2026](https://arxiv.org/abs/2608.06106) | Suno and Lyria 3 against human music in four genres | 72 hand-built MIR features with dispersion and separability diagnostics. They report homogenisation. |
+
+The existing evidence is either one aggregate number per model, or dispersion of signal features for commercial systems. Our table differs in two ways: the axes are learned from real music and carry musical labels, and the models are open ones that a slider can then be trained on.
+
+### Open models noted for later (from the search pass; check each model card before use)
+
+`ACE-Step/acestep-v15-xl-sft-diffusers` (MIT, same pipeline class as the turbo model used here), `ASLP-lab/DiffRhythm2` (Apache-2.0), `declare-lab/JAM-0.5` (non-commercial, flow transformer), `HeartMuLa/HeartMuLa-oss-3B` (Apache-2.0, language model plus codec).
