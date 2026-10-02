@@ -1,0 +1,94 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\title{Adapting SliderSpace to Music Diffusion Models}
+\author{MS Thesis Notes}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Motivation}
+Text-to-audio diffusion models such as Stable Audio Open promise rich sonic
+variation, but users currently explore this space via prompt engineering alone.
+Visual work like SliderSpace shows that latent capabilities can be decomposed
+into interpretable directions by analyzing semantic embeddings. This document
+lays out an audio-focused adaptation where the slides correspond to musical
+attributes (timbre, density, ambience, groove) instead of visual concepts.
+
+\section{Method Overview}
+Given a textual concept $c$ (e.g., ``solo jazz guitar, warm tone''), we want a
+set of independent controls $\{T_i\}_{i=1}^n$ such that scaling slider $i$
+pushes generated audio along a semantically meaningful axis while preserving
+alignment with $c$. The workflow mirrors SliderSpace:
+\begin{enumerate}[label=\arabic*)]
+  \item \textbf{Distribution sampling:} Generate $m$ waveform clips using a
+  text-to-audio diffusion model with fixed prompt $c$ and varying seeds.
+  \item \textbf{Semantic encoding:} Embed each clip via an audio--text model
+  such as CLAP to obtain $\phi(x_j) \in \mathbb{R}^d$.
+  \item \textbf{PCA decomposition:} Perform PCA on $\{\phi(x_j)\}$ to obtain
+  orthogonal principal directions $\{v_i\}$ that capture variation axes.
+  \item \textbf{Slider training:} For each $v_i$, attach low-rank LoRA
+  adapters to the diffusion model's cross-attention layers. Optimize slider
+  weights so that applying slider $i$ produces an embedding shift
+  $\Delta \phi_i$ that aligns with $v_i$.
+  \item \textbf{Evaluation:} Sweep each slider across seeds and measure both
+  perceptual coherence (listening tests, MIR descriptors) and prompt fidelity
+  (text--audio similarity). Promote the most robust sliders to a user-facing
+  interface.
+\end{enumerate}
+
+\section{Experimental Pipeline}
+\subsection{Sampling + Storage}
+The script \texttt{scripts/generate\_samples.py} will call the diffusion model
+to produce batches of audio for a prompt. Each clip is written to
+\texttt{data/raw/<concept>/seed\_XXXXX.wav} with companion JSON metadata
+capturing prompt, seed, and model parameters. The placeholder generator will
+be replaced with Stable Audio Open inference once the checkpoint is available
+on lisplab-2.
+
+\subsection{Embeddings + PCA}
+\texttt{scripts/compute\_embeddings.py} loads each WAV file, runs CLAP (stubbed
+for now), and saves the embeddings matrix plus an index file. PCA is applied via
+\texttt{scripts/run\_pca.py}, which outputs the components, explained variance,
+and per-sample projections. These PCA directions define target semantics for
+slider training.
+
+\subsection{Slider Training Stub}
+\texttt{scripts/train\_sliders.py} currently records a plan describing which PCA
+directions and LoRA rank to use. The full implementation will:
+\begin{itemize}
+  \item Load PCA components $v_i$ and construct loss terms
+  $1 - \cos(\Delta \phi_i, v_i)$ as in SliderSpace.
+  \item Attach rank-$r$ LoRA blocks to the audio model's cross-attention layers.
+  \item For each slider, optimize LoRA weights on batches of seeds to produce
+  consistent CLAP deltas aligned with $v_i$.
+  \item Save trained adapters for inference-time composition.
+\end{itemize}
+
+\section{Evaluation Plan}
+\begin{itemize}
+  \item \textbf{Automatic metrics:} Track MIR descriptors (spectral centroid,
+  onset density, dynamic range) as slider parameters change to ensure monotonic
+  control. Compute CLAP similarity to the original prompt to detect drift.
+  \item \textbf{Human listening:} Build a lightweight UI (e.g., Gradio) where
+  musicians can sweep sliders and annotate perceived axes. Log which sliders
+  feel musically meaningful.
+  \item \textbf{Diversity recovery:} Compare generation diversity before/after
+  slider application via embedding variance, mirroring SliderSpace's diversity
+  enhancement studies.
+\end{itemize}
+
+\section{Open Questions}
+\begin{itemize}
+  \item Which layers of Stable Audio Open respond best to LoRA adapters for
+  semantic steering?
+  \item Does CLAP provide sufficiently disentangled axes for timbre/density, or
+  do we need MIR-based embeddings for certain attributes?
+  \item How many sliders per concept deliver meaningful coverage before human
+  evaluation becomes overwhelming?
+\end{itemize}
+
+\end{document}

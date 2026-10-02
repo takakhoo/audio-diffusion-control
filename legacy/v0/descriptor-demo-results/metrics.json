@@ -1,0 +1,183 @@
+{
+  "backend": "additive-dsp-diagnostic",
+  "not_implemented": [
+    "diffusion inference",
+    "CLAP",
+    "LoRA training"
+  ],
+  "descriptor_names": [
+    "power_spectral_centroid_hz",
+    "detected_onsets_per_second",
+    "rms"
+  ],
+  "train_samples": 80,
+  "held_out_samples": 20,
+  "train_seed": 7,
+  "held_audio_seed": 19,
+  "pca": {
+    "mean": [
+      252.67419845066684,
+      5.2666666666666675,
+      0.061703857397092124
+    ],
+    "scale": [
+      53.778021651561374,
+      1.6819301082057152,
+      0.01044344740568679
+    ],
+    "components": [
+      [
+        -0.1850434198030792,
+        0.6948956607283163,
+        0.6948949226239449
+      ],
+      [
+        0.9827303459002803,
+        0.13084131264157783,
+        0.1308496012716274
+      ]
+    ],
+    "variance_ratio": [
+      0.6773428972833784,
+      0.32113644424428583
+    ]
+  },
+  "sweeps": {
+    "brightness": [
+      {
+        "brightness": 0.0,
+        "note_rate": 4,
+        "descriptors": [
+          220.54668071999427,
+          4.0,
+          0.05477225575051663
+        ],
+        "pca_coordinates": [
+          -0.8740020395629009,
+          -0.7724781980899901
+        ]
+      },
+      {
+        "brightness": 0.25,
+        "note_rate": 4,
+        "descriptors": [
+          222.12386009240012,
+          4.0,
+          0.05477225575051663
+        ],
+        "pca_coordinates": [
+          -0.879428915742984,
+          -0.743657092690584
+        ]
+      },
+      {
+        "brightness": 0.5,
+        "note_rate": 4,
+        "descriptors": [
+          228.4250391300775,
+          4.0,
+          0.05477225575051661
+        ],
+        "pca_coordinates": [
+          -0.9011104815967457,
+          -0.6285104274711416
+        ]
+      },
+      {
+        "brightness": 0.75,
+        "note_rate": 4,
+        "descriptors": [
+          256.492180623895,
+          4.0,
+          0.05477225575051663
+        ],
+        "pca_coordinates": [
+          -0.9976859911936492,
+          -0.11561629671706607
+        ]
+      },
+      {
+        "brightness": 1.0,
+        "note_rate": 4,
+        "descriptors": [
+          482.1344218349481,
+          4.0,
+          0.05477225575051663
+        ],
+        "pca_coordinates": [
+          -1.7740926101699777,
+          4.00773132643996
+        ]
+      }
+    ],
+    "density": [
+      {
+        "brightness": 0.5,
+        "note_rate": 2,
+        "descriptors": [
+          228.42503913004882,
+          2.0,
+          0.03872983346207417
+        ],
+        "pca_coordinates": [
+          -2.7948621390299975,
+          -0.9850962614172296
+        ]
+      },
+      {
+        "brightness": 0.5,
+        "note_rate": 3,
+        "descriptors": [
+          228.42503913006075,
+          3.0,
+          0.04743416490252569
+        ],
+        "pca_coordinates": [
+          -1.8025322751703978,
+          -0.7982442915845754
+        ]
+      },
+      {
+        "brightness": 0.5,
+        "note_rate": 4,
+        "descriptors": [
+          228.4250391300775,
+          4.0,
+          0.05477225575051661
+        ],
+        "pca_coordinates": [
+          -0.9011104815967457,
+          -0.6285104274711416
+        ]
+      },
+      {
+        "brightness": 0.5,
+        "note_rate": 6,
+        "descriptors": [
+          228.42503913028833,
+          6.0,
+          0.0670820393249937
+        ],
+        "pca_coordinates": [
+          0.7442757089966723,
+          -0.3186921280762102
+        ]
+      },
+      {
+        "brightness": 0.5,
+        "note_rate": 8,
+        "descriptors": [
+          228.4250391319183,
+          8.0,
+          0.07745966692414835
+        ],
+        "pca_coordinates": [
+          2.261098473657677,
+          -0.03308248592572749
+        ]
+      }
+    ]
+  },
+  "held_out_standardized_rmse": 0.04274139999210056,
+  "caveat": "PCA variance directions are not automatically semantic or independent controls. This measures a known synthesizer, not a text-to-audio model."
+}

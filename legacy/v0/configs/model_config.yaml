@@ -1,0 +1,20 @@
+audio_model:
+  name: stable-audio-open-1.0  # TODO: confirm exact checkpoint name
+  sample_rate: 44100
+  max_duration_sec: 30
+  device: cuda
+  guidance_scale: 7.5
+  seed: 0
+embedding_model:
+  name: laion/clap-htsat-unfused  # TODO: verify preferred CLAP checkpoint
+  device: cuda
+  embedding_dim: 512
+paths:
+  raw_audio_dir: data/raw
+  embeddings_dir: data/embeddings
+  pca_dir: data/pca
+  logs_dir: logs
+experiment:
+  default_num_samples: 128
+  default_prompt: "solo jazz guitar, warm tone, swing feel"
+  precision: fp16
