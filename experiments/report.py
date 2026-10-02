@@ -233,6 +233,10 @@ def main():
         row = dict(slider=name, method=LABELS.get(method, method), measure=s.get("measure") or "",
                    n=len({(r["prompt_index"], r["seed"]) for r in rows}))
         row.update(M.summarize(rows, s.get("measure"), s.get("measure_sign", 1)))
+        if s.get("measure"):
+            others = [k for k in LEAK_KEYS if k != s["measure"] and all(k in r for r in rows)]
+            row["selectivity"] = M.selectivity(rows, s["measure"], others, s.get("measure_sign", 1))
+            row["monotone_share"] = M.monotone_share(rows, s["measure"], s.get("measure_sign", 1))
         if reference is not None and (Path(args.eval) / f"{method}_{name}" / "clap.npy").exists():
             emb = np.load(Path(args.eval) / f"{method}_{name}" / "clap.npy")
             all_rows = M.load_rows(Path(args.eval) / f"{method}_{name}")

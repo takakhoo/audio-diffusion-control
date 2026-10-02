@@ -119,27 +119,47 @@ dynamics:
 quality:
   ends: [less enjoyable, more enjoyable]
   measure: ce
-# The two below keep the polarity of the discovered axis, whose positive end is the calmer or darker one.
+# Axes found in real music (results/discovery/real). `axis` is the direction the slider is scored
+# against. Each keeps the polarity of the discovered axis: for arousal and valence the positive end
+# is the calmer or darker one. The prompt pair, where present, is the axis's own tags, used to
+# train a text slider for the same axis.
 arousal:
   ends: [energetic and aggressive, quiet and dreamy]
+  positive: quiet, dreamy, melancholic, minor key
+  negative: aggressive, energetic, rhythmic, dry
+  axis: {emb: muq, source: runs/discovery/real_muq_ica/directions.npy, index: 3}
   measure: flux
   measure_sign: -1
 valence:
   ends: [playful and happy, dark and distorted]
+  positive: dark, heavy, distorted, dark-toned
+  negative: playful, happy, simple, pop
+  axis: {emb: muq, source: runs/discovery/real_muq_ica/directions.npy, index: 7}
   measure: majorness
   measure_sign: -1
 jazz_electronic:
   ends: [electronic, jazz]
+  positive: jazz, saxophone, trumpet, improvised
+  negative: electronic dance, synthesizer, electronic
+  axis: {emb: muq, source: runs/discovery/real_muq_ica/directions.npy, index: 5}
   measure: null
 strings_synth:
   ends: [synthesizer and choir, guitars and strings]
+  positive: acoustic guitar, electric guitar, strings, acoustic
+  negative: synthesizer, choir, reverberant
+  axis: {emb: muq, source: runs/discovery/real_muq_ica/directions.npy, index: 1}
   measure: null
 piano_axis:
   ends: [organ and rock, piano]
+  positive: piano, electric piano, slow, melancholic
+  negative: organ, rock, folk, metal
+  axis: {emb: muq, source: runs/discovery/real_muq_ica/directions.npy, index: 4}
   measure: null
 classical_funk:
   ends: [funk and drums, classical and epic]
+  axis: {emb: clap, source: runs/discovery/real_pca/directions.npy, index: 4}
   measure: null
 acoustic_electronic:
   ends: [studio electronic, acoustic and blues]
+  axis: {emb: clap, source: runs/discovery/real_ica/directions.npy, index: 3}
   measure: null

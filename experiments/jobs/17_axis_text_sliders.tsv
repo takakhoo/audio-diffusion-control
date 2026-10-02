@@ -1,0 +1,12 @@
+# Text sliders for axes found in real music: the prompt pair is the axis's own tags (configs/sliders.yaml).
+# Scored against the same axis as the set-trained sliders of 12_v2_sliders.tsv.
+axes_train_arousal	python -m audiosliders.train arousal --backbone ace-turbo --eta 2 --out runs/sliders/ace_axes
+axes_train_valence	python -m audiosliders.train valence --backbone ace-turbo --eta 2 --out runs/sliders/ace_axes
+axes_train_jazz_electronic	python -m audiosliders.train jazz_electronic --backbone ace-turbo --eta 2 --out runs/sliders/ace_axes
+axes_train_strings_synth	python -m audiosliders.train strings_synth --backbone ace-turbo --eta 2 --out runs/sliders/ace_axes
+axes_train_piano_axis	python -m audiosliders.train piano_axis --backbone ace-turbo --eta 2 --out runs/sliders/ace_axes
+axes_eval_arousal	python experiments/evaluate.py --backbone ace-turbo --method lora --slider arousal --weights runs/sliders/ace_axes/arousal.safetensors --out runs/eval/ace_v2/lora_arousal --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
+axes_eval_valence	python experiments/evaluate.py --backbone ace-turbo --method lora --slider valence --weights runs/sliders/ace_axes/valence.safetensors --out runs/eval/ace_v2/lora_valence --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
+axes_eval_jazz_electronic	python experiments/evaluate.py --backbone ace-turbo --method lora --slider jazz_electronic --weights runs/sliders/ace_axes/jazz_electronic.safetensors --out runs/eval/ace_v2/lora_jazz_electronic --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
+axes_eval_strings_synth	python experiments/evaluate.py --backbone ace-turbo --method lora --slider strings_synth --weights runs/sliders/ace_axes/strings_synth.safetensors --out runs/eval/ace_v2/lora_strings_synth --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
+axes_eval_piano_axis	python experiments/evaluate.py --backbone ace-turbo --method lora --slider piano_axis --weights runs/sliders/ace_axes/piano_axis.safetensors --out runs/eval/ace_v2/lora_piano_axis --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio

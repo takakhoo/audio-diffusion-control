@@ -29,6 +29,8 @@ def load_rows(path: str | Path) -> list[dict]:
         for r, line in zip(rows, extra.read_text().splitlines()):
             m = json.loads(line)
             r.update(muq_dir=m["muq_pos"] - m["muq_neg"], muq_prompt=m["muq_prompt"])
+            if "muq_axis" in m:
+                r["muq_axis"] = m["muq_axis"]
     for r in rows:
         for hz, octv in (("centroid_hz", "centroid_oct"), ("rolloff_hz", "rolloff_oct")):
             if hz in r and octv not in r:

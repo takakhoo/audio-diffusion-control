@@ -43,6 +43,9 @@ for run in map(Path, args.runs):
             meta = json.loads((f.metadata() or {}).get("slider", "{}"))
         if meta.get("emb") == "muq" and meta.get("by", "").startswith("direction:"):
             axis = torch.tensor(np.load(meta["source"])[meta["index"]], dtype=torch.float32).cuda()
+    declared = spec.get(name, {}).get("axis")
+    if declared and declared["emb"] == "muq":
+        axis = torch.tensor(np.load(declared["source"])[declared["index"]], dtype=torch.float32).cuda()
     if axis is None and not (name in spec and "positive" in spec[name]):
         print("skip", run)
         continue
@@ -68,7 +71,10 @@ for run in map(Path, args.runs):
             sim = model.calc_similarity(emb, text).cpu().numpy()
             proj = (emb @ axis).cpu().numpy() if axis is not None else None
         for j, (r, f, s) in enumerate(zip(rows[b : b + args.batch], files[b : b + args.batch], sim)):
-            pos, neg = (float(proj[j]), 0.0) if proj is not None else (float(s[0]), float(s[1]))
-            out.append(dict(file=f.name, muq_pos=pos, muq_neg=neg, muq_prompt=float(s[2 + prompts.index(r["prompt"])])))
+            pos, neg = (float(s[0]), float(s[1])) if named else (float(proj[j]), 0.0)
+            row = dict(file=f.name, muq_pos=pos, muq_neg=neg, muq_prompt=float(s[2 + prompts.index(r["prompt"])]))
+            if proj is not None:
+                row["muq_axis"] = float(proj[j])
+            out.append(row)
     (run / "muq.jsonl").write_text("\n".join(json.dumps(o) for o in out) + "\n")
     print("scored", run, len(out))
