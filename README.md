@@ -299,7 +299,7 @@ Most of them do what their names say; the drum slider moves the percussive share
 
 ```bash
 pip install -e ".[dev]"
-python -m pytest -q          # 50 CPU tests, no model download
+python -m pytest -q          # 54 CPU tests, no model download
 ```
 
 With a GPU:
@@ -309,6 +309,17 @@ pip install -e ".[model,experiments,demo]" audiobox_aesthetics
 python -m audiosliders.train mood --backbone ace-turbo --eta 2 --out runs/sliders/ace   # about 20 minutes
 python experiments/sweep.py runs/sliders/ace/mood.safetensors --backbone ace-turbo      # descriptor table per position
 python -m audiosliders.server --sliders runs/sliders/ace --backbone ace-turbo           # live page: type a prompt, drag sliders
+```
+
+A slider with no text, along an axis found in real music:
+
+```bash
+python experiments/make_corpus.py --backbone ace-turbo --split large --seeds 24 --save-audio --out runs/corpus/ace_large
+venv-muq/bin/python experiments/muq_embed.py runs/corpus/ace_large          # MuQ embeddings, in their own environment
+python experiments/discover.py --corpus runs/corpus/real_ace --method ica --emb muq --max-vocal 0.6 \
+    --vocab runs/reference/vocab_muq.npz --out runs/discovery/real_muq_ica
+python -m audiosliders.contrast arousal --backbone ace-turbo --corpus runs/corpus/ace_large --emb muq \
+    --by direction:runs/discovery/real_muq_ica/directions.npy:3 --fraction 0.2 --balance ce --symmetry 0 --out runs/sliders/ace_v2
 ```
 
 The server page adds a live panel under the recorded demo: type any prompt, set any combination of sliders, and it returns the clip in two to four seconds with its enjoyment score and descriptors. On a remote GPU box, forward the port (`ssh -L 7860:127.0.0.1:7860 host`) and open `localhost:7860`.
@@ -322,7 +333,7 @@ The first version of this repository never ran a model. Its sampling script wrot
 ## Layout
 
 - [`audiosliders/`](audiosliders/): backbones, slider LoRA, both trainers, measurement code, demo server
-- [`configs/`](configs/): 20 slider definitions, the 48/24 train/eval prompt split, discovery concepts
+- [`configs/`](configs/): 28 slider definitions, the 48/24 train/eval prompt split, 648 prompts for the large corpus, discovery concepts
 - [`experiments/`](experiments/): scripts and job lists behind each number
 - [`results/`](results/): tables and figures
 - [`paper/`](paper/): draft on the ISMIR template (`tectonic -X compile paper/audiosliders.tex`)

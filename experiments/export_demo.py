@@ -29,7 +29,7 @@ MEASURES = dict(
 )
 METHODS = dict(
     lora=("Text slider", "A LoRA trained from a prompt pair, scaled by the slider position. Same cost as plain generation."),
-    contrast=("Descriptor slider", "A LoRA trained without text, from the model's own clips sorted by a measurement."),
+    contrast=("Set-trained slider", "A LoRA trained with no text, between two sets of the model's own clips: the top and bottom 20% along a measurement or along an axis found in real music. Usable from -1 to +1."),
     discovered=("Discovered axis", "A LoRA trained along a principal direction of the model's own output for this concept. Nobody named it in advance; the labels come from the tags it moves."),
     internal=("The model's own axis", "A principal direction of the transformer's own activations across seeds of the same prompt, added back at sampling time. No text, no embedding model, and no training chose it; the labels come from the tags it moves."),
     guidance=("Prompt-pair guidance", "The text slider's training target applied directly at every step. Two extra forward passes per step."),
@@ -43,7 +43,10 @@ MODELS = dict(
 CONTRAST_MEASURE = dict(quality="ce", production="pq", ensemble="pc", harmony="harmonic_change", groove="pulse_clarity")
 
 ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-ap.add_argument("--source", action="append", default=[], metavar="MODEL=DIR")
+ap.add_argument("--source", action="append", default=[], metavar="MODEL=DIR[:METHOD,METHOD]",
+                help="evaluation directory for a model, optionally limited to some methods; repeatable per model")
+ap.add_argument("--max-scale", action="append", default=[], metavar="METHOD=VALUE",
+                help="publish only positions up to this magnitude for a method")
 ap.add_argument("--discovered", action="append", default=[], metavar="MODEL=EVALDIR:SLIDERS_JSON")
 ap.add_argument("--axes", action="append", default=[], metavar="MODEL=EVALDIR:AXES_JSON",
                 help="unnamed axes described by experiments/report_axes.py")
@@ -57,13 +60,15 @@ ap.add_argument("--bitrate", default="96k")
 args = ap.parse_args()
 
 spec = yaml.safe_load(Path("configs/sliders.yaml").read_text())
+limit = {m: float(v) for m, _, v in (item.partition("=") for item in args.max_scale)}
 out = Path(args.out)
 manifest = dict(models={}, methods={}, clips={})
 
 
 def publish(model, method, name, run, rows, pid, seed, prompt_slot):
     """Convert one trajectory to AAC and return its clip list."""
-    mine = sorted((r for r in rows if r["prompt_index"] == pid and r["seed"] == seed), key=lambda r: r["scale"])
+    mine = sorted((r for r in rows if r["prompt_index"] == pid and r["seed"] == seed
+                   and abs(r["scale"]) <= limit.get(method, float("inf"))), key=lambda r: r["scale"])
     clips = []
     for r in mine:
         src = run / f"p{pid:02d}_s{seed:05d}_x{r['scale']:+.2f}.flac"
@@ -89,22 +94,23 @@ def entry_for(model, name, label, low, high, measure):
 
 for source in args.source:
     model, _, root = source.partition("=")
+    root, _, only = root.partition(":")
     root = Path(root)
-    manifest["models"][model] = dict(label=MODELS[model][0], note=MODELS[model][1], sliders={}, prompts=[])
+    manifest["models"].setdefault(model, dict(label=MODELS[model][0], note=MODELS[model][1], sliders={}, prompts=[]))
     prompts = manifest["models"][model]["prompts"]
-    names = args.sliders or (list(spec) + ["quality", "production"])
+    names = args.sliders or list(dict.fromkeys(list(spec) + ["production"]))
     for name in names:
-        for method in args.methods:
+        for method in (only.split(",") if only else args.methods):
             run = root / f"{method}_{name}"
             if not (run / "rows.jsonl").exists():
                 continue
             rows = metrics.load_rows(run)
             s = spec.get(name, {})
             measure = s.get("display") or s.get("measure") or CONTRAST_MEASURE.get(name)
-            ends = s.get("ends") or dict(quality=["less enjoyable", "more enjoyable"],
-                                         production=["rougher production", "cleaner production"])[name]
-            entry = entry_for(model, name, name.capitalize(), ends[0], ends[1], measure)
-            entry["methods"].append(method)
+            ends = s.get("ends") or ["rougher production", "cleaner production"]
+            entry = entry_for(model, name, name.replace("_axis", "").replace("_", " / ").capitalize(), ends[0], ends[1], measure)
+            if method not in entry["methods"]:
+                entry["methods"].append(method)
             manifest["methods"][method] = dict(label=METHODS[method][0], note=METHODS[method][1])
             for pid in args.prompts or sorted({r["prompt_index"] for r in rows}):
                 mine = [r for r in rows if r["prompt_index"] == pid]

@@ -71,6 +71,8 @@ for run in sorted(Path(args.eval).iterdir()):
         top=scales[-1], moved_real_std=[span(x) / model["real_std"][index] for x in (1.0, scales[-1])],
         moved_seed_std=[span(x) / model["generated_within_std"][index] for x in (1.0, scales[-1])],
         coverage_all_prompts=model["total"][index], coverage_one_prompt=model["within"][index],
+        position=[float((resp["level"][scales.index(x)] - model["real_mean"][index]) / model["real_std"][index])
+                  for x in (scales[0], -1.0, 0.0, 1.0, scales[-1])] if "real_mean" in model else [],
         kept=float(np.mean([r["clap_keep"] for r in rows if abs(r["scale"]) == 1.0])), ce=list(ce.values()),
         musicality=list(music.values()),
         rises=[t for t, _ in up], falls=[t for t, _ in down],

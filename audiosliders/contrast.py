@@ -173,7 +173,7 @@ def axis_coverage(real: np.ndarray, real_groups: np.ndarray, generated: np.ndarr
     pr, pg = real.astype(np.float64) @ d.T, generated.astype(np.float64) @ d.T
     wr, wg = _centered(real, real_groups) @ d.T, _centered(generated, generated_groups) @ d.T
     return dict(total=pg.std(0) / pr.std(0), within=wg.std(0) / wr.std(0), offset=(pg.mean(0) - pr.mean(0)) / pr.std(0),
-                real_std=pr.std(0), real_within_std=wr.std(0), generated_within_std=wg.std(0))
+                real_mean=pr.mean(0), real_std=pr.std(0), real_within_std=wr.std(0), generated_within_std=wg.std(0))
 
 
 def subspace_overlap(a: np.ndarray, b: np.ndarray, k: int = 8) -> float:
