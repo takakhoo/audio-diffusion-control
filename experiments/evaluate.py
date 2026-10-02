@@ -51,6 +51,9 @@ def main():
     ap.add_argument("--seconds", type=float, default=10.0)
     ap.add_argument("--pairs-per-batch", type=int, default=4)
     ap.add_argument("--save-audio", action="store_true")
+    ap.add_argument("--mix", action="append", default=[], metavar="WEIGHTS:COEF",
+                    help="with --method lora: a second slider applied at COEF times the main slider's position, "
+                         "used to cancel a measured leak")
     ap.add_argument("--workers", type=int, default=12)
     args = ap.parse_args()
 
@@ -70,6 +73,11 @@ def main():
         bank = SliderBank(model.dit)
         meta = bank.load("s", args.weights)
         spec = spec or meta
+        mixes = []
+        for k, item in enumerate(args.mix):
+            path, _, coef = item.rpartition(":")
+            bank.load(f"m{k}", path)
+            mixes.append((f"m{k}", float(coef)))
     direction = None
     if spec and "direction" in spec:
         # A discovered slider carries the CLAP direction it was trained along.
@@ -90,7 +98,8 @@ def main():
         s = torch.tensor(render * len(chunk), device=model.device)
         kw = dict(seconds=args.seconds, steps=args.steps, guidance=args.guidance)
         if args.method == "lora":
-            audio = model.generate(text, seeds, wrap=methods.lora(bank, "s", s, args.start), **kw)
+            scales_now = {"s": s, **{name: coef * s for name, coef in mixes}}
+            audio = model.generate(text, seeds, wrap=lambda p: bank.gated(p, scales_now, start=args.start), **kw)
         elif args.method == "guidance":
             wrap = methods.guidance(model, text, spec["positive"], spec["negative"], s, args.seconds, args.eta, args.start)
             audio = model.generate(text, seeds, wrap=wrap, **kw)
