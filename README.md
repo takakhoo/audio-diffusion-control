@@ -16,7 +16,7 @@
 
 **[Take the ten-minute listening test](https://takakhoo.github.io/audio-diffusion-control/listen.html)**: 23 questions on the same clips, nothing uploaded, and it shows how your ears line up with the measurements at the end.
 
-> **Status (2 Oct 2026).** Everything below is measured and reproducible from this repository. Still running: graded set training.
+> **Status (2 Oct 2026).** Everything below is measured and reproducible from this repository. Still running: gated evaluation on Stable Audio 3.
 
 ## Headline
 
@@ -180,6 +180,8 @@ Same attributes, both trainers, positions -1 to +1:
 Selectivity is how far a slider moves its own descriptor relative to the average bystander descriptor. The set-trained sliders are the selective ones, and for harmony they are far better at moving the thing itself. They also show the limits of each kind of score: the set-trained harmony slider moves harmonic change rate and leaves the text-embedding score flat, and the prompt-pair slider does the reverse. Each trainer moves what it was trained on.
 
 Two of these fail (tempo, and mood sorted by a tag score), and all of them stop at ±1: past that the piece is lost and SongEval musicality drops, while Audiobox enjoyment stays flat. The prompt-pair sliders reach ±2.
+
+**Past ±1 with graded training.** Training every clip at its own position along the measurement, instead of two sets at +1 and -1, removes the cliff ([`results/ace_g/`](results/ace_g/README.md)). Six sliders retrained this way are usable from -2 to +2 under both quality predictors: energy moves spectral flux 1.75 standard deviations across that range with 0.78 of the piece kept at the ends, and arousal moves a clip 1.46 standard deviations of real music. Inside ±1 they move slightly less than the plain versions.
 
 ### 8. Axes nobody named
 

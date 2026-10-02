@@ -13,6 +13,7 @@ What each file is and which script wrote it. Raw audio and per-clip rows live on
 | [`ace30/summary.md`](ace30/summary.md) | ACE-Step sliders trained on 10 s clips, measured on 30 s clips | `experiments/report.py` |
 | [`ace_v2/`](ace_v2/README.md) | Second-generation sliders: along axes of real music (two training routes) and along measurements, scored on the real axis, with both quality predictors | `experiments/report_real_axes.py`, `experiments/report.py` |
 | [`ace/ablations.md`](ace/ablations.md) | Mood slider retrained with rank, length, layer set, and guidance multiplier changed; two-slider composition grids | `experiments/jobs/07_ace_more.tsv`, `experiments/compose.py` |
+| [`ace_g/`](ace_g/README.md) | Graded set training: the same six sliders usable from -2 to +2 | `audiosliders.contrast --graded` |
 | [`ace/quality_check.md`](ace/quality_check.md) | Audiobox enjoyment next to SongEval musicality for every method and slider | `experiments/songeval_score.py`, `experiments/report.py` |
 | [`discovery/real/`](discovery/real/README.md) | Axes found in 14,985 FMA recordings with PCA, ICA, and a sparse autoencoder, in CLAP and MuQ-MuLan | `experiments/discover.py` |
 | [`discovery/internal/`](discovery/internal/README.md) | Principal axes of ACE-Step's own cross-attention activations and what steering along them does | `experiments/discover_internal.py`, `experiments/report_axes.py` |
