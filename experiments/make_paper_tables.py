@@ -24,13 +24,13 @@ def slider_table(name, caption, label, methods=("LoRA slider",)):
     if not path.exists():
         return
     rows = [r for r in json.loads(path.read_text())["summary"] if r["method"] in methods]
-    lines = [r"\begin{table*}[t]\centering\small", r"\begin{tabular}{llrrrrrrr}", r"\toprule",
-             r"Slider & Descriptor & $\rho$ & Ordered & Span & Moved & Kept & CE$_0$ & CE$_\text{ends}$ \\", r"\midrule"]
+    lines = [r"\begin{table*}[t]\centering\small", r"\begin{tabular}{llrrrrrrrr}", r"\toprule",
+             r"Slider & Descriptor & $\rho$ & Ordered & MuQ $\rho$ & Span & Moved & Kept & CE$_0$ & CE$_\text{ends}$ \\", r"\midrule"]
     for r in rows:
         span = f"{r.get('usable_lo', 0):+.1f} to {r.get('usable_hi', 0):+.1f}" if "usable_lo" in r else "--"
         lines.append(" & ".join([
             r["slider"], (r.get("measure") or "--").replace("_", r"\_"), fmt(r.get("rho")), fmt(r.get("consistent")),
-            span, fmt(r.get("usable_range_in_std")), fmt(r.get("usable_clap_keep")), fmt(r.get("ce_at_zero")),
+            fmt(r.get("muq_rho")), span, fmt(r.get("usable_range_in_std")), fmt(r.get("usable_clap_keep")), fmt(r.get("ce_at_zero")),
             fmt(r.get("ce_at_ends"))]) + r" \\")
     lines += [r"\bottomrule", r"\end{tabular}", rf"\caption{{{caption}}}\label{{{label}}}", r"\end{table*}"]
     (PAPER / "tables" / f"{name}.tex").write_text("\n".join(lines) + "\n")
@@ -39,7 +39,8 @@ def slider_table(name, caption, label, methods=("LoRA slider",)):
 
 
 slider_table("ace", "Prompt-pair sliders on ACE-Step 1.5 XL turbo. $\\rho$: mean rank correlation between position and "
-             "descriptor. Ordered: share of trajectories with correctly ordered ends. Span: usable span. Moved: descriptor "
+             "descriptor. Ordered: share of trajectories with correctly ordered ends. MuQ $\\rho$: the same correlation for the "
+             "MuQ-MuLan direction score. Span: usable span. Moved: descriptor "
              "change over the span in standard deviations of unsteered clips. Kept: CLAP similarity to the unsteered clip "
              "at the ends of the span. CE: content enjoyment unsteered and at the extreme positions.", "tab:ace")
 slider_table("main", "Prompt-pair sliders on Stable Audio Open 1.0 with the slider switched on after step 21 of 50. "

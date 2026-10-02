@@ -7,7 +7,7 @@
 \caption{Content enjoyment of unsteered model output and of real recordings.}\label{fig:yardstick}
 \end{figure}
 
-\smallskip\noindent\textbf{Musical sliders on ACE-Step.} Table~\ref{tab:ace} and Figure~\ref{fig:ace} report prompt-pair sliders on \nPrompts{} held-out prompts, three seeds, nine positions. Where a descriptor was assigned in advance it rises with the slider: harmonic change rate for harmony, production complexity for ensemble size, key clarity for melody, and major-minus-minor fit for mood. The tag panel agrees in words: the mood slider raises \emph{happy} and lowers \emph{dark-toned}; the groove slider raises \emph{latin} and \emph{funk} and lowers \emph{choir} and \emph{strings}; the ensemble slider raises \emph{orchestral film score} and \emph{choir}. Content enjoyment stays above the real-music mean across the range for all but the tension slider, which collapses past $+1$ and whose usable span ends there.
+\smallskip\noindent\textbf{Musical sliders on ACE-Step.} Table~\ref{tab:ace} and Figure~\ref{fig:ace} report prompt-pair sliders on \nPrompts{} held-out prompts, three seeds, nine positions. Where a descriptor was assigned in advance it rises with the slider: harmonic change rate for harmony, production complexity for ensemble size, key clarity for melody, and major-minus-minor fit for mood. The tag panel agrees in words: the mood slider raises \emph{happy} and lowers \emph{dark-toned}; the groove slider raises \emph{latin} and \emph{funk} and lowers \emph{choir} and \emph{strings}; the ensemble slider raises \emph{orchestral film score} and \emph{choir}. Content enjoyment stays above the real-music mean across the range for all but the tension slider, which collapses past $+1$ and whose usable span ends there. The tags and the direction score both come from CLAP, so we repeat the direction test with MuQ-MuLan, which shares no weights or training data pipeline with it: every slider is monotone under it as well (Table~\ref{tab:ace}).
 
 \input{tables/ace}
 
@@ -26,7 +26,7 @@
 \caption{Timestep gating on Stable Audio Open for four sliders.}\label{fig:gating}
 \end{figure*}
 
-\smallskip\noindent\textbf{The embedding says yes, the waveform says no.} The same gating runs include two sliders trained from the prompt pairs for note density and for percussion. Both move the output along their CLAP text direction at every gate setting. Neither moves its descriptor: the rank correlation between position and onset rate or percussive energy share never exceeds \weakRho{}, and the range is near zero. Scored by embedding alone, both would be reported as working.
+\smallskip\noindent\textbf{The embedding says yes, the waveform says no.} The same gating runs include two sliders trained from the prompt pairs for note density and for percussion. Both move the output along their CLAP text direction at every gate setting. Neither moves its descriptor: the rank correlation between position and onset rate or percussive energy share never exceeds \weakRho{}, and the range is near zero. Scored by embedding alone, both would be reported as working. The descriptor has to be sound as well: with a tempo estimate prone to octave errors the tempo slider scored $\rho=-0.01$, and with a beat tracker it scores $0.57$ and moves the mean tempo from 90 to 167 BPM.
 
 \IfFileExists{tables/main.tex}{\smallskip\noindent\textbf{Stable Audio Open, all sliders.} Table~\ref{tab:sao} gives the gated evaluation of every prompt-pair slider.\input{tables/main}}{}
 

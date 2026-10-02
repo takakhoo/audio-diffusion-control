@@ -6,7 +6,7 @@ For each prompt and seed we render the same initial noise at every slider positi
 
 \smallskip\noindent\textbf{Does it still sound like music?} Every clip is scored by the Audiobox Aesthetics predictor \citep{tjandra2025aesthetics}. We use content enjoyment (CE) on its 1--10 scale and anchor it with 2{,}000 ten-second excerpts of real recordings from FMA \citep{defferrard2017fma}. The \emph{usable span} of a slider is the set of positions, walking outward from zero, over which mean CE stays within 0.5 of the unsteered clips. Effect sizes are reported inside the usable span, which stops a slider from being credited for change it only achieves by destroying the clip.
 
-\smallskip\noindent\textbf{What does it change, in words?} We embed every clip with CLAP \citep{wu2023clap} and score it against 80 tags for instruments, genres, moods, and playing characteristics. For a slider we report the tags whose similarity rises and falls most between its two ends.
+\smallskip\noindent\textbf{What does it change, in words?} We embed every clip with CLAP \citep{wu2023clap} and score it against 80 tags for instruments, genres, moods, and playing characteristics. For a slider we report the tags whose similarity rises and falls most between its two ends, and the rank correlation between position and the projection on the slider's text direction. The same correlation is computed with MuQ-MuLan as a check that does not depend on CLAP.
 
 \smallskip\noindent\textbf{How much of the piece survives?} CLAP similarity, frame-wise chroma similarity, and onset-envelope correlation between each clip and the same trajectory at position zero.
 

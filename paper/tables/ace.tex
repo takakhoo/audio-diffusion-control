@@ -1,17 +1,17 @@
 \begin{table*}[t]\centering\small
-\begin{tabular}{llrrrrrrr}
+\begin{tabular}{llrrrrrrrr}
 \toprule
-Slider & Descriptor & $\rho$ & Ordered & Span & Moved & Kept & CE$_0$ & CE$_\text{ends}$ \\
+Slider & Descriptor & $\rho$ & Ordered & MuQ $\rho$ & Span & Moved & Kept & CE$_0$ & CE$_\text{ends}$ \\
 \midrule
-brightness & centroid\_oct & 0.97 & 1.00 & -1.0 to +2.0 & 4.41 & 0.74 & 6.95 & 6.04 \\
-density & onset\_rate & 0.78 & 0.92 & -0.5 to +2.0 & 1.25 & 0.84 & 6.95 & 6.09 \\
-mood & majorness & 0.39 & 0.75 & -1.0 to +2.0 & 0.87 & 0.79 & 6.95 & 6.65 \\
-harmony & harmonic\_change & 0.41 & 0.76 & -1.5 to +2.0 & 0.84 & 0.83 & 6.95 & 6.64 \\
-groove & -- & -- & -- & -1.5 to +2.0 & -- & 0.79 & 6.95 & 6.88 \\
-ensemble & pc & 0.60 & 0.90 & -1.5 to +2.0 & 0.92 & 0.80 & 6.95 & 6.56 \\
-tension & -- & -- & -- & -1.5 to +1.0 & -- & 0.83 & 6.95 & 5.64 \\
-melody & key\_clarity & 0.48 & 0.78 & -1.0 to +2.0 & 0.97 & 0.80 & 6.95 & 6.47 \\
+brightness & centroid\_oct & 0.97 & 1.00 & 0.80 & -1.0 to +2.0 & 4.41 & 0.74 & 6.95 & 6.04 \\
+density & onset\_rate & 0.78 & 0.92 & 0.86 & -0.5 to +2.0 & 1.25 & 0.84 & 6.95 & 6.09 \\
+mood & majorness & 0.39 & 0.75 & 0.88 & -1.0 to +2.0 & 0.87 & 0.79 & 6.95 & 6.65 \\
+harmony & harmonic\_change & 0.41 & 0.76 & 0.73 & -1.5 to +2.0 & 0.84 & 0.83 & 6.95 & 6.64 \\
+groove & -- & -- & -- & 0.56 & -1.5 to +2.0 & -- & 0.79 & 6.95 & 6.88 \\
+ensemble & pc & 0.60 & 0.90 & 0.77 & -1.5 to +2.0 & 0.92 & 0.80 & 6.95 & 6.56 \\
+tension & -- & -- & -- & 0.86 & -1.5 to +1.0 & -- & 0.83 & 6.95 & 5.64 \\
+melody & key\_clarity & 0.48 & 0.78 & 0.89 & -1.0 to +2.0 & 0.97 & 0.80 & 6.95 & 6.47 \\
 \bottomrule
 \end{tabular}
-\caption{Prompt-pair sliders on ACE-Step 1.5 XL turbo. $\rho$: mean rank correlation between position and descriptor. Ordered: share of trajectories with correctly ordered ends. Span: usable span. Moved: descriptor change over the span in standard deviations of unsteered clips. Kept: CLAP similarity to the unsteered clip at the ends of the span. CE: content enjoyment unsteered and at the extreme positions.}\label{tab:ace}
+\caption{Prompt-pair sliders on ACE-Step 1.5 XL turbo. $\rho$: mean rank correlation between position and descriptor. Ordered: share of trajectories with correctly ordered ends. MuQ $\rho$: the same correlation for the MuQ-MuLan direction score. Span: usable span. Moved: descriptor change over the span in standard deviations of unsteered clips. Kept: CLAP similarity to the unsteered clip at the ends of the span. CE: content enjoyment unsteered and at the extreme positions.}\label{tab:ace}
 \end{table*}
