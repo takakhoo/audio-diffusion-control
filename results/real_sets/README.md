@@ -1,6 +1,6 @@
 # Training directly between sets of real recordings: a negative result
 
-The set trainer works on the model's own clips. We tried it on real ones: 24,975 FMA recordings encoded into ACE-Step's latent space, sorted by beat-tracked tempo or by a "happy" minus "sad" tag score, with the top and bottom 20% as the two sets (vocal-heavy tracks removed, sets balanced within genre). 1,500 iterations, 12 held-out prompts, one seed.
+The set trainer works on the model's own clips. We tried it on real ones: 24,975 FMA recordings encoded into ACE-Step's latent space, sorted by beat-tracked tempo or by a "happy" minus "sad" tag score, with the top and bottom 20% as the two sets (vocal-heavy tracks removed, sets balanced within genre). 1,500 iterations, 12 held-out prompts, one seed. The plain run was made when three quarters of the corpus had been encoded (about 18,700 recordings).
 
 | Slider | Trainer | What the target measurement did across the range | Enjoyment at -1 / 0 / +1 | CLAP similarity to the unsteered clip at ±1 |
 |---|---|---|---|---|
