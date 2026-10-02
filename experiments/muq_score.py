@@ -30,7 +30,20 @@ spec = yaml.safe_load(Path("configs/sliders.yaml").read_text())
 model = MuQMuLan.from_pretrained("OpenMuQ/MuQ-MuLan-large").cuda().eval()
 for run in map(Path, args.runs):
     name = args.slider or run.name.split("_", 1)[1]
-    if name not in spec or not (run / "rows.jsonl").exists():
+    if not (run / "rows.jsonl").exists():
+        print("skip", run)
+        continue
+    # A slider trained along a MuQ axis is scored by projecting its output on that axis.
+    axis = None
+    run_args = json.loads((run / "args.json").read_text()) if (run / "args.json").exists() else {}
+    if run_args.get("weights") and Path(run_args["weights"]).exists():
+        from safetensors import safe_open
+
+        with safe_open(run_args["weights"], framework="pt") as f:
+            meta = json.loads((f.metadata() or {}).get("slider", "{}"))
+        if meta.get("emb") == "muq" and meta.get("by", "").startswith("direction:"):
+            axis = torch.tensor(np.load(meta["source"])[meta["index"]], dtype=torch.float32).cuda()
+    if axis is None and name not in spec:
         print("skip", run)
         continue
     rows = [json.loads(line) for line in (run / "rows.jsonl").read_text().splitlines() if line]
@@ -40,7 +53,8 @@ for run in map(Path, args.runs):
         continue
     prompts = sorted({r["prompt"] for r in rows})
     with torch.no_grad():
-        text = model(texts=[spec[name]["positive"], spec[name]["negative"]] + prompts)
+        ends = [spec[name]["positive"], spec[name]["negative"]] if name in spec else ["music", "music"]
+        text = model(texts=ends + prompts)
     out = []
     for b in range(0, len(files), args.batch):
         wavs = []
@@ -51,8 +65,9 @@ for run in map(Path, args.runs):
         with torch.no_grad():
             emb = model(wavs=torch.tensor(np.stack([w[:n] for w in wavs])).cuda())
             sim = model.calc_similarity(emb, text).cpu().numpy()
-        for r, f, s in zip(rows[b : b + args.batch], files[b : b + args.batch], sim):
-            out.append(dict(file=f.name, muq_pos=float(s[0]), muq_neg=float(s[1]),
-                            muq_prompt=float(s[2 + prompts.index(r["prompt"])])))
+            proj = (emb @ axis).cpu().numpy() if axis is not None else None
+        for j, (r, f, s) in enumerate(zip(rows[b : b + args.batch], files[b : b + args.batch], sim)):
+            pos, neg = (float(proj[j]), 0.0) if proj is not None else (float(s[0]), float(s[1]))
+            out.append(dict(file=f.name, muq_pos=pos, muq_neg=neg, muq_prompt=float(s[2 + prompts.index(r["prompt"])])))
     (run / "muq.jsonl").write_text("\n".join(json.dumps(o) for o in out) + "\n")
     print("scored", run, len(out))

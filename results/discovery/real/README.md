@@ -1,6 +1,6 @@
 # Axes discovered in real music
 
-24,976 thirty-second recordings from FMA-medium, measured on their middle ten seconds. Recordings in the top 40% of a CLAP "vocals" score were left out, leaving 14,985. Each genre's mean embedding was removed first, so an axis describes how recordings of the same genre differ.
+24,975 thirty-second recordings from FMA-medium, measured on their middle ten seconds. Recordings in the top 40% of a CLAP "vocals" score were left out, leaving 14,985. Each genre's mean embedding was removed first, so an axis describes how recordings of the same genre differ.
 
 | File | Embedding | Method | Stability across two halves of the corpus |
 |---|---|---|---:|
