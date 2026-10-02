@@ -16,7 +16,7 @@
 
 **[Take the ten-minute listening test](https://takakhoo.github.io/audio-diffusion-control/listen.html)**: 23 questions on the same clips, nothing uploaded, and it shows how your ears line up with the measurements at the end.
 
-> **Status (2 Oct 2026).** Everything below is measured and reproducible from this repository. Still running: the text sliders retrained on 648 prompts, graded set training, Stable Audio 3, and a replication of the real-music axes on 81,600 more recordings.
+> **Status (2 Oct 2026).** Everything below is measured and reproducible from this repository. Still running: graded set training and Stable Audio 3.
 
 ## Headline
 
@@ -207,6 +207,8 @@ The axes above come from the model's own clips. The same decomposition was run o
 | MuQ-MuLan | independent components | 0.90 |
 | CLAP | independent components | 0.83 |
 | CLAP | sparse autoencoder, 1,024 features | 9 features found by both of two seeds |
+
+**Do they come back in a different sample?** Partly ([`results/discovery/replication/`](results/discovery/replication/README.md)). On 47,942 further recordings that share nothing with the first corpus, the leading subspace is the same (the top 32 directions overlap 97%), and the individual axes rotate inside it: the matched cosine falls from 0.90 between two halves of one corpus to 0.61 between the two corpora. Of the seven axes turned into sliders below, arousal, valence, jazz to electronic, and classical to funk come back with the same meaning (0.65 to 0.78), piano half comes back, and strings to synth and acoustic to electronic do not come back as single axes.
 
 Independent components of MuQ-MuLan give the axes that read most like music. Two of them are the dimensions listener studies keep finding:
 

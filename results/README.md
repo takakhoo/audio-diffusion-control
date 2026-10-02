@@ -16,6 +16,7 @@ What each file is and which script wrote it. Raw audio and per-clip rows live on
 | [`ace/quality_check.md`](ace/quality_check.md) | Audiobox enjoyment next to SongEval musicality for every method and slider | `experiments/songeval_score.py`, `experiments/report.py` |
 | [`discovery/real/`](discovery/real/README.md) | Axes found in 14,985 FMA recordings with PCA, ICA, and a sparse autoencoder, in CLAP and MuQ-MuLan | `experiments/discover.py` |
 | [`discovery/internal/`](discovery/internal/README.md) | Principal axes of ACE-Step's own cross-attention activations and what steering along them does | `experiments/discover_internal.py`, `experiments/report_axes.py` |
+| [`discovery/replication/`](discovery/replication/README.md) | Whether the real-music axes come back on 47,942 recordings that share nothing with the first corpus | `experiments/replicate_axes.py` |
 | [`coverage/`](coverage/README.md) | How much of each real-music axis the generated corpora span | `experiments/axis_coverage.py` |
 | [`real_sets/`](real_sets/README.md) | Negative result: training the set slider directly on real recordings | `audiosliders.contrast` |
 | [`sa3/`](sa3/README.md) | Stable Audio 3 pilot | `experiments/evaluate.py` |

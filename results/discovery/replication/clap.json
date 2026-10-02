@@ -1,0 +1,518 @@
+{
+ "clips": {
+  "a": 14985,
+  "b": 47942
+ },
+ "methods": {
+  "independent components": {
+   "mean_cosine": 0.5623008068958795,
+   "axes": [
+    {
+     "axis": 0,
+     "partner": 0,
+     "cosine": 0.8436981893119027,
+     "toward": [
+      "melodic",
+      "reverberant",
+      "melancholic"
+     ],
+     "away": [
+      "blues",
+      "aggressive",
+      "trumpet"
+     ],
+     "toward_b": [
+      "melodic",
+      "classical",
+      "melancholic"
+     ],
+     "away_b": [
+      "quiet",
+      "blues",
+      "trumpet"
+     ]
+    },
+    {
+     "axis": 1,
+     "partner": 2,
+     "cosine": 0.2864716377131613,
+     "toward": [
+      "violin",
+      "distorted",
+      "soul"
+     ],
+     "away": [
+      "brass",
+      "metal",
+      "rock"
+     ],
+     "toward_b": [
+      "violin",
+      "complex",
+      "flute"
+     ],
+     "away_b": [
+      "brass",
+      "choir",
+      "fast"
+     ]
+    },
+    {
+     "axis": 2,
+     "partner": 1,
+     "cosine": 0.5815732889401445,
+     "toward": [
+      "rhythmic",
+      "electronic dance",
+      "fast"
+     ],
+     "away": [
+      "sad",
+      "live",
+      "reverberant"
+     ],
+     "toward_b": [
+      "hand percussion",
+      "dense",
+      "energetic"
+     ],
+     "away_b": [
+      "sad",
+      "live",
+      "straight"
+     ]
+    },
+    {
+     "axis": 3,
+     "partner": 7,
+     "cosine": 0.4169313261605041,
+     "toward": [
+      "country",
+      "happy",
+      "straight"
+     ],
+     "away": [
+      "ambient",
+      "mysterious",
+      "jazz"
+     ],
+     "toward_b": [
+      "playful",
+      "synthesizer",
+      "organ"
+     ],
+     "away_b": [
+      "minor key",
+      "reverberant",
+      "harp"
+     ]
+    },
+    {
+     "axis": 4,
+     "partner": 8,
+     "cosine": 0.5041228130299562,
+     "toward": [
+      "improvised",
+      "loud",
+      "tense"
+     ],
+     "away": [
+      "calm",
+      "hip hop",
+      "dark"
+     ],
+     "toward_b": [
+      "tense",
+      "improvised",
+      "loud"
+     ],
+     "away_b": [
+      "studio",
+      "dry",
+      "major key"
+     ]
+    },
+    {
+     "axis": 5,
+     "partner": 5,
+     "cosine": 0.5024785365480674,
+     "toward": [
+      "distorted",
+      "swung",
+      "aggressive"
+     ],
+     "away": [
+      "major key",
+      "uplifting",
+      "piano"
+     ],
+     "toward_b": [
+      "distorted",
+      "dark-toned",
+      "metal"
+     ],
+     "away_b": [
+      "staccato",
+      "uplifting",
+      "repetitive"
+     ]
+    },
+    {
+     "axis": 6,
+     "partner": 3,
+     "cosine": 0.5973521735985665,
+     "toward": [
+      "funk",
+      "saxophone",
+      "legato"
+     ],
+     "away": [
+      "choir",
+      "organ",
+      "melodic"
+     ],
+     "toward_b": [
+      "drums",
+      "funk",
+      "fast"
+     ],
+     "away_b": [
+      "organ",
+      "synthesizer",
+      "melodic"
+     ]
+    },
+    {
+     "axis": 7,
+     "partner": 4,
+     "cosine": 0.37346372083439683,
+     "toward": [
+      "repetitive",
+      "electric guitar",
+      "acoustic guitar"
+     ],
+     "away": [
+      "dark",
+      "vocals",
+      "distorted"
+     ],
+     "toward_b": [
+      "funk",
+      "fast",
+      "drums"
+     ],
+     "away_b": [
+      "sad",
+      "choir",
+      "mysterious"
+     ]
+    },
+    {
+     "axis": 8,
+     "partner": 9,
+     "cosine": 0.6847884713094055,
+     "toward": [
+      "latin",
+      "dry",
+      "sad"
+     ],
+     "away": [
+      "dense",
+      "tense",
+      "jazz"
+     ],
+     "toward_b": [
+      "repetitive",
+      "latin",
+      "classical"
+     ],
+     "away_b": [
+      "loud",
+      "dark-toned",
+      "dense"
+     ]
+    },
+    {
+     "axis": 9,
+     "partner": 6,
+     "cosine": 0.8321279115126894,
+     "toward": [
+      "choir",
+      "rhythmic",
+      "synthesizer"
+     ],
+     "away": [
+      "bass guitar",
+      "minor key",
+      "simple"
+     ],
+     "toward_b": [
+      "reverberant",
+      "cello",
+      "synthesizer"
+     ],
+     "away_b": [
+      "electric piano",
+      "playful",
+      "bass guitar"
+     ]
+    }
+   ]
+  },
+  "principal components": {
+   "mean_cosine": 0.6389164524221258,
+   "axes": [
+    {
+     "axis": 0,
+     "partner": 1,
+     "cosine": 0.6803114918248121,
+     "toward": [
+      "violin",
+      "distorted",
+      "flute"
+     ],
+     "away": [
+      "calm",
+      "acoustic guitar",
+      "simple"
+     ],
+     "toward_b": [
+      "live",
+      "dry",
+      "sad"
+     ],
+     "away_b": [
+      "swung",
+      "rhythmic",
+      "hand percussion"
+     ]
+    },
+    {
+     "axis": 1,
+     "partner": 0,
+     "cosine": 0.7187400475167424,
+     "toward": [
+      "swung",
+      "hand percussion",
+      "distorted"
+     ],
+     "away": [
+      "happy",
+      "funk",
+      "country"
+     ],
+     "toward_b": [
+      "distorted",
+      "aggressive",
+      "trumpet"
+     ],
+     "away_b": [
+      "piano",
+      "minor key",
+      "major key"
+     ]
+    },
+    {
+     "axis": 2,
+     "partner": 3,
+     "cosine": 0.7283051535827211,
+     "toward": [
+      "reverberant",
+      "calm",
+      "soul"
+     ],
+     "away": [
+      "loud",
+      "rock",
+      "playful"
+     ],
+     "toward_b": [
+      "reverberant",
+      "major key",
+      "harp"
+     ],
+     "away_b": [
+      "loud",
+      "tense",
+      "playful"
+     ]
+    },
+    {
+     "axis": 3,
+     "partner": 5,
+     "cosine": 0.6792093014996392,
+     "toward": [
+      "happy",
+      "latin",
+      "dry"
+     ],
+     "away": [
+      "dark-toned",
+      "distorted",
+      "tense"
+     ],
+     "toward_b": [
+      "playful",
+      "studio",
+      "happy"
+     ],
+     "away_b": [
+      "choir",
+      "dark-toned",
+      "reverberant"
+     ]
+    },
+    {
+     "axis": 4,
+     "partner": 4,
+     "cosine": 0.777051034257817,
+     "toward": [
+      "classical",
+      "epic",
+      "melodic"
+     ],
+     "away": [
+      "funk",
+      "drums",
+      "happy"
+     ],
+     "toward_b": [
+      "sad",
+      "melodic",
+      "choir"
+     ],
+     "away_b": [
+      "funk",
+      "energetic",
+      "drums"
+     ]
+    },
+    {
+     "axis": 5,
+     "partner": 6,
+     "cosine": 0.6777761925244121,
+     "toward": [
+      "improvised",
+      "complex",
+      "melodic"
+     ],
+     "away": [
+      "quiet",
+      "rock",
+      "dark"
+     ],
+     "toward_b": [
+      "improvised",
+      "melancholic",
+      "cello"
+     ],
+     "away_b": [
+      "dark-toned",
+      "distorted",
+      "rock"
+     ]
+    },
+    {
+     "axis": 6,
+     "partner": 2,
+     "cosine": 0.6470555449598694,
+     "toward": [
+      "studio",
+      "electronic",
+      "techno"
+     ],
+     "away": [
+      "organ",
+      "choir",
+      "country"
+     ],
+     "toward_b": [
+      "flute",
+      "complex",
+      "distorted"
+     ],
+     "away_b": [
+      "repetitive",
+      "happy",
+      "country"
+     ]
+    },
+    {
+     "axis": 7,
+     "partner": 7,
+     "cosine": 0.43461456212859073,
+     "toward": [
+      "electronic dance",
+      "minor key",
+      "electric piano"
+     ],
+     "away": [
+      "brass",
+      "metal",
+      "live"
+     ],
+     "toward_b": [
+      "legato",
+      "acoustic guitar",
+      "melancholic"
+     ],
+     "away_b": [
+      "synthesizer",
+      "choir",
+      "organ"
+     ]
+    },
+    {
+     "axis": 8,
+     "partner": 8,
+     "cosine": 0.3436686187582162,
+     "toward": [
+      "synthesizer",
+      "techno",
+      "choir"
+     ],
+     "away": [
+      "jazz",
+      "saxophone",
+      "legato"
+     ],
+     "toward_b": [
+      "straight",
+      "synthesizer",
+      "dark"
+     ],
+     "away_b": [
+      "hand percussion",
+      "fast",
+      "energetic"
+     ]
+    },
+    {
+     "axis": 9,
+     "partner": 9,
+     "cosine": 0.7024325771684381,
+     "toward": [
+      "sad",
+      "dark",
+      "reverberant"
+     ],
+     "away": [
+      "dense",
+      "energetic",
+      "loud"
+     ],
+     "toward_b": [
+      "live",
+      "acoustic guitar",
+      "dry"
+     ],
+     "away_b": [
+      "organ",
+      "tense",
+      "loud"
+     ]
+    }
+   ]
+  }
+ }
+}

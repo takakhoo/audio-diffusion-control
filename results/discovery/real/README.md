@@ -14,6 +14,8 @@ Stability is the mean absolute cosine between axes fitted on two random halves, 
 
 Each table lists, per axis, the tags its two ends align with and its strongest rank correlations with the measured descriptors, the beat-tracked tempo, and the aesthetics scores.
 
+A harder test, against 47,942 recordings from a different slice of FMA, is in [`../replication`](../replication/README.md): the leading subspace carries over and single axes do so only partly (matched cosine 0.56 to 0.66).
+
 ## What stands out
 
 - **MuQ-MuLan gives the most reproducible and the most musical axes.** Its independent components include an arousal axis (quiet, minor key, dreamy, melancholic against aggressive, dry, rhythmic, energetic), a valence axis (dark, metal, distorted against playful, pop, simple, happy), jazz against electronic, and plucked or bowed strings against synthesizer and choir. Arousal and valence are the two dimensions that listener studies of music keep finding.

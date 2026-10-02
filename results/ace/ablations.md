@@ -32,7 +32,7 @@ All eight text sliders retrained on 648 prompts for 2,000 iterations, against 48
 | groove | no descriptor | no descriptor | 0.56 | 0.64 | | | 0.79 | 0.74 |
 | tension | no descriptor | no descriptor | 0.86 | 0.86 | | | 0.83 | 0.83 |
 
-Nothing moves outside its confidence interval. The usable spans are the same on seven of eight and half a step wider for mood. For a prompt-pair slider, 48 training prompts are enough, and the published sliders are the 48-prompt ones. The larger prompt set matters for the text-free trainer, which needs many clips per attribute value, and not for this one.
+Nothing moves outside its confidence interval. The usable spans are the same on seven of eight and half a step wider for mood. For a prompt-pair slider, 48 training prompts are enough, and the published sliders are the 48-prompt ones. Where the larger prompt set earns its keep is the text-free trainer, which needs many clips at each end of a measurement.
 
 ## Two sliders at once
 
