@@ -1,0 +1,202 @@
+{
+ "real_clips": 14985,
+ "axes": [
+  {
+   "axis": 0,
+   "toward": [
+    "happy",
+    "simple",
+    "bright",
+    "country"
+   ],
+   "away": [
+    "ambient",
+    "improvised",
+    "mysterious",
+    "hip hop"
+   ]
+  },
+  {
+   "axis": 1,
+   "toward": [
+    "romantic",
+    "pop",
+    "soul",
+    "loud"
+   ],
+   "away": [
+    "bells",
+    "distorted",
+    "techno",
+    "straight"
+   ]
+  },
+  {
+   "axis": 2,
+   "toward": [
+    "synthesizer",
+    "organ",
+    "hip hop",
+    "ambient"
+   ],
+   "away": [
+    "vocals",
+    "simple",
+    "pop",
+    "bright"
+   ]
+  },
+  {
+   "axis": 3,
+   "toward": [
+    "saxophone",
+    "sparse",
+    "bass guitar",
+    "metal"
+   ],
+   "away": [
+    "synthesizer",
+    "electronic dance",
+    "electric piano",
+    "pop"
+   ]
+  },
+  {
+   "axis": 4,
+   "toward": [
+    "metal",
+    "sad",
+    "dark",
+    "melancholic"
+   ],
+   "away": [
+    "playful",
+    "rhythmic",
+    "dry",
+    "happy"
+   ]
+  },
+  {
+   "axis": 5,
+   "toward": [
+    "hip hop",
+    "soul",
+    "vocals",
+    "rhythmic"
+   ],
+   "away": [
+    "sparse",
+    "rock",
+    "electric guitar",
+    "techno"
+   ]
+  },
+  {
+   "axis": 6,
+   "toward": [
+    "jazz",
+    "dreamy",
+    "quiet",
+    "organ"
+   ],
+   "away": [
+    "vocals",
+    "techno",
+    "aggressive",
+    "straight"
+   ]
+  },
+  {
+   "axis": 7,
+   "toward": [
+    "piano",
+    "hip hop",
+    "electronic dance",
+    "bright"
+   ],
+   "away": [
+    "organ",
+    "folk",
+    "rock",
+    "mysterious"
+   ]
+  },
+  {
+   "axis": 8,
+   "toward": [
+    "synthesizer",
+    "vocals",
+    "lo-fi",
+    "straight"
+   ],
+   "away": [
+    "acoustic guitar",
+    "acoustic",
+    "strings",
+    "electric guitar"
+   ]
+  },
+  {
+   "axis": 9,
+   "toward": [
+    "calm",
+    "romantic",
+    "simple",
+    "minor key"
+   ],
+   "away": [
+    "tense",
+    "dense",
+    "dark",
+    "aggressive"
+   ]
+  }
+ ],
+ "models": {
+  "ace": {
+   "clips": 15552,
+   "prompts": 648,
+   "overlap": {
+    "4": 0.11133338510990143,
+    "8": 0.3128512501716614,
+    "16": 0.5281854271888733
+   },
+   "total": [
+    0.34097996203412617,
+    0.5214267682312417,
+    0.49473307283068413,
+    0.7020190068084987,
+    0.6045036982767041,
+    0.36602182200983674,
+    0.8699889702270278,
+    0.8212528061409088,
+    0.8598119636614369,
+    0.6401601059307924
+   ],
+   "within": [
+    0.38160907072863803,
+    0.43884591297931613,
+    0.5065690730559845,
+    0.601751052583025,
+    0.5330255514486252,
+    0.425662532663484,
+    0.6500612770013768,
+    0.6858072772102263,
+    0.6485205871381667,
+    0.5344338203506146
+   ],
+   "offset": [
+    -0.5098291474064204,
+    0.30855571895908707,
+    -0.06782190619321761,
+    -0.5367316952495147,
+    -0.6086626544278878,
+    0.5614974764369801,
+    1.720635243338403,
+    -0.8763353746916561,
+    -0.11401114836102834,
+    1.7033548358179342
+   ]
+  }
+ }
+}

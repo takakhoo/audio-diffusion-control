@@ -44,18 +44,21 @@ class ContrastConfig:
     backbone: str = "sao"
 
 
-def load_corpus(path: str | Path) -> dict:
+def load_corpus(path: str | Path, latents: bool = True) -> dict:
     """Concatenate the shards written by experiments/make_corpus.py."""
     path = Path(path)
     shards = sorted(p.stem.split("_")[1] for p in path.glob("rows_*.jsonl"))
-    rows, latents, clap, muq = [], [], [], []
+    rows, lat, clap, muq = [], [], [], []
     for tag in shards:
         rows += [json.loads(line) for line in (path / f"rows_{tag}.jsonl").read_text().splitlines() if line]
-        latents.append(np.load(path / f"latents_{tag}.npy"))
+        if latents:
+            lat.append(np.load(path / f"latents_{tag}.npy"))
         clap.append(np.load(path / f"clap_{tag}.npy"))
         if (path / f"muq_{tag}.npy").exists():
             muq.append(np.load(path / f"muq_{tag}.npy"))
-    out = dict(rows=rows, latents=np.concatenate(latents), clap=np.concatenate(clap))
+    out = dict(rows=rows, clap=np.concatenate(clap))
+    if latents:
+        out["latents"] = np.concatenate(lat)
     if len(muq) == len(shards):
         out["muq"] = np.concatenate(muq)
     return out
@@ -148,6 +151,36 @@ def axis_stability(emb: np.ndarray, groups: np.ndarray, method: str = "pca", n: 
     cos = np.abs(halves[0] @ halves[1].T)
     rows, cols = linear_sum_assignment(-cos)
     return float(cos[rows, cols].mean())
+
+
+def _centered(emb: np.ndarray, groups: np.ndarray) -> np.ndarray:
+    out = emb.astype(np.float64).copy()
+    for g in np.unique(groups):
+        out[groups == g] -= out[groups == g].mean(0)
+    return out
+
+
+def axis_coverage(real: np.ndarray, real_groups: np.ndarray, generated: np.ndarray, generated_groups: np.ndarray,
+                  directions: np.ndarray) -> dict:
+    """How much of each axis found in real music a model's output spans.
+
+    `total` is the spread of all generated clips along an axis, as a fraction of the spread
+    of real recordings. `within` is the same after removing each prompt's (for real music,
+    each genre's) mean, so it measures what changing only the seed can reach. `offset` is
+    where the average generated clip sits on the axis, in standard deviations of real music.
+    """
+    d = directions / np.linalg.norm(directions, axis=1, keepdims=True)
+    pr, pg = real.astype(np.float64) @ d.T, generated.astype(np.float64) @ d.T
+    wr, wg = _centered(real, real_groups) @ d.T, _centered(generated, generated_groups) @ d.T
+    return dict(total=pg.std(0) / pr.std(0), within=wg.std(0) / wr.std(0), offset=(pg.mean(0) - pr.mean(0)) / pr.std(0))
+
+
+def subspace_overlap(a: np.ndarray, b: np.ndarray, k: int = 8) -> float:
+    """Share of the variance in the top-k principal subspace of `a` that the top-k subspace
+    of `b` also contains: the mean squared cosine of the principal angles between them."""
+    va = np.linalg.svd(a - a.mean(0), full_matrices=False)[2][:k]
+    vb = np.linalg.svd(b - b.mean(0), full_matrices=False)[2][:k]
+    return float((np.linalg.svd(va @ vb.T, compute_uv=False) ** 2).mean())
 
 
 def train_contrast(

@@ -102,3 +102,19 @@ def test_residualized_sets_are_balanced_on_the_bystander():
     gap = loudness[high].mean() - loudness[low].mean()
     assert raw_gap > 1.5 and abs(gap) < 0.15
     assert target[high].mean() - target[low].mean() > 1.0
+
+
+def test_axis_coverage_finds_the_axis_a_model_lacks():
+    from audiosliders.contrast import axis_coverage, subspace_overlap
+
+    rng = np.random.default_rng(6)
+    real = rng.normal(size=(4000, 6)) * np.array([3, 2, 1, 1, 1, 1])
+    generated = rng.normal(size=(4000, 6)) * np.array([3, 0.2, 1, 1, 1, 1]) + np.array([1.5, 0, 0, 0, 0, 0])
+    prompts = np.repeat(np.arange(8), 500)
+    generated[:, 2] = prompts[:, None][:, 0] - 3.5  # axis 2 varies only between prompts
+    cover = axis_coverage(real, np.zeros(4000, dtype=int), generated, prompts, np.eye(6)[:3])
+    assert abs(cover["total"][0] - 1) < 0.1 and cover["total"][1] < 0.15
+    assert abs(cover["offset"][0] - 0.5) < 0.05
+    assert cover["total"][2] > 1.5 and cover["within"][2] < 0.01
+    assert subspace_overlap(real, real, 2) > 0.99
+    assert subspace_overlap(real, generated, 2) < 0.6

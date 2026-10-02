@@ -7,6 +7,7 @@ training_curves.png   how much of the guidance target each slider has learned, b
 gating.png            what switching the slider on later buys and costs
 discovery.png         variance carried by the leading discovered axes of each concept
 quality_reference.png enjoyment scores of unsteered model output against real recordings
+coverage.png          how much of each real-music axis the model's output spans
 """
 
 import argparse
@@ -231,13 +232,51 @@ def quality_reference(out, sources):
     plt.close(fig)
 
 
+def coverage(out, table, model="ace"):
+    if not Path(table).exists():
+        return
+    rep = json.loads(Path(table).read_text())
+    m = rep["models"][model]
+    order = np.argsort(m["total"])
+    fig, ax = plt.subplots(figsize=(9.2, 0.42 * len(order) + 2.0))
+    for row, i in enumerate(order):
+        a = rep["axes"][i]
+        ax.plot([m["within"][i], m["total"][i]], [row, row], color=LINE, linewidth=2, zorder=1)
+        ax.scatter(m["total"][i], row, s=64, color=BLUE, zorder=2, edgecolor=SURFACE, linewidth=2,
+                   label="all 648 prompts" if row == 0 else None)
+        ax.scatter(m["within"][i], row, s=64, color=ORANGE, zorder=2, edgecolor=SURFACE, linewidth=2,
+                   label="one prompt, many seeds (real music: one genre)" if row == 0 else None)
+        ax.text(-0.03, row, f"{', '.join(a['toward'][:2])}  /  {', '.join(a['away'][:2])}", ha="right", va="center",
+                fontsize=8.5, color=INK, transform=ax.get_yaxis_transform())
+    ax.axvline(1, color=MUTED, linewidth=1.2, linestyle=(0, (4, 3)))
+    ax.text(0.985, len(order) + 0.6, "real music", ha="right", va="center", fontsize=8.5, color=MUTED)
+    ax.set_xlim(0, 1.05)
+    ax.set_ylim(-0.7, len(order) + 1.1)
+    ax.set_yticks([])
+    ax.grid(axis="y", visible=False)
+    ax.set_xlabel("spread of generated clips along the axis, as a fraction of the spread of real recordings")
+    ax.legend(frameon=False, loc="upper left", fontsize=8.5)
+    fig.suptitle("The model explores less of each musical axis than real music does", x=0.01, ha="left",
+                 fontweight="bold", fontsize=13)
+    fig.text(0.01, 0.905, f"Axes: independent components of MuQ-MuLan embeddings of {rep['real_clips']:,} FMA recordings. "
+             f"Model: ACE-Step 1.5 XL turbo, {m['clips']:,} clips.", fontsize=8.5, color=MUTED)
+    fig.tight_layout(rect=(0.2, 0, 1, 0.9))
+    fig.savefig(out / "coverage.png", bbox_inches="tight")
+    plt.close(fig)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--out", default="results/figures")
+    ap.add_argument("--only", default=None, help="draw a single figure, by name")
     args = ap.parse_args()
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     style()
+    if args.only in (None, "coverage"):
+        coverage(out, "results/coverage/muq_ica/coverage.json")
+    if args.only == "coverage":
+        return
     architecture(out)
     training_curves(out, [("ACE-Step 1.5 XL turbo", "runs/sliders/ace"), ("Stable Audio Open 1.0", "runs/sliders/v1")])
     gating(out, "results/gating/summary.csv")

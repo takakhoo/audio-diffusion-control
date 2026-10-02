@@ -9,6 +9,12 @@ What each file is and which script wrote it. Raw audio and per-clip rows live on
 | `ace/response.png`, `quality.png`, `tradeoff.png`, `leakage_lora.png`, `leakage.csv` | Descriptor against position; enjoyment against position; piece kept against descriptor moved; slope of every descriptor for every slider | `experiments/report.py` |
 | [`gating/`](gating/) | Stable Audio Open: what switching the slider on later buys and costs, for four sliders at five start times | `experiments/jobs/02_gating.tsv`, summarised inline |
 | [`discovery/ace/pca.md`](discovery/ace/pca.md), `pca.json` | First six principal components of CLAP embeddings for each of five concepts, with tag labels and descriptor correlations | `experiments/discover.py` |
+| [`main/summary.md`](main/summary.md) | The same table for 20 text sliders on Stable Audio Open 1.0 | `experiments/report.py` |
+| [`ace30/summary.md`](ace30/summary.md) | ACE-Step sliders trained on 10 s clips, measured on 30 s clips | `experiments/report.py` |
+| [`discovery/real/`](discovery/real/README.md) | Axes found in 14,985 FMA recordings with PCA, ICA, and a sparse autoencoder, in CLAP and MuQ-MuLan | `experiments/discover.py` |
+| [`coverage/`](coverage/README.md) | How much of each real-music axis the generated corpora span | `experiments/axis_coverage.py` |
+| [`real_sets/`](real_sets/README.md) | Negative result: training the set slider directly on real recordings | `audiosliders.contrast` |
+| [`sa3/`](sa3/README.md) | Stable Audio 3 pilot | `experiments/evaluate.py` |
 | [`figures/`](figures/) | Architecture diagram, overview, training curves, gating, discovery spectrum, quality yardstick | `experiments/make_figures.py`, `experiments/make_pipeline_figure.py` |
 | [`demo/sliders.gif`](demo/sliders.gif) | Animated sweep of four sliders | `experiments/make_gif.py` |
 

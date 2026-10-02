@@ -1,0 +1,202 @@
+{
+ "real_clips": 14985,
+ "axes": [
+  {
+   "axis": 0,
+   "toward": [
+    "latin",
+    "tense",
+    "synthesizer",
+    "brass"
+   ],
+   "away": [
+    "hip hop",
+    "loud",
+    "ambient",
+    "bass guitar"
+   ]
+  },
+  {
+   "axis": 1,
+   "toward": [
+    "acoustic guitar",
+    "electric guitar",
+    "strings",
+    "acoustic"
+   ],
+   "away": [
+    "reverberant",
+    "choir",
+    "synthesizer",
+    "straight"
+   ]
+  },
+  {
+   "axis": 2,
+   "toward": [
+    "hip hop",
+    "rhythmic",
+    "mysterious",
+    "organ"
+   ],
+   "away": [
+    "rock",
+    "bass guitar",
+    "metal",
+    "bright"
+   ]
+  },
+  {
+   "axis": 3,
+   "toward": [
+    "quiet",
+    "minor key",
+    "dreamy",
+    "melancholic"
+   ],
+   "away": [
+    "aggressive",
+    "dry",
+    "rhythmic",
+    "energetic"
+   ]
+  },
+  {
+   "axis": 4,
+   "toward": [
+    "piano",
+    "melancholic",
+    "electric piano",
+    "slow"
+   ],
+   "away": [
+    "organ",
+    "rock",
+    "folk",
+    "metal"
+   ]
+  },
+  {
+   "axis": 5,
+   "toward": [
+    "jazz",
+    "saxophone",
+    "trumpet",
+    "improvised"
+   ],
+   "away": [
+    "electronic dance",
+    "synthesizer",
+    "electronic",
+    "vocals"
+   ]
+  },
+  {
+   "axis": 6,
+   "toward": [
+    "vocals",
+    "sad",
+    "country",
+    "slow"
+   ],
+   "away": [
+    "electronic dance",
+    "techno",
+    "organ",
+    "sparse"
+   ]
+  },
+  {
+   "axis": 7,
+   "toward": [
+    "dark",
+    "metal",
+    "dark-toned",
+    "distorted"
+   ],
+   "away": [
+    "playful",
+    "pop",
+    "simple",
+    "happy"
+   ]
+  },
+  {
+   "axis": 8,
+   "toward": [
+    "happy",
+    "simple",
+    "calm",
+    "bright"
+   ],
+   "away": [
+    "tense",
+    "dark",
+    "sad",
+    "dense"
+   ]
+  },
+  {
+   "axis": 9,
+   "toward": [
+    "vocals",
+    "straight",
+    "techno",
+    "electronic dance"
+   ],
+   "away": [
+    "slow",
+    "jazz",
+    "organ",
+    "country"
+   ]
+  }
+ ],
+ "models": {
+  "ace": {
+   "clips": 15552,
+   "prompts": 648,
+   "overlap": {
+    "4": 0.11133338510990143,
+    "8": 0.3128512501716614,
+    "16": 0.5281854271888733
+   },
+   "total": [
+    0.6606512360697362,
+    0.7977302042018666,
+    0.2801769628758963,
+    0.8345774595421046,
+    0.8007707271009952,
+    0.7715410186109138,
+    0.45541776696598824,
+    0.6591801005055185,
+    0.5953366958932618,
+    0.5535422122989052
+   ],
+   "within": [
+    0.5332506956907817,
+    0.5989184367718999,
+    0.3823227434534686,
+    0.6808124863319216,
+    0.6927535539216098,
+    0.5450343178697242,
+    0.46201190595762487,
+    0.5361000852203421,
+    0.5066774883734316,
+    0.4837935045478792
+   ],
+   "offset": [
+    0.3187742380123401,
+    0.46468584760463505,
+    1.0401142710546696,
+    1.3492147145480657,
+    -0.30491223084584007,
+    0.7087291518949363,
+    0.3630415970898384,
+    -1.356653105412388,
+    0.958033969699833,
+    -0.4855573744298959
+   ]
+  }
+ }
+}
