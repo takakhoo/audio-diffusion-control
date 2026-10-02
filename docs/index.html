@@ -34,6 +34,8 @@ a { color: var(--accent); }
 .chip { font: inherit; font-size: 14px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line);
   background: transparent; color: var(--ink); cursor: pointer; }
 .chip:hover { border-color: var(--accent); }
+.group { flex-basis: 100%; font-size: 12px; color: var(--muted); margin: 6px 0 -2px; }
+.group:first-child { margin-top: 0; }
 .chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .chip[aria-pressed="true"] { color: #1c1005; } }
 .stage { display: grid; gap: 16px; }
@@ -140,7 +142,14 @@ const fmt = (v, unit) => {
 
 function chips(el, items, current, onPick) {
   el.innerHTML = "";
-  items.forEach(([key, label]) => {
+  let group = null;
+  items.forEach(([key, label, heading]) => {
+    if (heading && heading !== group) {
+      const h = document.createElement("span");
+      h.className = "group"; h.textContent = heading;
+      el.appendChild(h);
+      group = heading;
+    }
     const b = document.createElement("button");
     b.className = "chip"; b.textContent = label; b.setAttribute("aria-pressed", key === current);
     b.onclick = () => onPick(key);
@@ -161,14 +170,20 @@ function render() {
   if (!available.some(([i]) => i === state.prompt)) state.prompt = available[0][0];
   const pick = (field) => (k) => { state[field] = k; render(); load(); };
   chips($("models"), Object.entries(m.models).map(([k, v]) => [k, v.label]), state.model, pick("model"));
-  chips($("sliders"), Object.entries(model.sliders).map(([k, v]) => [k, v.label]), state.slider, pick("slider"));
+  const grouped = Object.entries(model.sliders).some(([, v]) => v.group);
+  const order = [...new Set(Object.values(model.sliders).map((v) => v.group))];
+  const entries = Object.entries(model.sliders).sort((a, b) => order.indexOf(a[1].group) - order.indexOf(b[1].group));
+  chips($("sliders"), entries.map(([k, v]) => [k, v.label, grouped ? v.group : null]), state.slider, pick("slider"));
   chips($("methods"), s.methods.map((k) => [k, m.methods[k].label]), state.method, pick("method"));
   chips($("prompts"), available, state.prompt, pick("prompt"));
   $("low").textContent = s.low; $("high").textContent = s.high;
   $("method-note").textContent = `${m.methods[state.method].note} ${model.note}`;
   const clips = clipsFor();
   $("scale").max = clips.length - 1;
-  state.index = Math.min(state.index, clips.length - 1);
+  // Keep the position when the method or slider changes, even if the new one has fewer stops.
+  const want = state.x ?? 0;
+  state.index = clips.reduce((best, c, k) => (Math.abs(c.x - want) < Math.abs(clips[best].x - want) ? k : best), 0);
+  $("scale").value = state.index;
   $("ticks").innerHTML = clips.map((c) => `<span>${c.x > 0 ? "+" : ""}${c.x}</span>`).join("");
   update();
 }
@@ -336,7 +351,7 @@ async function live() {
 }
 
 $("play").onclick = () => state.playing ? stop() : start();
-$("scale").oninput = (e) => { state.index = +e.target.value; update(); };
+$("scale").oninput = (e) => { state.index = +e.target.value; state.x = clipsFor()[state.index].x; update(); };
 fetch("demo/manifest.json").then((r) => r.json()).then((m) => {
   state.manifest = m;
   // Deep links: ?model=ace&slider=mood&method=lora&prompt=2&x=1.5 opens the page in that state.
@@ -346,6 +361,7 @@ fetch("demo/manifest.json").then((r) => r.json()).then((m) => {
   state.slider = sliders[q.get("slider")] ? q.get("slider") : Object.keys(sliders)[0];
   state.method = sliders[state.slider].methods.includes(q.get("method")) ? q.get("method") : sliders[state.slider].methods[0];
   if (q.has("prompt")) state.prompt = +q.get("prompt") || 0;
+  state.x = q.has("x") ? +q.get("x") : 0;
   render();
   const xs = clipsFor().map((c) => c.x);
   state.index = q.has("x") && xs.includes(+q.get("x")) ? xs.indexOf(+q.get("x")) : Math.floor(xs.length / 2);

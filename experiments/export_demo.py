@@ -85,10 +85,10 @@ def publish(model, method, name, run, rows, pid, seed, prompt_slot):
     return clips
 
 
-def entry_for(model, name, label, low, high, measure):
+def entry_for(model, name, label, low, high, measure, group):
     sliders = manifest["models"][model]["sliders"]
     return sliders.setdefault(name, dict(
-        label=label, low=low, high=high, measure=measure, methods=[],
+        label=label, low=low, high=high, measure=measure, methods=[], group=group,
         measure_label=MEASURES[measure][0] if measure else None, unit=MEASURES[measure][1] if measure else None))
 
 
@@ -108,7 +108,8 @@ for source in args.source:
             s = spec.get(name, {})
             measure = s.get("display") or s.get("measure") or CONTRAST_MEASURE.get(name)
             ends = s.get("ends") or ["rougher production", "cleaner production"]
-            entry = entry_for(model, name, name.replace("_axis", "").replace("_", " / ").capitalize(), ends[0], ends[1], measure)
+            entry = entry_for(model, name, name.replace("_axis", "").replace("_", " / ").capitalize(), ends[0], ends[1], measure,
+                              "Axes found in real music" if "axis" in s else "Named attributes")
             if method not in entry["methods"]:
                 entry["methods"].append(method)
             manifest["methods"][method] = dict(label=METHODS[method][0], note=METHODS[method][1])
@@ -143,7 +144,7 @@ for item in args.discovered:
         low = ", ".join(s["falls"][:2]) or ", ".join(s["corpus_away"][:2])
         high = ", ".join(s["rises"][:2]) or ", ".join(s["corpus_toward"][:2])
         name = f"{concept.replace(' ', '-')}-axis-{i + 1}"
-        entry = entry_for(model, name, f"{concept}: axis {i + 1}", low, high, None)
+        entry = entry_for(model, name, f"{concept}: axis {i + 1}", low, high, None, "Axes of one concept")
         entry["methods"].append("discovered")
         for k, seed in enumerate(sorted({r["seed"] for r in rows})[: args.discovered_seeds]):
             label = f"{concept} (seed {k + 1})"
@@ -165,7 +166,7 @@ for item in args.axes:
         run = Path(root) / a["name"]
         rows = metrics.load_rows(run)
         name = f"own-axis-{k + 1}"
-        entry = entry_for(model, name, f"Own axis {k + 1}", ", ".join(a["falls"][:2]), ", ".join(a["rises"][:2]), "ce")
+        entry = entry_for(model, name, f"Own axis {k + 1}", ", ".join(a["falls"][:2]), ", ".join(a["rises"][:2]), "ce", "Axes inside the model")
         entry["methods"].append("internal")
         for pid in args.prompts or sorted({r["prompt_index"] for r in rows}):
             mine = [r for r in rows if r["prompt_index"] == pid]

@@ -19,3 +19,8 @@ Real recordings (FMA, 2,000 clips): mean musicality 2.78.
 | strings_synth | Descriptor slider | 6.95 / 7.15 / 7.03 | 2.77 / 2.68 / 2.69 | -1.0 to +1.0 | -1.0 to +1.0 | 0.50 |
 | tempo | Descriptor slider | 6.95 / 6.99 / 7.08 | 2.77 / 2.71 / 2.67 | -1.0 to +1.0 | -1.0 to +1.0 | 0.52 |
 | valence | Descriptor slider | 6.95 / 7.10 / 7.05 | 2.77 / 2.78 / 2.67 | -1.0 to +1.0 | -1.0 to +1.0 | 0.52 |
+| arousal | LoRA slider | 6.95 / 7.11 / 6.57 | 2.77 / 2.87 / 2.55 | -1.0 to +1.0 | -1.0 to +1.0 | 0.58 |
+| jazz_electronic | LoRA slider | 6.95 / 6.77 / 7.35 | 2.77 / 2.68 / 2.75 | -1.0 to +1.0 | -1.0 to +1.0 | 0.51 |
+| piano_axis | LoRA slider | 6.95 / 6.80 / 6.76 | 2.77 / 2.77 / 2.71 | -1.0 to +1.0 | -1.0 to +1.0 | 0.50 |
+| strings_synth | LoRA slider | 6.95 / 5.97 / 7.43 | 2.77 / 2.42 / 2.87 | -0.5 to +1.0 | -0.5 to +1.0 | 0.66 |
+| valence | LoRA slider | 6.95 / 6.96 / 6.55 | 2.77 / 2.82 / 2.52 | -1.0 to +1.0 | -1.0 to +1.0 | 0.57 |

@@ -15,3 +15,8 @@
 | strings_synth | Descriptor slider | staccato (+0.018), distorted (+0.016), trumpet (+0.016), drums (+0.016) | calm (-0.017), reggae (-0.012), dreamy (-0.011), swung (-0.011) |
 | tempo | Descriptor slider | funk (+0.036), happy (+0.030), repetitive (+0.028), dry (+0.027) | choir (-0.028), organ (-0.016), bells (-0.015), trumpet (-0.012) |
 | valence | Descriptor slider | cello (+0.024), reverberant (+0.020), trumpet (+0.020), saxophone (+0.016) | playful (-0.038), happy (-0.038), country (-0.037), simple (-0.035) |
+| arousal | LoRA slider | reverberant (+0.115), lo-fi (+0.089), calm (+0.089), dreamy (+0.073) | latin (-0.232), country (-0.215), playful (-0.191), happy (-0.191) |
+| jazz_electronic | LoRA slider | jazz (+0.122), swung (+0.115), funk (+0.102), legato (+0.093) | rhythmic (-0.110), techno (-0.104), epic (-0.100), bells (-0.080) |
+| piano_axis | LoRA slider | reverberant (+0.156), calm (+0.149), melancholic (+0.146), mysterious (+0.124) | blues (-0.182), latin (-0.163), country (-0.139), reggae (-0.139) |
+| strings_synth | LoRA slider | repetitive (+0.317), acoustic guitar (+0.304), funk (+0.297), happy (+0.276) | choir (-0.178), distorted (-0.104), organ (-0.068), synthesizer (-0.067) |
+| valence | LoRA slider | dark-toned (+0.112), lo-fi (+0.082), distorted (+0.081), quiet (+0.063) | repetitive (-0.166), happy (-0.164), staccato (-0.123), complex (-0.111) |

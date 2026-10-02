@@ -26,6 +26,38 @@ Fifteen sliders on ACE-Step 1.5 XL turbo, trained with no text from two sets of 
 - The arousal slider moves a clip 1.19 standard deviations of real music along the arousal axis. The model's whole output over 648 prompts has a standard deviation of 0.83 on that axis ([`../coverage`](../coverage/README.md)), so one slider on one prompt and seed crosses more of the axis than changing the prompt typically does.
 - The piece survives (CLAP similarity 0.84 to 0.87 at ±1), enjoyment is at or above the unsteered level at both ends, and SongEval musicality drops by 0.1 at most (2.63 to 2.78 against 2.77).
 
+## The same axes from a prompt pair made of the axis's tags
+
+A second route to the same axis: read the tags at its two ends, use them as the prompt pair, and train an ordinary text slider (1,000 iterations, 48 prompts). The output is still scored by its projection on the axis from real recordings. Five MuQ-MuLan axes, 24 held-out prompts, 3 seeds, positions -2 to +2.
+
+| Axis | Trained from | ρ with the axis, -1 to +1 | -1 and +1 ordered | Moved between -1 and +1 (std of real music) | Moved between the ends | Piece kept at ±1 | Usable span | Enjoyment at -1 / 0 / +1 | Musicality at -1 / 0 / +1 |
+|---|---|---:|---:|---:|---:|---:|---|---|---|
+| arousal | prompt pair | 0.91 | 100% | 1.85 | 2.89 (±2) | 0.80 | -2 to +1 | 7.11 / 6.95 / 6.57 | 2.87 / 2.77 / 2.55 |
+| arousal | two sets | 0.82 | 99% | 1.19 | 1.11 (±1.5) | 0.84 | -1 to +1 | 7.09 / 6.95 / 7.16 | 2.72 / 2.77 / 2.68 |
+| jazz to electronic | prompt pair | 0.86 | 97% | 1.86 | 2.81 (±2) | 0.82 | -2 to +2 | 6.77 / 6.95 / 7.35 | 2.68 / 2.77 / 2.75 |
+| jazz to electronic | two sets | 0.61 | 94% | 0.61 | 0.33 (±1.5) | 0.87 | -1 to +1 | 7.08 / 6.95 / 7.09 | 2.77 / 2.77 / 2.63 |
+| strings to synth | prompt pair | 0.80 | 97% | 1.78 | 2.41 (±2) | 0.73 | -0.5 to +2 | 5.97 / 6.95 / 7.43 | 2.42 / 2.77 / 2.87 |
+| strings to synth | two sets | 0.40 | 82% | 0.44 | 0.52 (±1.5) | 0.87 | -1 to +1 | 7.15 / 6.95 / 7.03 | 2.68 / 2.77 / 2.69 |
+| piano | prompt pair | 0.78 | 97% | 1.56 | 2.28 (±2) | 0.80 | -2 to +1 | 6.80 / 6.95 / 6.76 | 2.77 / 2.77 / 2.71 |
+| piano | two sets | 0.63 | 96% | 0.75 | 0.94 (±1.5) | 0.87 | -1 to +1 | 7.10 / 6.95 / 7.06 | 2.66 / 2.77 / 2.72 |
+| valence | prompt pair | 0.42 | 75% | 0.86 | 2.16 (±2) | 0.85 | -2 to +1 | 6.96 / 6.95 / 6.55 | 2.82 / 2.77 / 2.52 |
+| valence | two sets | 0.50 | 93% | 0.62 | 0.45 (±1.5) | 0.87 | -1 to +1 | 7.10 / 6.95 / 7.05 | 2.78 / 2.77 / 2.67 |
+
+Where the clips end up on the axis, in standard deviations of real music from the mean of real music (0 is the average recording):
+
+| Axis (positive end) | Prompt-pair slider at -2 | at -1 | unsteered | at +1 | at +2 |
+|---|---:|---:|---:|---:|---:|
+| arousal (quiet, dreamy) | -0.26 | 0.31 | 1.21 | 2.16 | 2.63 |
+| jazz to electronic (jazz) | -0.51 | -0.12 | 0.60 | 1.74 | 2.29 |
+| strings to synth (guitars, strings) | -1.21 | -0.77 | 0.23 | 1.01 | 1.19 |
+| piano (piano) | -0.90 | -0.51 | 0.23 | 1.05 | 1.38 |
+| valence (dark, distorted) | -1.86 | -1.67 | -1.26 | -0.81 | 0.30 |
+
+- **The prompt pair is the stronger route on four of five axes.** It follows the axis more reliably (ρ 0.78 to 0.91) and moves the clip 1.6 to 1.9 standard deviations of real music between -1 and +1, two to four times what the set-trained slider does, and it keeps going to ±2.
+- **The slider reaches parts of the axis the prompts leave empty.** Unsteered clips sit 1.21 standard deviations toward the quiet end of the arousal axis. The slider takes the same prompts and seeds across the mean of real music to -0.26, and out to +2.63 the other way. On valence it moves the output from 1.26 on the playful side to 0.30 on the dark side.
+- **The set-trained slider is the gentler one.** It keeps more of the piece (0.84 to 0.87 against 0.73 to 0.85) and holds enjoyment and musicality level at both ends, where the prompt-pair sliders lose quality toward one end (arousal toward quiet, strings-to-synth toward synthesizer and choir). On valence it is also the more reliable (93% of trajectories ordered against 75%).
+- **Discovery supplied the axis and the words.** Nobody chose "quiet, dreamy, melancholic, minor key" against "aggressive, energetic, rhythmic, dry" as a prompt pair. Those are the tags at the two ends of an independent component of real-music embeddings.
+
 ## Sliders along a measurement
 
 | Slider | Sorted by | ρ with the measurement | -1 and +1 ordered | Moved (std of unsteered clips) | Selectivity | Piece kept at ±1 | Enjoyment at ±1 |
