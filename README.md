@@ -150,6 +150,42 @@ All 30 are in [`results/discovery/ace/pca.md`](results/discovery/ace/pca.md) wit
 
 The prompt-pair trainer asks the slider to reproduce a shift in the frozen model's prediction. After 1,000 iterations the Stable Audio sliders reproduce about 62% of that shift on average and the ACE-Step sliders about 31%. The ACE-Step sliders work anyway, as section 2 shows, but they are the ones with the most room left: longer training and higher rank are the obvious next experiments.
 
+### 10. Against other methods
+
+Two outside approaches were run through the same protocol on ACE-Step, on the same prompts and seeds.
+
+**Activation steering** (the training-free approach TADA argues for: add the mean difference in cross-attention output between the positive and the negative prompt, times the slider position). It needs no training at all.
+
+| Slider | Method | ρ with descriptor | Descriptor moved in usable span (std) | Piece kept | Enjoyment at ends |
+|---|---|---:|---:|---:|---:|
+| brightness | trained slider | 0.97 | 4.41 | 0.74 | 6.04 |
+| | activation steering | 0.93 | 1.72 | 0.83 | 6.11 |
+| density | trained slider | 0.78 | 1.25 | 0.84 | 6.09 |
+| | activation steering | 0.71 | 1.63 | 0.87 | 6.46 |
+| ensemble | trained slider | 0.60 | 0.92 | 0.80 | 6.56 |
+| | activation steering | 0.58 | 0.67 | 0.85 | 6.61 |
+| melody | trained slider | 0.48 | 0.97 | 0.80 | 6.47 |
+| | activation steering | 0.53 | 0.92 | 0.83 | 6.64 |
+| harmony | trained slider | 0.41 | 0.84 | 0.83 | 6.64 |
+| | activation steering | 0.24 | 0.60 | 0.83 | 6.72 |
+| mood | trained slider | 0.39 | 0.87 | 0.79 | 6.65 |
+| | activation steering | 0.41 | 1.28 | 0.83 | 6.37 |
+
+Activation steering is a real competitor. It is as monotone as the trained slider on four of six attributes and keeps slightly more of the piece on all six. The trained slider reaches further on brightness and harmony. Neither dominates, which agrees with TADA's finding on a different ACE-Step version and argues against treating LoRA sliders as the default.
+
+**Community sliders.** Nineteen Concept Sliders for ACE-Step 1.5 XL are [published on Hugging Face](https://huggingface.co/Xanthius/Ace-Step-1.5-XL-Concept-Sliders) with no evaluation. `SliderBank.load_peft` loads them unchanged, and seven were measured here for the first time (24 prompts, 2 seeds, positions -6 to +6):
+
+| Community slider | Descriptor | ρ | Moved in usable span (std) | Piece kept |
+|---|---|---:|---:|---:|
+| energetic-calm | spectral flux | 0.91 | 2.26 | 0.59 |
+| bass | energy below 150 Hz | 0.83 | 0.86 | 0.86 |
+| reverb | energy decay time | 0.81 | 1.36 | 0.80 |
+| tempo | beat-tracked tempo | 0.61 | 0.60 | 0.70 |
+| happiness | major/minor fit | 0.40 | 0.71 | 0.87 |
+| drum | percussive share | 0.32 | -0.35 | 0.82 |
+
+Most of them do what their names say; the drum slider moves the percussive share the wrong way. They need much larger positions than ours (their usable spans run to ±6) because each unit does less.
+
 ## Try it
 
 ```bash
