@@ -87,6 +87,8 @@ def main():
         directions, table = analyse(sub, clap[mask], groups[mask], args.n, vocab, args.method)
         report[name] = dict(n_clips=int(mask.sum()), components=table)
         np.save(out / f"directions_{name.replace(' ', '_').replace(',', '')[:40]}.npy", directions)
+        if not args.per_prompt:
+            np.save(out / "directions.npy", directions)
         lines += [f"### {name} ({int(mask.sum())} clips)", "",
                   "| Axis | Variance share or kurtosis | Toward | Away | Strongest measured correlates |", "|---:|---:|---|---|---|"]
         for e in table:

@@ -218,6 +218,14 @@ def main() -> None:
         meta.update(kurtosis=float(kurt[int(rest)]), emb=args.emb)
         if args.emb == "clap":
             meta["direction"] = directions[int(rest)].tolist()
+    elif kind == "direction":
+        # A direction saved by experiments/discover.py, so the axis stays the same as the corpus grows.
+        path, _, index = rest.rpartition(":")
+        direction = np.load(path)[int(index)]
+        values = corpus[args.emb] @ direction
+        meta.update(emb=args.emb, source=path, index=int(index))
+        if args.emb == "clap":
+            meta["direction"] = direction.tolist()
     elif kind == "tags":
         vocab = np.load(args.vocab)
         names = list(vocab["tags"])
