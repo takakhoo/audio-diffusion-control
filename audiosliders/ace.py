@@ -127,6 +127,12 @@ class AceStep:
             x = x + (ts[i + 1] - ts[i]) * predict(x, ts[i])
         return x, ts[last]
 
+    @torch.no_grad()
+    def encode_audio(self, audio: Tensor) -> Tensor:
+        """Stereo waveforms (B, 2, T) at 48 kHz to latents shaped (B, frames, 64), using the posterior mode."""
+        dist = self.vae.encode(audio.to(self.device, self.vae.dtype)).latent_dist
+        return (dist.mode() if hasattr(dist, "mode") else dist.sample()).transpose(1, 2).float()
+
     def decode(self, z: Tensor, seconds: float | None = None) -> Tensor:
         chunk = max(1, 2048 // z.shape[1])
         outs = [self.vae.decode(z[i : i + chunk].transpose(1, 2).to(self.vae.dtype)).sample.float()

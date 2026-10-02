@@ -95,12 +95,20 @@ def train_contrast(
     opt = torch.optim.AdamW(params, lr=cfg.lr, weight_decay=0.0)
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda i: min(1.0, (i + 1) / 50))
     half = cfg.batch // 2
+    shape = model.latent_shape(cfg.seconds)
+    window = model.frames(cfg.seconds)
+    time_axis = 1 + shape.index(window)
     scale = torch.cat([torch.ones(half), -torch.ones(half)]).to(model.device)
     history, t0 = [], time.time()
     for it in range(cfg.iters):
         ih = rng.integers(0, len(high[0]), half)
         il = ih if cfg.paired else rng.integers(0, len(low[0]), half)
-        x0 = torch.from_numpy(np.concatenate([high[0][ih], low[0][il]])).to(model.device, torch.float32)
+        x0 = np.concatenate([high[0][ih], low[0][il]])
+        if x0.shape[time_axis] > window:
+            # Longer clips (real recordings are stored at 30 s) give a fresh crop every time they are drawn.
+            start = rng.integers(0, x0.shape[time_axis] - window + 1)
+            x0 = np.take(x0, np.arange(start, start + window), axis=time_axis)
+        x0 = torch.from_numpy(x0).to(model.device, torch.float32)
         cond = model.encode([high[1][i] for i in ih] + [low[1][i] for i in il], cfg.seconds)
         drop = torch.rand(len(x0), device=model.device) < cfg.drop_text
         cond.cross = torch.where(drop.view(-1, 1, 1), torch.zeros_like(cond.cross), cond.cross)
@@ -132,18 +140,29 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("name")
     ap.add_argument("--corpus", required=True)
-    ap.add_argument("--by", required=True, help="descriptor:<key>[:-1] or pca:<index>")
+    ap.add_argument("--by", required=True,
+                    help="descriptor:<key>[:-1], pca:<index>, or tags:<tag>|<tag> (CLAP similarity to the first tag "
+                         "minus the second; needs --vocab)")
+    ap.add_argument("--vocab", default="runs/reference/vocab.npz")
+    ap.add_argument("--max-vocal", type=float, default=None,
+                    help="keep only clips whose vocal_score is below this quantile (real recordings)")
+    ap.add_argument("--seconds", type=float, default=None)
     ap.add_argument("--fraction", type=float, default=0.3)
     ap.add_argument("--prompt-index", type=int, default=None, help="use only clips of this prompt")
     ap.add_argument("--out", default="runs/sliders")
     for f, typ in [("rank", int), ("alpha", float), ("targets", str), ("lr", float), ("iters", int),
-                   ("batch", int), ("seed", int), ("backbone", str)]:
+                   ("batch", int), ("seed", int), ("backbone", str)]:  # --seconds is declared above
         ap.add_argument(f"--{f}", type=typ, default=None)
     args = ap.parse_args()
 
     corpus = load_corpus(args.corpus)
     if args.prompt_index is not None:
         keep = np.array([r["prompt_index"] == args.prompt_index for r in corpus["rows"]])
+        corpus = dict(rows=[r for r, k in zip(corpus["rows"], keep) if k], latents=corpus["latents"][keep],
+                      clap=corpus["clap"][keep])
+    if args.max_vocal is not None:
+        vocal = np.array([r.get("vocal_score", -np.inf) for r in corpus["rows"]])
+        keep = vocal <= np.quantile(vocal, args.max_vocal)
         corpus = dict(rows=[r for r, k in zip(corpus["rows"], keep) if k], latents=corpus["latents"][keep],
                       clap=corpus["clap"][keep])
     rows = corpus["rows"]
@@ -158,6 +177,13 @@ def main() -> None:
         directions, share = principal_directions(corpus["clap"], groups, int(rest) + 1)
         values = corpus["clap"] @ directions[int(rest)]
         meta.update(variance_share=float(share[int(rest)]), direction=directions[int(rest)].tolist())
+    elif kind == "tags":
+        vocab = np.load(args.vocab)
+        names = list(vocab["tags"])
+        a, _, b = rest.partition("|")
+        values = corpus["clap"] @ vocab["text"][names.index(a)]
+        if b:
+            values = values - corpus["clap"] @ vocab["text"][names.index(b)]
     else:
         raise SystemExit(f"unknown --by {args.by!r}")
     ih, il = split_ends(values, groups, args.fraction)

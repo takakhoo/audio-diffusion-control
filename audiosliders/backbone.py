@@ -217,6 +217,12 @@ class StableAudio:
         s_end = sig[last]
         return x / torch.sqrt(s_end * s_end + 1.0), sigma_to_t(s_end)
 
+    @torch.no_grad()
+    def encode_audio(self, audio: Tensor) -> Tensor:
+        """Stereo waveforms (B, 2, T) at the model's sample rate to latents, using the posterior mode."""
+        dist = self.vae.encode(audio.to(self.device, self.vae.dtype)).latent_dist
+        return (dist.mode() if hasattr(dist, "mode") else dist.sample()).float()
+
     def decode(self, z: Tensor, seconds: float | None = None) -> Tensor:
         """Latents to stereo waveforms, shape (B, 2, T). Differentiable. Peaks can exceed 1."""
         chunk = max(1, 2048 // z.shape[-1])

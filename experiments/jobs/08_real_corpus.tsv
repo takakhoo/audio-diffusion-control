@@ -1,0 +1,4 @@
+real_medium_00	python experiments/make_real_corpus.py --music /scratch/f004h1v/remaster/data/raw/fma_medium --metadata ../data/fma/fma_metadata/tracks.csv --out runs/corpus/real_ace --backbone ace-turbo --shard 0 4
+real_medium_01	python experiments/make_real_corpus.py --music /scratch/f004h1v/remaster/data/raw/fma_medium --metadata ../data/fma/fma_metadata/tracks.csv --out runs/corpus/real_ace --backbone ace-turbo --shard 1 4
+real_medium_02	python experiments/make_real_corpus.py --music /scratch/f004h1v/remaster/data/raw/fma_medium --metadata ../data/fma/fma_metadata/tracks.csv --out runs/corpus/real_ace --backbone ace-turbo --shard 2 4
+real_medium_03	python experiments/make_real_corpus.py --music /scratch/f004h1v/remaster/data/raw/fma_medium --metadata ../data/fma/fma_metadata/tracks.csv --out runs/corpus/real_ace --backbone ace-turbo --shard 3 4
