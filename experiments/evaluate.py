@@ -34,7 +34,8 @@ def measure(job):
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--backbone", default="sao")
-    ap.add_argument("--method", required=True, choices=["lora", "guidance", "embed", "dsp", "base"])
+    ap.add_argument("--method", required=True, choices=["lora", "guidance", "embed", "dsp", "base", "caa"])
+    ap.add_argument("--caa-layers", type=int, nargs="+", default=None, help="restrict activation steering to these blocks")
     ap.add_argument("--slider", default=None)
     ap.add_argument("--weights", default=None)
     ap.add_argument("--out", required=True)
@@ -78,6 +79,12 @@ def main():
             path, _, coef = item.rpartition(":")
             bank.load(f"m{k}", path)
             mixes.append((f"m{k}", float(coef)))
+    vectors = None
+    if args.method == "caa":
+        from audiosliders import steer
+
+        train = yaml.safe_load(Path("configs/prompts.yaml").read_text())["train"][:16]
+        vectors = steer.collect(model, train, spec["positive"], spec["negative"], args.seconds, args.caa_layers)
     direction = None
     if spec and "direction" in spec:
         # A discovered slider carries the CLAP direction it was trained along.
@@ -103,6 +110,14 @@ def main():
         elif args.method == "guidance":
             wrap = methods.guidance(model, text, spec["positive"], spec["negative"], s, args.seconds, args.eta, args.start)
             audio = model.generate(text, seeds, wrap=wrap, **kw)
+        elif args.method == "caa":
+            with steer.steering(model, vectors, s, args.start) as clock:
+                def timed(predict):
+                    def run(z, t):
+                        clock["t"] = float(t)
+                        return predict(z, t)
+                    return run
+                audio = model.generate(text, seeds, wrap=timed, **kw)
         elif args.method == "embed":
             cond = methods.embed(model, text, spec["positive"], spec["negative"], s, args.seconds)
             audio = model.generate(text, seeds, cond=cond, **kw)

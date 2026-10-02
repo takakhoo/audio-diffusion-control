@@ -17,9 +17,11 @@ import yaml
 from audiosliders import metrics as M
 
 # Categorical palette in fixed order: blue, orange, aqua, yellow, magenta.
-COLORS = dict(lora="#2a78d6", guidance="#eb6834", embed="#1baf7a", dsp="#eda100", contrast="#e87ba4")
+COLORS = dict(lora="#2a78d6", guidance="#eb6834", embed="#1baf7a", dsp="#eda100", contrast="#e87ba4", caa="#008300",
+              community="#4a3aa7")
 LABELS = dict(lora="LoRA slider", guidance="Prompt-pair guidance", embed="Prompt interpolation",
-              dsp="Signal processing", contrast="Descriptor slider")
+              dsp="Signal processing", contrast="Descriptor slider", caa="Activation steering",
+              community="Community slider")
 SURFACE, INK, MUTED, GRID = "#fcfcfb", "#0b0b0b", "#52514e", "#e6e4de"
 LEAK_KEYS = ["centroid_oct", "rolloff_oct", "bass_ratio", "flatness", "flux", "rms_db", "onset_rate",
              "pulse_bpm", "percussive_ratio", "decay_s", "side_ratio", "majorness"]

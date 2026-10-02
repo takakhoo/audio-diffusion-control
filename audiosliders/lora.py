@@ -163,10 +163,43 @@ class SliderBank:
         file.parent.mkdir(parents=True, exist_ok=True)
         save_file(self.state_dict(name), str(file), metadata={"slider": json.dumps(self.meta[name])})
 
+    def load_peft(self, name: str, file: str | Path, prefix: str = "diffusion_model.decoder.") -> dict:
+        """Attach a LoRA saved in the PEFT layout (lora_A / lora_B per layer) as a slider.
+
+        This is the format written by ai-toolkit and used by community ACE-Step sliders. Layer
+        names are mapped from the original repository's (q_proj, o_proj, ...) to diffusers'.
+        """
+        from safetensors import safe_open
+
+        rename = {"q_proj": "to_q", "k_proj": "to_k", "v_proj": "to_v", "o_proj": "to_out.0"}
+        with safe_open(str(file), framework="pt") as f:
+            sd = {k: f.get_tensor(k) for k in f.keys()}
+        rank = 0
+        for key in sorted(k for k in sd if k.endswith(".lora_A.weight")):
+            stem = key[: -len(".lora_A.weight")]
+            path = ".".join(rename.get(part, part) for part in stem.removeprefix(prefix).split("."))
+            layer = self._wrap(path)
+            a, b = sd[key], sd[f"{stem}.lora_B.weight"]
+            base, rank = layer.base, a.shape[0]
+            if (a.shape[1], b.shape[0]) != (base.in_features, base.out_features):
+                raise ValueError(f"{path}: adapter {tuple(b.shape)} x {tuple(a.shape)} does not fit the layer")
+            down = nn.Linear(base.in_features, rank, bias=False)
+            up = nn.Linear(rank, base.out_features, bias=False)
+            down.weight.data.copy_(a)
+            up.weight.data.copy_(b)
+            layer.down[name], layer.up[name] = down.to(base.weight.device), up.to(base.weight.device)
+            alpha = sd.get(f"{stem}.alpha")
+            layer.gain[name] = float(alpha) / rank if alpha is not None else 1.0
+        self.meta[name] = dict(rank=rank, targets="external", source=Path(file).name)
+        self.scales[name] = 0.0
+        return self.meta[name]
+
     def load(self, name: str, file: str | Path) -> dict:
         from safetensors import safe_open
 
         with safe_open(str(file), framework="pt") as f:
+            if "slider" not in (f.metadata() or {}):
+                return self.load_peft(name, file)
             meta = json.loads(f.metadata()["slider"])
             sd = {k: f.get_tensor(k) for k in f.keys()}
         self.add(name, **meta)

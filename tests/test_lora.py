@@ -126,3 +126,21 @@ def test_gated_predictor_only_acts_inside_window():
     ref = model(x, ctx)
     assert torch.allclose(gated(x, torch.tensor(0.9)), ref, atol=1e-6)
     assert not torch.allclose(gated(x, torch.tensor(0.3)), ref, atol=1e-3)
+
+
+def test_peft_layout_adapter_loads_as_a_slider(tmp_path):
+    from safetensors.torch import save_file
+
+    model, bank, x, ctx = setup()
+    ref = model(x, ctx)
+    torch.manual_seed(1)
+    a, b = torch.randn(2, 8) * 0.3, torch.randn(8, 2) * 0.3
+    save_file({"diffusion_model.decoder.transformer_blocks.0.attn1.q_proj.lora_A.weight": a,
+               "diffusion_model.decoder.transformer_blocks.0.attn1.q_proj.lora_B.weight": b}, str(tmp_path / "x.safetensors"))
+    meta = bank.load("ext", tmp_path / "x.safetensors")
+    assert meta["rank"] == 2 and meta["targets"] == "external"
+    assert torch.allclose(model(x, ctx), ref, atol=1e-6)
+    layer = model.transformer_blocks[0].attn1["to_q"]
+    with bank.at(ext=2.0):
+        got = layer(x)
+    assert torch.allclose(got, layer.base(x) + 2.0 * x @ a.T @ b.T, atol=1e-5)
