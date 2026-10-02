@@ -196,6 +196,36 @@ def tag_table(root, runs, spec, vocab_path, out):
     (out / "tags.md").write_text("\n".join(lines) + "\n")
 
 
+def second_opinion(runs, spec, out, real_path=None):
+    """Compare Audiobox content enjoyment with SongEval musicality, a predictor trained on different data."""
+    from scipy.stats import spearmanr
+
+    lines = ["| Slider | Method | Enjoyment at 0 / low end / high end | Musicality at 0 / low end / high end | "
+             "Usable span by enjoyment | Usable span by musicality | Agreement between the two (Spearman over clips) |",
+             "|---|---|---|---|---|---|---:|"]
+    for (method, name), rows in runs.items():
+        if name not in spec or not all("se_musicality" in r and "ce" in r for r in rows):
+            continue
+        scales = sorted({r["scale"] for r in rows})
+        mean = lambda k, x: float(np.mean([r[k] for r in rows if r["scale"] == x]))
+        a, b = M.usable_span(rows), M.usable_span(rows, "se_musicality", 0.25)
+        rho = spearmanr([r["ce"] for r in rows], [r["se_musicality"] for r in rows]).statistic
+        lines.append(f"| {name} | {LABELS.get(method, method)} | "
+                     f"{mean('ce', 0.0):.2f} / {mean('ce', scales[0]):.2f} / {mean('ce', scales[-1]):.2f} | "
+                     f"{mean('se_musicality', 0.0):.2f} / {mean('se_musicality', scales[0]):.2f} / {mean('se_musicality', scales[-1]):.2f} | "
+                     f"{a[0]:+.1f} to {a[1]:+.1f} | {b[0]:+.1f} to {b[1]:+.1f} | {rho:.2f} |")
+    if len(lines) == 2:
+        return
+    note = ""
+    if real_path and (Path(real_path) / "songeval.jsonl").exists():
+        vals = [json.loads(line)["se_musicality"] for line in (Path(real_path) / "songeval.jsonl").read_text().splitlines() if line]
+        note = f"\nReal recordings (FMA, {len(vals):,} clips): mean musicality {np.mean(vals):.2f}.\n"
+    (out / "quality_check.md").write_text(
+        "Audiobox Aesthetics content enjoyment (1 to 10) next to SongEval musicality (1 to 5). The usable span by "
+        "musicality uses a tolerance of 0.25, half the tolerance used for enjoyment on a scale twice as wide.\n"
+        + note + "\n" + "\n".join(lines) + "\n")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--eval", required=True)
@@ -294,6 +324,7 @@ def main():
         quality_figure(both, spec, out, plt, real_ce, "compare_quality.png")
     if args.vocab:
         tag_table(Path(args.eval), runs, spec, args.vocab, out)
+    second_opinion(runs, spec, out, args.real)
     with (out / "leakage.csv").open("w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["method", "slider"] + LEAK_KEYS)

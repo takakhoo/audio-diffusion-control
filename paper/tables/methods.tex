@@ -1,0 +1,21 @@
+\begin{table}[t]\centering\small\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lrrrrrrrr}
+\toprule
+ & \multicolumn{2}{c}{Slider} & \multicolumn{2}{c}{Guidance} & \multicolumn{2}{c}{Act. steer.} & \multicolumn{2}{c}{Interp.} \\
+Slider & $\rho$ & MuQ & $\rho$ & MuQ & $\rho$ & MuQ & $\rho$ & MuQ \\
+\midrule
+brightness & 0.97 & 0.80 & 0.89 & 0.81 & 0.93 & 0.81 & 0.49 & 0.35 \\
+density & 0.78 & 0.86 & 0.74 & 0.81 & 0.71 & 0.86 & 0.10 & 0.38 \\
+mood & 0.39 & 0.88 & 0.45 & 0.87 & 0.41 & 0.88 & 0.25 & 0.63 \\
+harmony & 0.41 & 0.73 & 0.08 & 0.68 & 0.24 & 0.72 & -0.01 & 0.23 \\
+groove & -- & 0.56 & -- & 0.71 & -- & 0.58 & -- & 0.12 \\
+ensemble & 0.60 & 0.77 & 0.55 & 0.75 & 0.58 & 0.67 & 0.25 & 0.25 \\
+tension & -- & 0.86 & -- & 0.88 & -- & 0.91 & -- & 0.69 \\
+melody & 0.48 & 0.89 & 0.51 & 0.83 & 0.53 & 0.83 & 0.31 & 0.38 \\
+\midrule
+CE at ends & \multicolumn{2}{c}{6.37} & \multicolumn{2}{c}{6.54} & \multicolumn{2}{c}{6.52} & \multicolumn{2}{c}{4.95} \\
+Passes per step & \multicolumn{2}{c}{1} & \multicolumn{2}{c}{3} & \multicolumn{2}{c}{1} & \multicolumn{2}{c}{1} \\
+\bottomrule
+\end{tabular}
+\caption{Four ways to move the same attribute on ACE-Step, same prompts and seeds. $\rho$: rank correlation of position with the waveform descriptor (-- where none was assigned); MuQ: with the MuQ-MuLan direction. CE at ends: mean content enjoyment at the two extreme positions, averaged over sliders.}\label{tab:methods}
+\end{table}

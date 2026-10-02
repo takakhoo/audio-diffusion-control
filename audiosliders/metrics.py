@@ -31,6 +31,11 @@ def load_rows(path: str | Path) -> list[dict]:
             r.update(muq_dir=m["muq_pos"] - m["muq_neg"], muq_prompt=m["muq_prompt"])
             if "muq_axis" in m:
                 r["muq_axis"] = m["muq_axis"]
+    second = path.with_name("songeval.jsonl")
+    if second.exists():
+        # A second quality predictor, written by experiments/songeval_score.py in the same order.
+        for r, line in zip(rows, second.read_text().splitlines()):
+            r.update(json.loads(line))
     for r in rows:
         for hz, octv in (("centroid_hz", "centroid_oct"), ("rolloff_hz", "rolloff_oct")):
             if hz in r and octv not in r:

@@ -99,6 +99,37 @@ if found.exists():
               r"the unsteered clip at the ends of the usable span.}\label{tab:found}", r"\end{table*}"]
     (PAPER / "tables" / "found.tex").write_text("\n".join(lines) + "\n")
 
+ace = RESULTS / "ace" / "summary.json"
+if ace.exists():
+    rows = json.loads(ace.read_text())["summary"]
+    methods = [("LoRA slider", "Slider"), ("Prompt-pair guidance", "Guidance"), ("Activation steering", "Act. steer."),
+               ("Prompt interpolation", "Interp.")]
+    by = {(r["slider"], r["method"]): r for r in rows}
+    sliders = [s for s in dict.fromkeys(r["slider"] for r in rows) if all((s, m) in by for m, _ in methods)]
+    lines = [r"\begin{table}[t]\centering\small\setlength{\tabcolsep}{3pt}", r"\begin{tabular}{l" + "rr" * len(methods) + "}",
+             r"\toprule", " & " + " & ".join(rf"\multicolumn{{2}}{{c}}{{{short}}}" for _, short in methods) + r" \\",
+             "Slider & " + " & ".join(r"$\rho$ & MuQ" for _ in methods) + r" \\", r"\midrule"]
+    for name in sliders:
+        lines.append(name + " & " + " & ".join(f"{fmt(by[(name, m)].get('rho'))} & {fmt(by[(name, m)].get('muq_rho'))}"
+                                                 for m, _ in methods) + r" \\")
+    lines += [r"\midrule", "CE at ends & " + " & ".join(
+        rf"\multicolumn{{2}}{{c}}{{{sum(by[(n, m)]['ce_at_ends'] for n in sliders) / len(sliders):.2f}}}" for m, _ in methods) + r" \\",
+        "Passes per step & " + " & ".join(rf"\multicolumn{{2}}{{c}}{{{c}}}" for c in (1, 3, 1, 1)) + r" \\",
+        r"\bottomrule", r"\end{tabular}",
+        r"\caption{Four ways to move the same attribute on ACE-Step, same prompts and seeds. $\rho$: rank correlation of "
+        r"position with the waveform descriptor (-- where none was assigned); MuQ: with the MuQ-MuLan direction. CE at ends: "
+        r"mean content enjoyment at the two extreme positions, averaged over sliders.}\label{tab:methods}", r"\end{table}"]
+    (PAPER / "tables" / "methods.tex").write_text("\n".join(lines) + "\n")
+
+cover = RESULTS / "coverage" / "muq_ica" / "coverage.json"
+if cover.exists():
+    c = json.loads(cover.read_text())
+    m = c["models"]["ace"]
+    macros.update(covLo=f"{100 * min(m['total']):.0f}", covHi=f"{100 * max(m['total']):.0f}",
+                  covSeedLo=f"{100 * min(m['within']):.0f}", covSeedHi=f"{100 * max(m['within']):.0f}",
+                  covOverlap=f"{100 * m['overlap']['8']:.0f}", covClips=f"{m['clips']:,}".replace(",", "{,}"),
+                  covReal=f"{c['real_clips']:,}".replace(",", "{,}"))
+
 macros.update(nPrompts="24", nReal="2{,}000", fmaCE="6.12", aceCE="6.92", saoCE="6.16")
 (PAPER / "numbers.tex").write_text("".join(f"\\newcommand{{\\{k}}}{{{v}}}\n" for k, v in sorted(macros.items())))
 print("macros:", macros)
