@@ -9,6 +9,7 @@ reads. Run on the machine that holds the evaluation output; needs ffmpeg.
 
 import argparse
 import json
+import math
 import re
 import subprocess
 from pathlib import Path
@@ -45,6 +46,8 @@ CONTRAST_MEASURE = dict(quality="ce", production="pq", ensemble="pc", harmony="h
 ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
 ap.add_argument("--source", action="append", default=[], metavar="MODEL=DIR[:METHOD,METHOD]",
                 help="evaluation directory for a model, optionally limited to some methods; repeatable per model")
+ap.add_argument("--skip", nargs="*", default=[], metavar="METHOD/SLIDER", help="combinations to leave out")
+ap.add_argument("--max-axes", type=int, default=None, help="with --axes: publish only the first N")
 ap.add_argument("--max-scale", action="append", default=[], metavar="METHOD=VALUE",
                 help="publish only positions up to this magnitude for a method")
 ap.add_argument("--discovered", action="append", default=[], metavar="MODEL=EVALDIR:SLIDERS_JSON")
@@ -102,13 +105,13 @@ for source in args.source:
     for name in names:
         for method in (only.split(",") if only else args.methods):
             run = root / f"{method}_{name}"
-            if not (run / "rows.jsonl").exists():
+            if not (run / "rows.jsonl").exists() or f"{method}/{name}" in args.skip:
                 continue
             rows = metrics.load_rows(run)
             s = spec.get(name, {})
             measure = s.get("display") or s.get("measure") or CONTRAST_MEASURE.get(name)
             ends = s.get("ends") or ["rougher production", "cleaner production"]
-            entry = entry_for(model, name, name.replace("_axis", "").replace("_", " / ").capitalize(), ends[0], ends[1], measure,
+            entry = entry_for(model, name, s.get("label", name.capitalize()), ends[0], ends[1], measure,
                               "Axes found in real music" if "axis" in s else "Named attributes")
             if method not in entry["methods"]:
                 entry["methods"].append(method)
@@ -122,7 +125,8 @@ for source in args.source:
                 slot = prompts.index(mine[0]["prompt"])
                 clips = publish(model, method, name, run, rows, pid, min(r["seed"] for r in mine), slot)
                 for c in clips:
-                    c["v"] = c.pop("row").get(measure) if measure else None
+                    row = c.pop("row")
+                    c["v"] = row.get(measure) if measure else None
                 manifest["clips"][f"{model}/{method}/{name}/{slot}"] = clips
 
 for item in args.discovered:
@@ -162,7 +166,7 @@ for item in args.axes:
     root, _, table = rest.partition(":")
     prompts = manifest["models"][model]["prompts"]
     manifest["methods"]["internal"] = dict(label=METHODS["internal"][0], note=METHODS["internal"][1])
-    for k, a in enumerate(json.loads(Path(table).read_text())):
+    for k, a in enumerate(json.loads(Path(table).read_text())[: args.max_axes]):
         run = Path(root) / a["name"]
         rows = metrics.load_rows(run)
         name = f"own-axis-{k + 1}"
@@ -182,6 +186,13 @@ for item in args.axes:
 
 if args.summary:
     manifest.update(json.loads(Path(args.summary).read_text()))
+# Drop audio left over from earlier exports that this manifest no longer references.
+used = {c["f"] for clips in manifest["clips"].values() for c in clips}
+for f in (out / "audio").rglob("*.m4a"):
+    if str(f.relative_to(out)) not in used:
+        f.unlink()
 (out / "demo").mkdir(parents=True, exist_ok=True)
-(out / "demo" / "manifest.json").write_text(json.dumps(manifest))
+clean = lambda o: ({k: clean(v) for k, v in o.items()} if isinstance(o, dict) else [clean(v) for v in o] if isinstance(o, list)
+                   else None if isinstance(o, float) and not math.isfinite(o) else o)
+(out / "demo" / "manifest.json").write_text(json.dumps(clean(manifest), allow_nan=False))
 print(f"{len(manifest['clips'])} slider tracks, {sum(len(c) for c in manifest['clips'].values())} clips")

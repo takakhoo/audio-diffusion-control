@@ -138,28 +138,33 @@ valence:
   measure: majorness
   measure_sign: -1
 jazz_electronic:
+  label: Electronic to jazz
   ends: [electronic, jazz]
   positive: jazz, saxophone, trumpet, improvised
   negative: electronic dance, synthesizer, electronic
   axis: {emb: muq, source: runs/discovery/real_muq_ica/directions.npy, index: 5}
   measure: null
 strings_synth:
+  label: Synth to strings
   ends: [synthesizer and choir, guitars and strings]
   positive: acoustic guitar, electric guitar, strings, acoustic
   negative: synthesizer, choir, reverberant
   axis: {emb: muq, source: runs/discovery/real_muq_ica/directions.npy, index: 1}
   measure: null
 piano_axis:
+  label: Piano
   ends: [organ and rock, piano]
   positive: piano, electric piano, slow, melancholic
   negative: organ, rock, folk, metal
   axis: {emb: muq, source: runs/discovery/real_muq_ica/directions.npy, index: 4}
   measure: null
 classical_funk:
+  label: Funk to classical
   ends: [funk and drums, classical and epic]
   axis: {emb: clap, source: runs/discovery/real_pca/directions.npy, index: 4}
   measure: null
 acoustic_electronic:
+  label: Electronic to acoustic
   ends: [studio electronic, acoustic and blues]
   axis: {emb: clap, source: runs/discovery/real_ica/directions.npy, index: 3}
   measure: null
