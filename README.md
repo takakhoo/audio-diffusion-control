@@ -14,7 +14,7 @@
 
 ## Headline
 
-Six musical sliders on ACE-Step 1.5 XL turbo, each trained from one prompt pair in about 20 minutes. 24 held-out prompts, 3 seeds, 9 slider positions, 648 clips per slider.
+Eight sliders on ACE-Step 1.5 XL turbo, each trained from one prompt pair in about 20 minutes. 24 held-out prompts, 3 seeds, 9 slider positions, 648 clips per slider.
 
 | Slider | What rises toward + (CLAP tags) | What falls | Measured descriptor follows? (ρ, ends ordered) | Usable span | Piece kept | Enjoyment at the ends |
 |---|---|---|---|---|---:|---:|
@@ -24,6 +24,8 @@ Six musical sliders on ACE-Step 1.5 XL turbo, each trained from one prompt pair 
 | [**harmony**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=harmony&prompt=0&x=2) (plain to rich) | minor key, melancholic, major key | country, vocals, violin | harmonic change rate: 0.41, 76% | -1.5 to +2 | 0.83 | 6.64 |
 | [**melody**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=melody&prompt=0&x=2) (texture to tune) | romantic, happy, blues | lo-fi, mysterious, calm | key clarity: 0.48, 78% | -1 to +2 | 0.80 | 6.47 |
 | [**tension**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=tension&prompt=0&x=1) (relaxed to tense) | metal, rock, distorted | melancholic, uplifting, sad | no descriptor assigned | -1.5 to +1 | 0.83 | 5.64 |
+| [**brightness**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=brightness&prompt=0&x=2) (dark to bright) | happy, repetitive, romantic | dark-toned, lo-fi, quiet | spectral centroid: 0.97, 100% | -1 to +2 | 0.74 | 6.04 |
+| [**density**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=density&prompt=0&x=2) (sparse to dense) | latin, repetitive, romantic | dark-toned, quiet, lo-fi | onset rate: 0.78, 92% | -0.5 to +2 | 0.84 | 6.09 |
 
 Each slider name opens the live demo on that slider. For scale: unsteered clips score 6.95 on Audiobox Aesthetics content enjoyment, and 2,000 real recordings from FMA average 6.1. "Usable span" is how far the slider goes before mean enjoyment falls more than 0.5 below the unsteered clips. "Piece kept" is CLAP similarity to the unsteered clip at the ends of that span. Full tables: [`results/ace/`](results/ace/).
 
@@ -62,7 +64,7 @@ A fourth readout says what changed in words: 80 instrument, genre, mood, and cha
 
 ![Descriptor against slider position, ACE-Step](results/ace/response.png)
 
-Each curve is the mean change from the unsteered clip over 72 trajectories, in units of the descriptor's spread across unsteered clips. Harmony moves the harmonic change rate by about half a standard deviation in each direction, and ensemble, melody, and mood all rise with their slider.
+Each curve is the mean change from the unsteered clip over 72 trajectories, in units of the descriptor's spread across unsteered clips. Brightness moves the spectral centroid by more than four standard deviations with every one of its 72 trajectories ordered correctly. Harmony moves the harmonic change rate by about half a standard deviation in each direction, and density, ensemble, melody, and mood all rise with their slider.
 
 ### 3. Pushing too far stops sounding like music, and that is measurable
 
@@ -72,7 +74,7 @@ First the yardstick. Audiobox Aesthetics scores 2,000 real recordings from FMA a
 
 ![Content enjoyment against slider position, ACE-Step](results/ace/quality.png)
 
-The dashed line is the mean of real recordings. Five of the six sliders stay above it across the whole range. Tension collapses past +1, which is why its usable span ends there. The negative ends (sadder, sparser, plainer) cost a little enjoyment; the positive ends cost almost none.
+The dashed line is the mean of real recordings. Seven of the eight sliders stay at or above it across their usable span. Tension collapses past +1, which is why its usable span ends there. The negative ends (sadder, sparser, plainer) cost a little enjoyment; the positive ends cost almost none.
 
 ### 4. Leaving the first steps alone keeps the piece
 
@@ -93,11 +95,19 @@ Starting at step 21 keeps most of the effect and cuts the loss in enjoyment from
 
 On Stable Audio Open, the text sliders for "density" and "percussion" move the output along their CLAP text direction, as the published evaluations would report. The measured onset rate and percussive energy share do not follow: rank correlation at or below 0.37 and a range near zero at every gate setting. A slider that only passes the embedding test has not been shown to do its job, and this is the reason sliders can also be trained from the measurement itself.
 
-### 6. A slider trained with no text
+On ACE-Step the density slider does pass: onset rate follows it with ρ = 0.78. Whether a prompt pair yields a working slider depends on the backbone, which is one more reason to measure.
+
+### 6. What else moves
+
+![Slope of every descriptor for every ACE-Step slider](results/ace/leakage_lora.png)
+
+Each row is a slider and each cell is how far a descriptor moves per unit of slider, in standard deviations of unsteered clips; bold marks the slider's own descriptor. Sliders are not clean. Mood and melody both brighten the clip (centroid +0.8 per unit), and density, groove, harmony, and ensemble all raise loudness (+0.6 to +0.9). A slider named for one thing moves several, and the table says which.
+
+### 7. A slider trained with no text
 
 Sorting the model's own clips by measured spectral centroid and training between the two ends gives a brightness slider that moves the mean centroid from 408 Hz at -2 to 1,488 Hz at +1 (899 Hz unsteered) on 8 held-out prompts in a pilot run, with stereo width, loudness, and low-end energy nearly unchanged. The text slider for brightness drags all three along. The same trainer, sorting by aesthetics score, gives a quality slider. Full evaluation of these is in the running queue.
 
-### 7. Axes nobody named
+### 8. Axes nobody named
 
 For each of five broad concepts, 1,024 clips were generated on ACE-Step and their CLAP embeddings decomposed with PCA. The leading components carry 16 to 25% of the variance within a concept, and the tags they point toward and away from read as musical contrasts:
 
@@ -114,7 +124,7 @@ For each of five broad concepts, 1,024 clips were generated on ACE-Step and thei
 
 All 30 are in [`results/discovery/ace/pca.md`](results/discovery/ace/pca.md) with their correlations to every descriptor. Training these directions into sliders with the set trainer is in the running queue.
 
-### 8. How well a slider learns its target
+### 9. How well a slider learns its target
 
 ![Share of the guidance target not yet reproduced, by training iteration](results/figures/training_curves.png)
 
