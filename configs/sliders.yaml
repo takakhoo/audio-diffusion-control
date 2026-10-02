@@ -119,12 +119,15 @@ dynamics:
 quality:
   ends: [less enjoyable, more enjoyable]
   measure: ce
+# The two below keep the polarity of the discovered axis, whose positive end is the calmer or darker one.
 arousal:
-  ends: [quiet and dreamy, energetic and aggressive]
+  ends: [energetic and aggressive, quiet and dreamy]
   measure: flux
+  measure_sign: -1
 valence:
-  ends: [dark and distorted, playful and happy]
+  ends: [playful and happy, dark and distorted]
   measure: majorness
+  measure_sign: -1
 jazz_electronic:
   ends: [electronic, jazz]
   measure: null
