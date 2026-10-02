@@ -17,6 +17,23 @@ The mood slider retrained with one setting changed, 24 held-out prompts, 2 seeds
 - Restricting the update to cross-attention keeps the embedding score and loses a quarter of the descriptor correlation; only 54% of trajectories end up ordered.
 - Three times the training is the one change that helps the descriptor (0.52 against 0.39), with overlapping intervals.
 
+## More training prompts
+
+All eight text sliders retrained on 648 prompts for 2,000 iterations, against 48 prompts for 1,000. Same evaluation: 24 held-out prompts, 3 seeds, 9 positions.
+
+| Slider | ρ with the descriptor, 48 prompts | 648 prompts | MuQ ρ, 48 | 648 | Descriptor moved in the usable span (std), 48 | 648 | Piece kept, 48 | 648 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| brightness | 0.97 ± 0.01 | 0.95 ± 0.02 | 0.80 | 0.84 | 4.41 | 4.26 | 0.74 | 0.72 |
+| density | 0.78 ± 0.09 | 0.80 ± 0.08 | 0.86 | 0.88 | 1.25 | 1.54 | 0.84 | 0.81 |
+| ensemble | 0.60 ± 0.10 | 0.67 ± 0.10 | 0.77 | 0.76 | 0.92 | 1.02 | 0.80 | 0.79 |
+| melody | 0.48 ± 0.11 | 0.47 ± 0.11 | 0.89 | 0.89 | 0.97 | 0.77 | 0.80 | 0.80 |
+| harmony | 0.41 ± 0.12 | 0.33 ± 0.12 | 0.73 | 0.61 | 0.84 | 0.56 | 0.83 | 0.84 |
+| mood | 0.39 ± 0.10 | 0.40 ± 0.11 | 0.88 | 0.92 | 0.87 | 0.98 | 0.79 | 0.74 |
+| groove | no descriptor | no descriptor | 0.56 | 0.64 | | | 0.79 | 0.74 |
+| tension | no descriptor | no descriptor | 0.86 | 0.86 | | | 0.83 | 0.83 |
+
+Nothing moves outside its confidence interval. The usable spans are the same on seven of eight and half a step wider for mood. For a prompt-pair slider, 48 training prompts are enough, and the published sliders are the 48-prompt ones. The larger prompt set matters for the text-free trainer, which needs many clips per attribute value, and not for this one.
+
 ## Two sliders at once
 
 Both sliders on a 3 by 3 grid of positions (-1, 0, +1), 24 prompts. A descriptor's change is regressed on its own slider's position, the other slider's position, and their product, in standard deviations of unsteered clips ([`experiments/compose.py`](../../experiments/compose.py)).
