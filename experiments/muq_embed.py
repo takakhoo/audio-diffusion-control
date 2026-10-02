@@ -27,19 +27,20 @@ ap.add_argument("--corpus", required=True)
 ap.add_argument("--music", nargs="+", required=True)
 ap.add_argument("--vocab-out", default="runs/reference/vocab_muq.npz")
 ap.add_argument("--batch", type=int, default=32)
+ap.add_argument("--offset", type=float, default=10.0, help="seconds into each file where the ten-second excerpt starts")
 args = ap.parse_args()
 
 
 def find(name: str) -> str | None:
     for root in args.music:
-        p = Path(root) / name[:3] / name
-        if p.exists():
-            return str(p)
+        for p in (Path(root) / name[:3] / name, Path(root) / name):
+            if p.exists():
+                return str(p)
     return None
 
 
 def excerpt(path: str) -> np.ndarray:
-    cmd = ["ffmpeg", "-loglevel", "error", "-ss", "10", "-t", "10", "-i", path, "-ar", "24000", "-ac", "1", "-f", "f32le", "-"]
+    cmd = ["ffmpeg", "-loglevel", "error", "-ss", str(args.offset), "-t", "10", "-i", path, "-ar", "24000", "-ac", "1", "-f", "f32le", "-"]
     audio = np.frombuffer(subprocess.run(cmd, capture_output=True).stdout, dtype=np.float32)
     out = np.zeros(240_000, dtype=np.float32)
     out[: min(len(audio), 240_000)] = audio[:240_000]

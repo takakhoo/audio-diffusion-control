@@ -39,6 +39,7 @@ def main():
     ap.add_argument("--guidance", type=float, default=None)
     ap.add_argument("--seconds", type=float, default=10.0)
     ap.add_argument("--workers", type=int, default=12)
+    ap.add_argument("--save-audio", action="store_true", help="keep each clip as FLAC, for embedding in other spaces")
     args = ap.parse_args()
 
     out = Path(args.out)
@@ -51,6 +52,16 @@ def main():
     clap = Clap()
     aesthetics = Aesthetics()
     pool = ProcessPoolExecutor(args.workers)
+    try:
+        from beat_this.inference import Audio2Beats
+
+        tracker = Audio2Beats(checkpoint_path="final0", device="cuda", dbn=False)
+    except Exception:
+        tracker = None
+    if args.save_audio:
+        import soundfile as sf
+
+        (out / "audio").mkdir(exist_ok=True)
     latents, embeds, rows, pending = [], [], [], []
     for b in range(0, len(jobs), args.batch):
         chunk = jobs[b : b + args.batch]
@@ -64,8 +75,14 @@ def main():
         embeds.append(emb.cpu().numpy())
         scores = aesthetics(audio, model.sample_rate)
         for j, (i, seed) in enumerate(chunk):
-            rows.append(dict(prompt_index=i, prompt=prompts[i], seed=seed, clap_prompt=float(emb[j] @ text_emb[j]),
-                             **scores[j]))
+            row = dict(prompt_index=i, prompt=prompts[i], seed=seed, clap_prompt=float(emb[j] @ text_emb[j]),
+                       file=f"p{i:04d}_s{seed}.flac", **scores[j])
+            if tracker is not None:
+                found, _ = tracker(audio[j].mean(0), model.sample_rate)
+                row["beat_bpm"] = float(60 / np.median(np.diff(found))) if len(found) > 3 else float("nan")
+            if args.save_audio:
+                sf.write(out / "audio" / row["file"], audio[j].T, model.sample_rate)
+            rows.append(row)
             pending.append(pool.submit(measure, (audio[j], model.sample_rate)))
         print(f"{min(b + args.batch, len(jobs))}/{len(jobs)}", flush=True)
     for row, fut in zip(rows, pending):
