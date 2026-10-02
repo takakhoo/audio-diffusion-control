@@ -95,9 +95,22 @@ Starting at step 21 keeps most of the effect and cuts the loss in enjoyment from
 
 ### 5. The embedding can say yes while the waveform says no
 
-On Stable Audio Open, the text sliders for "density" and "percussion" move the output along their CLAP text direction, as the published evaluations would report. The measured onset rate and percussive energy share do not follow: rank correlation at or below 0.37 and a range near zero at every gate setting. A slider that only passes the embedding test has not been shown to do its job, and this is the reason sliders can also be trained from the measurement itself.
+All 20 prompt-pair sliders were trained on Stable Audio Open and evaluated with the gate on (24 held-out prompts, 3 seeds, 7 positions). Every one of them moves the output along its CLAP text direction. Scored against the waveform, they split:
 
-On ACE-Step the density slider does pass: onset rate follows it with ρ = 0.78. Whether a prompt pair yields a working slider depends on the backbone, which is one more reason to measure.
+| Follows its descriptor | ρ | Ends ordered | | Does not | ρ | Ends ordered |
+|---|---:|---:|---|---|---:|---:|
+| width (side/mid energy) | 0.95 ± 0.01 | 100% | | tempo (beat tracker) | -0.01 ± 0.14 | 29% |
+| bass (energy below 150 Hz) | 0.92 ± 0.05 | 97% | | mood (major/minor fit) | -0.04 ± 0.13 | 43% |
+| brightness (centroid) | 0.84 ± 0.04 | 96% | | harmony (harmonic change) | 0.19 ± 0.14 | 64% |
+| energy (spectral flux) | 0.71 ± 0.08 | 94% | | density (onset rate) | 0.30 ± 0.16, no net change | 75% |
+| ensemble (production complexity) | 0.70 ± 0.09 | 93% | | percussion (percussive share) | 0.34 ± 0.18, no net change | 71% |
+| distortion (spectral flatness) | 0.50 ± 0.12 | 81% | | | | |
+
+Timbre and space pass. Rhythm and tonality do not: the tempo, density, and percussion sliders drift toward their words in the embedding while the beat tracker, the onset count, and the percussive share stay where they were. Scored by embedding alone, as published audio sliders are, all of these would be reported as working. Full table: [`results/main/summary.md`](results/main/summary.md).
+
+The backbone matters. On ACE-Step the same density prompt pair does move the onset rate (ρ = 0.78), and mood follows the major/minor fit there.
+
+**Why not just use an EQ?** For brightness, you should. A spectral tilt applied to the unsteered clip moves the centroid further than the slider (4.1 against 1.7 standard deviations inside the usable span), is perfectly monotone, and keeps more of the piece (CLAP similarity 0.89 against 0.82). The sliders earn their place on attributes no effect can produce: mood, harmony, ensemble size, melody.
 
 ### 6. What else moves
 
