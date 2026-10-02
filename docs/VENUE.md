@@ -15,11 +15,15 @@ International Society for Music Information Retrieval Conference, London, 12 to 
 
 ## What the paper still needs to be competitive there
 
-1. **A listening study.** The main gap. It should test whether the usable span from the aesthetics predictor matches where listeners hear quality drop, and whether descriptor shifts match heard changes. Needs human-subjects review at Dartmouth.
-2. **The two closest methods as baselines** on the same backbones, scored with this protocol and with their own metrics: FreeSliders ([arXiv:2511.00103](https://arxiv.org/abs/2511.00103)) and TADA activation steering ([arXiv:2602.11910](https://arxiv.org/abs/2602.11910)).
-3. **Non-CLAP evidence** for the semantic sliders, since tags and direction scores both come from CLAP.
-4. **Confidence intervals** on every headline number.
-5. **A tighter story.** Six pages will not hold four contributions at equal weight. Lead with the protocol and the embedding-passes, waveform-fails result.
+Status on 2 October 2026:
+
+1. **A listening study. Open, and the main gap.** It should test whether the usable span from the two quality predictors matches where listeners hear quality drop, and whether a move along the arousal or valence axis is heard as one. Needs human-subjects review at Dartmouth. Design: [`LISTENING_STUDY.md`](LISTENING_STUDY.md).
+2. **The two closest methods as baselines. Done on ACE-Step.** Prompt-pair guidance (the FreeSliders recipe) and activation steering (TADA's difference-of-means vectors) run through the same protocol, with prompt interpolation as a third ([`results/ace/summary.md`](../results/ace/summary.md)). Still open: their own metrics (LPAPS, the TADA area-under-curve score) and their sparse-autoencoder variant.
+3. **Non-CLAP evidence. Done.** Every direction score is repeated in MuQ-MuLan, and quality is scored by SongEval as well as Audiobox Aesthetics.
+4. **Confidence intervals. Done** for rank correlations and effect sizes in the summary tables.
+5. **A tighter story. Done in the current draft**: protocol and method comparison first, then axes of real music, coverage, and sliders along them. Six pages including references, 200-word abstract.
+6. **A third backbone.** Stable Audio 3 sliders are training. A result on a second diffusion model with different training data would answer "is this specific to ACE-Step".
+7. **A bigger and cleaner sample of real music** for the axes and the coverage numbers. FMA-large is on disk; MTG-Jamendo is the corpus other recent work uses.
 
 ## Backup and fallbacks
 
