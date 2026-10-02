@@ -121,6 +121,17 @@ The backbone matters. On ACE-Step the same density prompt pair does move the ons
 
 Each row is a slider and each cell is how far a descriptor moves per unit of slider, in standard deviations of unsteered clips; bold marks the slider's own descriptor. Sliders are not clean. Mood and melody both brighten the clip (centroid +0.8 per unit), and density, groove, harmony, and ensemble all raise loudness (+0.6 to +0.9). A slider named for one thing moves several, and the table says which.
 
+A measured leak can be cancelled by adding a second slider against it. Mood and melody were rerun with the brightness slider applied at -0.53 and -0.55 times their position (`--mix` in `experiments/evaluate.py`), coefficients read off the slopes above:
+
+| Slider | Brightness leak (std per unit) | Piece kept at ±1 | Enjoyment at -2 | ρ with its CLAP direction |
+|---|---:|---:|---:|---:|
+| mood | +0.81 | 0.85 | 6.17 | 0.92 |
+| mood, brightness cancelled | -0.02 | 0.90 | 6.57 | 0.69 |
+| melody | +0.83 | 0.87 | 6.12 | 0.93 |
+| melody, brightness cancelled | +0.09 | 0.92 | 6.43 | 0.72 |
+
+The leak goes away and more of the piece survives. The CLAP score for the concept drops as well, which says that part of what CLAP hears as "happier" or "more melodic" was the brightness.
+
 ### 7. A slider trained with no text
 
 Sorting the model's own clips by measured spectral centroid and training between the two ends gives a brightness slider that moves the mean centroid from 408 Hz at -2 to 1,488 Hz at +1 (899 Hz unsteered) on 8 held-out prompts in a pilot run, with stereo width, loudness, and low-end energy nearly unchanged. The text slider for brightness drags all three along. The same trainer, sorting by aesthetics score, gives a quality slider. Full evaluation of these is in the running queue.
