@@ -37,8 +37,13 @@ def worker(gpu: str) -> None:
             name, cmd = todo.get_nowait()
         except queue.Empty:
             return
+        if (done_dir / name).exists():
+            continue
         t0 = time.time()
-        env = dict(os.environ, CUDA_VISIBLE_DEVICES=gpu, PYTHONPATH=".", PYTHONUNBUFFERED="1")
+        # Cap math-library threads: every job also runs a pool of descriptor workers, and
+        # uncapped they oversubscribe a shared machine many times over.
+        threads = {k: "2" for k in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS", "NUMBA_NUM_THREADS")}
+        env = dict(os.environ, CUDA_VISIBLE_DEVICES=gpu, PYTHONPATH=".", PYTHONUNBUFFERED="1", **threads)
         with open(Path(args.logs) / f"{name}.log", "w") as log:
             code = subprocess.call(cmd, shell=True, env=env, stdout=log, stderr=subprocess.STDOUT)
         if code == 0:

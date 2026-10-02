@@ -1,0 +1,24 @@
+ace2_train_energy	python -m audiosliders.train energy --backbone ace-turbo --eta 2 --out runs/sliders/ace
+ace2_train_percussion	python -m audiosliders.train percussion --backbone ace-turbo --eta 2 --out runs/sliders/ace
+ace2_train_electronic	python -m audiosliders.train electronic --backbone ace-turbo --eta 2 --out runs/sliders/ace
+ace2_train_vintage	python -m audiosliders.train vintage --backbone ace-turbo --eta 2 --out runs/sliders/ace
+ace2_train_articulation	python -m audiosliders.train articulation --backbone ace-turbo --eta 2 --out runs/sliders/ace
+ace2_train_dynamics	python -m audiosliders.train dynamics --backbone ace-turbo --eta 2 --out runs/sliders/ace
+ace2_train_reverb	python -m audiosliders.train reverb --backbone ace-turbo --eta 2 --out runs/sliders/ace
+ace2_train_tempo	python -m audiosliders.train tempo --backbone ace-turbo --eta 2 --out runs/sliders/ace
+ace2_train_distortion	python -m audiosliders.train distortion --backbone ace-turbo --eta 2 --out runs/sliders/ace
+ace2_train_lofi	python -m audiosliders.train lofi --backbone ace-turbo --eta 2 --out runs/sliders/ace
+ace2_train_bass	python -m audiosliders.train bass --backbone ace-turbo --eta 2 --out runs/sliders/ace
+ace2_train_width	python -m audiosliders.train width --backbone ace-turbo --eta 2 --out runs/sliders/ace
+ace2_eval_lora_energy	python experiments/evaluate.py --backbone ace-turbo --method lora --slider energy --weights runs/sliders/ace/energy.safetensors --out runs/eval/ace/lora_energy --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
+ace2_eval_lora_percussion	python experiments/evaluate.py --backbone ace-turbo --method lora --slider percussion --weights runs/sliders/ace/percussion.safetensors --out runs/eval/ace/lora_percussion --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
+ace2_eval_lora_electronic	python experiments/evaluate.py --backbone ace-turbo --method lora --slider electronic --weights runs/sliders/ace/electronic.safetensors --out runs/eval/ace/lora_electronic --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
+ace2_eval_lora_vintage	python experiments/evaluate.py --backbone ace-turbo --method lora --slider vintage --weights runs/sliders/ace/vintage.safetensors --out runs/eval/ace/lora_vintage --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
+ace2_eval_lora_articulation	python experiments/evaluate.py --backbone ace-turbo --method lora --slider articulation --weights runs/sliders/ace/articulation.safetensors --out runs/eval/ace/lora_articulation --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
+ace2_eval_lora_dynamics	python experiments/evaluate.py --backbone ace-turbo --method lora --slider dynamics --weights runs/sliders/ace/dynamics.safetensors --out runs/eval/ace/lora_dynamics --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
+ace2_eval_lora_reverb	python experiments/evaluate.py --backbone ace-turbo --method lora --slider reverb --weights runs/sliders/ace/reverb.safetensors --out runs/eval/ace/lora_reverb --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
+ace2_eval_lora_tempo	python experiments/evaluate.py --backbone ace-turbo --method lora --slider tempo --weights runs/sliders/ace/tempo.safetensors --out runs/eval/ace/lora_tempo --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
+ace2_eval_lora_distortion	python experiments/evaluate.py --backbone ace-turbo --method lora --slider distortion --weights runs/sliders/ace/distortion.safetensors --out runs/eval/ace/lora_distortion --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
+ace2_eval_lora_lofi	python experiments/evaluate.py --backbone ace-turbo --method lora --slider lofi --weights runs/sliders/ace/lofi.safetensors --out runs/eval/ace/lora_lofi --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
+ace2_eval_lora_bass	python experiments/evaluate.py --backbone ace-turbo --method lora --slider bass --weights runs/sliders/ace/bass.safetensors --out runs/eval/ace/lora_bass --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
+ace2_eval_lora_width	python experiments/evaluate.py --backbone ace-turbo --method lora --slider width --weights runs/sliders/ace/width.safetensors --out runs/eval/ace/lora_width --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio

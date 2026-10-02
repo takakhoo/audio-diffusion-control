@@ -2,48 +2,24 @@ ace_corpus_train_00	python experiments/make_corpus.py --backbone ace-turbo --out
 ace_corpus_train_01	python experiments/make_corpus.py --backbone ace-turbo --out runs/corpus/ace_train --shard 1 4
 ace_corpus_train_02	python experiments/make_corpus.py --backbone ace-turbo --out runs/corpus/ace_train --shard 2 4
 ace_corpus_train_03	python experiments/make_corpus.py --backbone ace-turbo --out runs/corpus/ace_train --shard 3 4
-ace_train_brightness	python -m audiosliders.train brightness --backbone ace-turbo --eta 2 --out runs/sliders/ace
-ace_train_density	python -m audiosliders.train density --backbone ace-turbo --eta 2 --out runs/sliders/ace
-ace_train_reverb	python -m audiosliders.train reverb --backbone ace-turbo --eta 2 --out runs/sliders/ace
-ace_train_energy	python -m audiosliders.train energy --backbone ace-turbo --eta 2 --out runs/sliders/ace
-ace_train_tempo	python -m audiosliders.train tempo --backbone ace-turbo --eta 2 --out runs/sliders/ace
-ace_train_percussion	python -m audiosliders.train percussion --backbone ace-turbo --eta 2 --out runs/sliders/ace
-ace_train_distortion	python -m audiosliders.train distortion --backbone ace-turbo --eta 2 --out runs/sliders/ace
-ace_train_lofi	python -m audiosliders.train lofi --backbone ace-turbo --eta 2 --out runs/sliders/ace
-ace_train_bass	python -m audiosliders.train bass --backbone ace-turbo --eta 2 --out runs/sliders/ace
-ace_train_width	python -m audiosliders.train width --backbone ace-turbo --eta 2 --out runs/sliders/ace
-ace_train_mood	python -m audiosliders.train mood --backbone ace-turbo --eta 2 --out runs/sliders/ace
-ace_train_electronic	python -m audiosliders.train electronic --backbone ace-turbo --eta 2 --out runs/sliders/ace
-ace_train_harmony	python -m audiosliders.train harmony --backbone ace-turbo --eta 2 --out runs/sliders/ace
-ace_train_groove	python -m audiosliders.train groove --backbone ace-turbo --eta 2 --out runs/sliders/ace
-ace_train_articulation	python -m audiosliders.train articulation --backbone ace-turbo --eta 2 --out runs/sliders/ace
-ace_train_ensemble	python -m audiosliders.train ensemble --backbone ace-turbo --eta 2 --out runs/sliders/ace
-ace_train_tension	python -m audiosliders.train tension --backbone ace-turbo --eta 2 --out runs/sliders/ace
-ace_train_vintage	python -m audiosliders.train vintage --backbone ace-turbo --eta 2 --out runs/sliders/ace
-ace_train_melody	python -m audiosliders.train melody --backbone ace-turbo --eta 2 --out runs/sliders/ace
-ace_train_dynamics	python -m audiosliders.train dynamics --backbone ace-turbo --eta 2 --out runs/sliders/ace
 ace_corpus_concepts_00	python experiments/make_corpus.py --backbone ace-turbo --out runs/corpus/ace_concepts --split concepts --seeds 1024 --seed-offset 50000 --shard 0 4
 ace_corpus_concepts_01	python experiments/make_corpus.py --backbone ace-turbo --out runs/corpus/ace_concepts --split concepts --seeds 1024 --seed-offset 50000 --shard 1 4
 ace_corpus_concepts_02	python experiments/make_corpus.py --backbone ace-turbo --out runs/corpus/ace_concepts --split concepts --seeds 1024 --seed-offset 50000 --shard 2 4
 ace_corpus_concepts_03	python experiments/make_corpus.py --backbone ace-turbo --out runs/corpus/ace_concepts --split concepts --seeds 1024 --seed-offset 50000 --shard 3 4
+ace_train_mood	python -m audiosliders.train mood --backbone ace-turbo --eta 2 --out runs/sliders/ace
+ace_train_harmony	python -m audiosliders.train harmony --backbone ace-turbo --eta 2 --out runs/sliders/ace
+ace_train_groove	python -m audiosliders.train groove --backbone ace-turbo --eta 2 --out runs/sliders/ace
+ace_train_ensemble	python -m audiosliders.train ensemble --backbone ace-turbo --eta 2 --out runs/sliders/ace
+ace_train_tension	python -m audiosliders.train tension --backbone ace-turbo --eta 2 --out runs/sliders/ace
+ace_train_melody	python -m audiosliders.train melody --backbone ace-turbo --eta 2 --out runs/sliders/ace
+ace_train_brightness	python -m audiosliders.train brightness --backbone ace-turbo --eta 2 --out runs/sliders/ace
+ace_train_density	python -m audiosliders.train density --backbone ace-turbo --eta 2 --out runs/sliders/ace
 ace_eval_base	python experiments/evaluate.py --backbone ace-turbo --method base --out runs/eval/ace/base_none --seeds 8 --seed-offset 5000 --save-audio
-ace_eval_lora_brightness	python experiments/evaluate.py --backbone ace-turbo --method lora --slider brightness --weights runs/sliders/ace/brightness.safetensors --out runs/eval/ace/lora_brightness --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
-ace_eval_lora_density	python experiments/evaluate.py --backbone ace-turbo --method lora --slider density --weights runs/sliders/ace/density.safetensors --out runs/eval/ace/lora_density --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
-ace_eval_lora_reverb	python experiments/evaluate.py --backbone ace-turbo --method lora --slider reverb --weights runs/sliders/ace/reverb.safetensors --out runs/eval/ace/lora_reverb --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
-ace_eval_lora_energy	python experiments/evaluate.py --backbone ace-turbo --method lora --slider energy --weights runs/sliders/ace/energy.safetensors --out runs/eval/ace/lora_energy --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
-ace_eval_lora_tempo	python experiments/evaluate.py --backbone ace-turbo --method lora --slider tempo --weights runs/sliders/ace/tempo.safetensors --out runs/eval/ace/lora_tempo --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
-ace_eval_lora_percussion	python experiments/evaluate.py --backbone ace-turbo --method lora --slider percussion --weights runs/sliders/ace/percussion.safetensors --out runs/eval/ace/lora_percussion --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
-ace_eval_lora_distortion	python experiments/evaluate.py --backbone ace-turbo --method lora --slider distortion --weights runs/sliders/ace/distortion.safetensors --out runs/eval/ace/lora_distortion --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
-ace_eval_lora_lofi	python experiments/evaluate.py --backbone ace-turbo --method lora --slider lofi --weights runs/sliders/ace/lofi.safetensors --out runs/eval/ace/lora_lofi --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
-ace_eval_lora_bass	python experiments/evaluate.py --backbone ace-turbo --method lora --slider bass --weights runs/sliders/ace/bass.safetensors --out runs/eval/ace/lora_bass --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
-ace_eval_lora_width	python experiments/evaluate.py --backbone ace-turbo --method lora --slider width --weights runs/sliders/ace/width.safetensors --out runs/eval/ace/lora_width --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
 ace_eval_lora_mood	python experiments/evaluate.py --backbone ace-turbo --method lora --slider mood --weights runs/sliders/ace/mood.safetensors --out runs/eval/ace/lora_mood --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
-ace_eval_lora_electronic	python experiments/evaluate.py --backbone ace-turbo --method lora --slider electronic --weights runs/sliders/ace/electronic.safetensors --out runs/eval/ace/lora_electronic --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
 ace_eval_lora_harmony	python experiments/evaluate.py --backbone ace-turbo --method lora --slider harmony --weights runs/sliders/ace/harmony.safetensors --out runs/eval/ace/lora_harmony --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
 ace_eval_lora_groove	python experiments/evaluate.py --backbone ace-turbo --method lora --slider groove --weights runs/sliders/ace/groove.safetensors --out runs/eval/ace/lora_groove --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
-ace_eval_lora_articulation	python experiments/evaluate.py --backbone ace-turbo --method lora --slider articulation --weights runs/sliders/ace/articulation.safetensors --out runs/eval/ace/lora_articulation --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
 ace_eval_lora_ensemble	python experiments/evaluate.py --backbone ace-turbo --method lora --slider ensemble --weights runs/sliders/ace/ensemble.safetensors --out runs/eval/ace/lora_ensemble --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
 ace_eval_lora_tension	python experiments/evaluate.py --backbone ace-turbo --method lora --slider tension --weights runs/sliders/ace/tension.safetensors --out runs/eval/ace/lora_tension --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
-ace_eval_lora_vintage	python experiments/evaluate.py --backbone ace-turbo --method lora --slider vintage --weights runs/sliders/ace/vintage.safetensors --out runs/eval/ace/lora_vintage --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
 ace_eval_lora_melody	python experiments/evaluate.py --backbone ace-turbo --method lora --slider melody --weights runs/sliders/ace/melody.safetensors --out runs/eval/ace/lora_melody --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
-ace_eval_lora_dynamics	python experiments/evaluate.py --backbone ace-turbo --method lora --slider dynamics --weights runs/sliders/ace/dynamics.safetensors --out runs/eval/ace/lora_dynamics --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
+ace_eval_lora_brightness	python experiments/evaluate.py --backbone ace-turbo --method lora --slider brightness --weights runs/sliders/ace/brightness.safetensors --out runs/eval/ace/lora_brightness --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio
+ace_eval_lora_density	python experiments/evaluate.py --backbone ace-turbo --method lora --slider density --weights runs/sliders/ace/density.safetensors --out runs/eval/ace/lora_density --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 3 --save-audio

@@ -40,6 +40,7 @@ def main():
     ap.add_argument("--out", required=True)
     ap.add_argument("--scales", type=float, nargs="+", default=[-3, -2, -1, 0, 1, 2, 3])
     ap.add_argument("--split", default="eval")
+    ap.add_argument("--prompt", action="append", default=None, help="use this prompt instead of a split (repeatable)")
     ap.add_argument("--n-prompts", type=int, default=24)
     ap.add_argument("--seeds", type=int, default=3)
     ap.add_argument("--seed-offset", type=int, default=0)
@@ -55,7 +56,7 @@ def main():
 
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
-    prompts = yaml.safe_load(Path("configs/prompts.yaml").read_text())[args.split][: args.n_prompts]
+    prompts = args.prompt or yaml.safe_load(Path("configs/prompts.yaml").read_text())[args.split][: args.n_prompts]
     spec = yaml.safe_load(Path("configs/sliders.yaml").read_text())[args.slider] if args.slider else None
     scales = [0.0] if args.method == "base" else sorted(set(args.scales) | {0.0})
     zero = scales.index(0.0)
@@ -70,7 +71,11 @@ def main():
         meta = bank.load("s", args.weights)
         spec = spec or meta
     direction = None
-    if spec and "positive" in spec:
+    if spec and "direction" in spec:
+        # A discovered slider carries the CLAP direction it was trained along.
+        direction = torch.tensor(spec["direction"], device=clap.device, dtype=torch.float32)
+        direction = direction / direction.norm()
+    elif spec and "positive" in spec:
         direction = clap.text([spec["positive"]]) - clap.text([spec["negative"]])
         direction = (direction / direction.norm())[0]
 
