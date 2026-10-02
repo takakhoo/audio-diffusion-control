@@ -16,18 +16,18 @@
 
 Eight sliders on ACE-Step 1.5 XL turbo, each trained from one prompt pair in about 20 minutes. 24 held-out prompts, 3 seeds, 9 slider positions, 648 clips per slider.
 
-| Slider | What rises toward + (CLAP tags) | What falls | Measured descriptor follows? (ρ, ends ordered) | Usable span | Piece kept | Enjoyment at the ends |
-|---|---|---|---|---|---:|---:|
-| [**mood**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=mood&prompt=0&x=2) (sad to happy) | happy, latin, reggae | distorted, dark-toned, lo-fi | major/minor fit: 0.39, 75% | -1 to +2 | 0.79 | 6.65 |
-| [**ensemble**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=ensemble&prompt=0&x=2) (solo to full) | orchestral film score, epic, choir | straight, funk, hip hop | production complexity: 0.60, 90% | -1.5 to +2 | 0.80 | 6.56 |
-| [**groove**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=groove&prompt=0&x=2) (stiff to groovy) | latin, funk, reggae | choir, strings, cello | no descriptor assigned | -1.5 to +2 | 0.79 | 6.88 |
-| [**harmony**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=harmony&prompt=0&x=2) (plain to rich) | minor key, melancholic, major key | country, vocals, violin | harmonic change rate: 0.41, 76% | -1.5 to +2 | 0.83 | 6.64 |
-| [**melody**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=melody&prompt=0&x=2) (texture to tune) | romantic, happy, blues | lo-fi, mysterious, calm | key clarity: 0.48, 78% | -1 to +2 | 0.80 | 6.47 |
-| [**tension**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=tension&prompt=0&x=1) (relaxed to tense) | metal, rock, distorted | melancholic, uplifting, sad | no descriptor assigned | -1.5 to +1 | 0.83 | 5.64 |
-| [**brightness**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=brightness&prompt=0&x=2) (dark to bright) | happy, repetitive, romantic | dark-toned, lo-fi, quiet | spectral centroid: 0.97, 100% | -1 to +2 | 0.74 | 6.04 |
-| [**density**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=density&prompt=0&x=2) (sparse to dense) | latin, repetitive, romantic | dark-toned, quiet, lo-fi | onset rate: 0.78, 92% | -0.5 to +2 | 0.84 | 6.09 |
+| Slider | What rises toward + (CLAP tags) | What falls | Measured descriptor follows? (ρ, ends ordered) | Second model agrees? (MuQ ρ, ordered) | Usable span | Piece kept | Enjoyment at the ends |
+|---|---|---|---|---|---|---:|---:|
+| [**mood**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=mood&prompt=0&x=2) (sad to happy) | happy, latin, reggae | distorted, dark-toned, lo-fi | major/minor fit: 0.39, 75% | 0.88, 100% | -1 to +2 | 0.79 | 6.65 |
+| [**ensemble**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=ensemble&prompt=0&x=2) (solo to full) | orchestral film score, epic, choir | straight, funk, hip hop | production complexity: 0.60, 90% | 0.77, 94% | -1.5 to +2 | 0.80 | 6.56 |
+| [**groove**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=groove&prompt=0&x=2) (stiff to groovy) | latin, funk, reggae | choir, strings, cello | no descriptor assigned | 0.56, 96% | -1.5 to +2 | 0.79 | 6.88 |
+| [**harmony**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=harmony&prompt=0&x=2) (plain to rich) | minor key, melancholic, major key | country, vocals, violin | harmonic change rate: 0.41, 76% | 0.73, 96% | -1.5 to +2 | 0.83 | 6.64 |
+| [**melody**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=melody&prompt=0&x=2) (texture to tune) | romantic, happy, blues | lo-fi, mysterious, calm | key clarity: 0.48, 78% | 0.89, 100% | -1 to +2 | 0.80 | 6.47 |
+| [**tension**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=tension&prompt=0&x=1) (relaxed to tense) | metal, rock, distorted | melancholic, uplifting, sad | no descriptor assigned | 0.86, 100% | -1.5 to +1 | 0.83 | 5.64 |
+| [**brightness**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=brightness&prompt=0&x=2) (dark to bright) | happy, repetitive, romantic | dark-toned, lo-fi, quiet | spectral centroid: 0.97, 100% | 0.80, 100% | -1 to +2 | 0.74 | 6.04 |
+| [**density**](https://takakhoo.github.io/audio-diffusion-control/?model=ace&method=lora&slider=density&prompt=0&x=2) (sparse to dense) | latin, repetitive, romantic | dark-toned, quiet, lo-fi | onset rate: 0.78, 92% | 0.86, 100% | -0.5 to +2 | 0.84 | 6.09 |
 
-Each slider name opens the live demo on that slider. For scale: unsteered clips score 6.95 on Audiobox Aesthetics content enjoyment, and 2,000 real recordings from FMA average 6.1. "Usable span" is how far the slider goes before mean enjoyment falls more than 0.5 below the unsteered clips. "Piece kept" is CLAP similarity to the unsteered clip at the ends of that span. Full tables: [`results/ace/`](results/ace/).
+Each slider name opens the live demo on that slider. The tag columns and the direction score come from CLAP; the "second model" column repeats the direction test with MuQ-MuLan, a music-text model that shares nothing with CLAP, and it agrees on all eight. For scale: unsteered clips score 6.95 on Audiobox Aesthetics content enjoyment, and 2,000 real recordings from FMA average 6.1. "Usable span" is how far the slider goes before mean enjoyment falls more than 0.5 below the unsteered clips. "Piece kept" is CLAP similarity to the unsteered clip at the ends of that span. Full tables: [`results/ace/`](results/ace/).
 
 **Target venue: ISMIR 2027** (London, September 2027; six pages, double-blind). The draft in [`paper/`](paper/) is already on the official ISMIR template and within its limits. Why this venue, its rules, and what the paper still needs to be competitive there are in [`docs/VENUE.md`](docs/VENUE.md).
 
@@ -99,14 +99,17 @@ All 20 prompt-pair sliders were trained on Stable Audio Open and evaluated with 
 
 | Follows its descriptor | ρ | Ends ordered | | Does not | ρ | Ends ordered |
 |---|---:|---:|---|---|---:|---:|
-| width (side/mid energy) | 0.95 ± 0.01 | 100% | | tempo (beat tracker) | -0.01 ± 0.14 | 29% |
-| bass (energy below 150 Hz) | 0.92 ± 0.05 | 97% | | mood (major/minor fit) | -0.04 ± 0.13 | 43% |
-| brightness (centroid) | 0.84 ± 0.04 | 96% | | harmony (harmonic change) | 0.19 ± 0.14 | 64% |
-| energy (spectral flux) | 0.71 ± 0.08 | 94% | | density (onset rate) | 0.30 ± 0.16, no net change | 75% |
-| ensemble (production complexity) | 0.70 ± 0.09 | 93% | | percussion (percussive share) | 0.34 ± 0.18, no net change | 71% |
+| width (side/mid energy) | 0.95 ± 0.01 | 100% | | mood (major/minor fit) | -0.04 ± 0.13 | 43% |
+| bass (energy below 150 Hz) | 0.92 ± 0.05 | 97% | | harmony (harmonic change) | 0.19 ± 0.14 | 64% |
+| brightness (centroid) | 0.84 ± 0.04 | 96% | | density (onset rate) | 0.30 ± 0.16, no net change | 75% |
+| energy (spectral flux) | 0.71 ± 0.08 | 94% | | percussion (percussive share) | 0.34 ± 0.18, no net change | 71% |
+| ensemble (production complexity) | 0.70 ± 0.09 | 93% | | | | |
+| tempo (beat tracker) | 0.57 ± 0.09 | 78% | | | | |
 | distortion (spectral flatness) | 0.50 ± 0.12 | 81% | | | | |
 
-Timbre and space pass. Rhythm and tonality do not: the tempo, density, and percussion sliders drift toward their words in the embedding while the beat tracker, the onset count, and the percussive share stay where they were. Scored by embedding alone, as published audio sliders are, all of these would be reported as working. Full table: [`results/main/summary.md`](results/main/summary.md).
+Timbre, space, and tempo pass: the tempo slider takes the mean beat-tracked tempo from 90 to 167 BPM across its range. Tonality, note density, and percussion do not: those sliders drift toward their words in the embedding while the key fit, the onset count, and the percussive share stay where they were. Scored by embedding alone, as published audio sliders are, all of these would be reported as working.
+
+The measuring tool matters too. With the common librosa tempo estimate, which makes octave errors, the tempo slider scored ρ = -0.01 and looked like a failure. A modern beat tracker (Beat This) shows it works. A descriptor test is only as good as its descriptor. Full table: [`results/main/summary.md`](results/main/summary.md).
 
 The backbone matters. On ACE-Step the same density prompt pair does move the onset rate (ρ = 0.78), and mood follows the major/minor fit there.
 
