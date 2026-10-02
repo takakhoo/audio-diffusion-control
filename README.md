@@ -176,11 +176,11 @@ Four other ways of moving the same attribute were run through the same protocol 
 | groove (MuQ only) | 0.56 | 0.71 | 0.58 | 0.12 |
 | tension (MuQ only) | 0.86 | 0.88 | 0.91 | 0.69 |
 | Forward passes per sampling step | 1 | 3 | 1 | 1 |
-| Training | 10 min per slider | none | none | none |
+| Training | about 22 min per slider on one GPU | none | none | none |
 
 ![Descriptor response of four methods on six sliders](results/ace/compare_response.png)
 
-- **The trained slider reproduces prompt-pair guidance at a third of the sampling cost.** Guidance is the slider's own training target applied directly at every step (the FreeSliders recipe), and it needs two extra forward passes per step. The slider matches it within the confidence interval on five of six descriptors and beats it on harmony (0.41 against 0.08).
+- **The trained slider reproduces prompt-pair guidance at a third of the sampling cost.** Guidance is the slider's own training target applied directly at every step (the FreeSliders recipe), and it needs two extra forward passes per step. The slider scores higher on brightness and harmony (0.41 against 0.08) and within the confidence interval on the other four descriptors.
 - **Prompt interpolation does not work on this model.** Moving the text conditioning toward the positive or negative prompt gives the lowest correlation on every attribute, and enjoyment at the ends falls to between 4.2 and 5.9 (unsteered: 6.96).
 - **Activation steering is a real competitor**, covered next.
 
