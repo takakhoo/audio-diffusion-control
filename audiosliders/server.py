@@ -25,6 +25,7 @@ from pydantic import BaseModel, Field
 from .backbone import load_backbone
 from .descriptors import describe
 from .lora import SliderBank
+from .quality import Aesthetics
 
 
 class Request(BaseModel):
@@ -40,6 +41,7 @@ class Request(BaseModel):
 def build(slider_dir: Path, static_dir: Path, backbone: str = "ace-turbo", device: str = "cuda") -> FastAPI:
     model = load_backbone(backbone, device)
     bank = SliderBank(model.dit)
+    aesthetics = Aesthetics()
     meta = {f.stem: bank.load(f.stem, f) for f in sorted(slider_dir.glob("*.safetensors"))}
     lock = threading.Lock()
     clips: OrderedDict[str, bytes] = OrderedDict()
@@ -66,10 +68,15 @@ def build(slider_dir: Path, static_dir: Path, backbone: str = "ace-turbo", devic
         clips[key] = buf.getvalue()
         while len(clips) > 64:
             clips.popitem(last=False)
-        keep = ("centroid_hz", "onset_rate", "percussive_ratio", "decay_s", "bass_ratio", "side_ratio", "rms_db")
         desc = describe(audio, model.sample_rate)
-        return dict(audio=f"api/audio/{key}.wav", seconds=round(time.time() - t0, 2),
-                    descriptors={k: desc[k] for k in keep})
+        score = aesthetics(audio[None], model.sample_rate)[0]
+        shown = {
+            "enjoyment (1-10)": score["ce"], "production quality (1-10)": score["pq"],
+            "spectral centroid (Hz)": desc["centroid_hz"], "onsets per second": desc["onset_rate"],
+            "pulse clarity": desc["pulse_clarity"], "key clarity": desc["key_clarity"],
+            "major minus minor": desc["majorness"], "harmonic change": desc["harmonic_change"],
+        }
+        return dict(audio=f"api/audio/{key}.wav", seconds=round(time.time() - t0, 2), descriptors=shown)
 
     @app.get("/api/audio/{key}.wav")
     def audio(key: str):

@@ -17,6 +17,14 @@ ace_eval_embed_density	python experiments/evaluate.py --backbone ace-turbo --met
 ace_compose_mood_brightness	python experiments/compose.py mood brightness --backbone ace-turbo --weights runs/sliders/ace --out runs/eval/ace_compose/mood_brightness
 ace_compose_harmony_groove	python experiments/compose.py harmony groove --backbone ace-turbo --weights runs/sliders/ace --out runs/eval/ace_compose/harmony_groove
 ace_compose_ensemble_tension	python experiments/compose.py ensemble tension --backbone ace-turbo --weights runs/sliders/ace --out runs/eval/ace_compose/ensemble_tension
+ace_train_mood_r16	python -m audiosliders.train mood --backbone ace-turbo --eta 2 --rank 16 --alpha 4 --tag mood_r16 --out runs/sliders/ace_ablate
+ace_train_mood_3k	python -m audiosliders.train mood --backbone ace-turbo --eta 2 --iters 3000 --tag mood_3k --out runs/sliders/ace_ablate
+ace_train_mood_xattn	python -m audiosliders.train mood --backbone ace-turbo --eta 2 --targets xattn --tag mood_xattn --out runs/sliders/ace_ablate
+ace_train_mood_eta4	python -m audiosliders.train mood --backbone ace-turbo --eta 4 --tag mood_eta4 --out runs/sliders/ace_ablate
+ace_eval_ablate_mood_r16	python experiments/evaluate.py --backbone ace-turbo --method lora --slider mood --weights runs/sliders/ace_ablate/mood_r16.safetensors --out runs/eval/ace_ablate/mood_r16/lora_mood --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 2
+ace_eval_ablate_mood_3k	python experiments/evaluate.py --backbone ace-turbo --method lora --slider mood --weights runs/sliders/ace_ablate/mood_3k.safetensors --out runs/eval/ace_ablate/mood_3k/lora_mood --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 2
+ace_eval_ablate_mood_xattn	python experiments/evaluate.py --backbone ace-turbo --method lora --slider mood --weights runs/sliders/ace_ablate/mood_xattn.safetensors --out runs/eval/ace_ablate/mood_xattn/lora_mood --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 2
+ace_eval_ablate_mood_eta4	python experiments/evaluate.py --backbone ace-turbo --method lora --slider mood --weights runs/sliders/ace_ablate/mood_eta4.safetensors --out runs/eval/ace_ablate/mood_eta4/lora_mood --scales -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 --seeds 2
 ace2_train_energy	python -m audiosliders.train energy --backbone ace-turbo --eta 2 --out runs/sliders/ace
 ace2_train_percussion	python -m audiosliders.train percussion --backbone ace-turbo --eta 2 --out runs/sliders/ace
 ace2_train_electronic	python -m audiosliders.train electronic --backbone ace-turbo --eta 2 --out runs/sliders/ace

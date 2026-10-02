@@ -136,6 +136,8 @@ python experiments/sweep.py runs/sliders/ace/mood.safetensors --backbone ace-tur
 python -m audiosliders.server --sliders runs/sliders/ace --backbone ace-turbo           # live page: type a prompt, drag sliders
 ```
 
+The server page adds a live panel under the recorded demo: type any prompt, set any combination of sliders, and it returns the clip in two to four seconds with its enjoyment score and descriptors. On a remote GPU box, forward the port (`ssh -L 7860:127.0.0.1:7860 host`) and open `localhost:7860`.
+
 ACE-Step 1.5 is MIT-licensed and ungated. Stable Audio Open 1.0 needs a Hugging Face account that has accepted its license.
 
 ## What happened to v0
