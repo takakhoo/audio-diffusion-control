@@ -1,0 +1,13 @@
+sa3_train_mood	python -m audiosliders.train mood --backbone sa3-small --iters 600 --out runs/sliders/sa3_small
+sa3_train_brightness	python -m audiosliders.train brightness --backbone sa3-small --iters 600 --out runs/sliders/sa3_small
+sa3_train_ensemble	python -m audiosliders.train ensemble --backbone sa3-small --iters 600 --out runs/sliders/sa3_small
+sa3_train_tempo	python -m audiosliders.train tempo --backbone sa3-small --iters 600 --out runs/sliders/sa3_small
+sa3_train_harmony	python -m audiosliders.train harmony --backbone sa3-small --iters 600 --out runs/sliders/sa3_small
+sa3_train_energy	python -m audiosliders.train energy --backbone sa3-small --iters 600 --out runs/sliders/sa3_small
+sa3_eval_base	python experiments/evaluate.py --backbone sa3-small --method base --out runs/eval/sa3/base_none --seeds 4 --seed-offset 5000
+sa3_eval_mood	python experiments/evaluate.py --backbone sa3-small --method lora --slider mood --weights runs/sliders/sa3_small/mood.safetensors --out runs/eval/sa3/lora_mood --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
+sa3_eval_brightness	python experiments/evaluate.py --backbone sa3-small --method lora --slider brightness --weights runs/sliders/sa3_small/brightness.safetensors --out runs/eval/sa3/lora_brightness --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
+sa3_eval_ensemble	python experiments/evaluate.py --backbone sa3-small --method lora --slider ensemble --weights runs/sliders/sa3_small/ensemble.safetensors --out runs/eval/sa3/lora_ensemble --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
+sa3_eval_tempo	python experiments/evaluate.py --backbone sa3-small --method lora --slider tempo --weights runs/sliders/sa3_small/tempo.safetensors --out runs/eval/sa3/lora_tempo --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
+sa3_eval_harmony	python experiments/evaluate.py --backbone sa3-small --method lora --slider harmony --weights runs/sliders/sa3_small/harmony.safetensors --out runs/eval/sa3/lora_harmony --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
+sa3_eval_energy	python experiments/evaluate.py --backbone sa3-small --method lora --slider energy --weights runs/sliders/sa3_small/energy.safetensors --out runs/eval/sa3/lora_energy --scales -1.5 -1 -0.5 0 0.5 1 1.5 --seeds 2 --save-audio
