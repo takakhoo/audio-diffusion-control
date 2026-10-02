@@ -28,15 +28,15 @@ Every graded slider is usable from -2 to +2 under both quality predictors; enjoy
 | harmony (harmonic change, std) | plain | 0.72 | 0.60 (±1.5) | 99% | 1.25 | 0.77 (±1.5) |
 | harmony | graded | 0.67 | 0.60 (±2) | 92% | 1.11 | 1.02 (±2) |
 | arousal (real-music axis, real std) | plain | 0.82 | 0.68 (±1.5) | 99% | 1.19 | 1.11 (±1.5) |
-| arousal | graded | 0.78 | 0.80 (±2) | 96% | 1.00 | 1.46 (±2) |
+| arousal | graded | 0.78 | 0.84 (±2) | 96% | 1.00 | 1.46 (±2) |
 | jazz to electronic (real std) | plain | 0.61 | 0.47 (±1.5) | 94% | 0.61 | 0.33 (±1.5) |
-| jazz to electronic | graded | 0.63 | 0.56 (±2) | 93% | 0.61 | 0.65 (±2) |
+| jazz to electronic | graded | 0.63 | 0.62 (±2) | 93% | 0.61 | 0.65 (±2) |
 | piano (real std) | plain | 0.63 | 0.57 (±1.5) | 96% | 0.75 | 0.94 (±1.5) |
-| piano | graded | 0.58 | 0.60 (±2) | 89% | 0.62 | 0.84 (±2) |
+| piano | graded | 0.58 | 0.64 (±2) | 89% | 0.62 | 0.84 (±2) |
 | valence (real std) | plain | 0.50 | 0.45 (±1.5) | 93% | 0.62 | 0.45 (±1.5) |
-| valence | graded | 0.49 | 0.56 (±2) | 82% | 0.49 | 0.61 (±2) |
+| valence | graded | 0.49 | 0.50 (±2) | 82% | 0.49 | 0.61 (±2) |
 
-- **Over the whole range the graded sliders are the more monotone** (0.56 to 0.89 against 0.45 to 0.73), because the plain ones reverse past ±1.
+- **Over the whole range the graded sliders are the more monotone** (0.50 to 0.89 against 0.45 to 0.73), because the plain ones reverse past ±1.
 - **Between -1 and +1 they are a little weaker** (energy moves 0.74 against 1.06 standard deviations and its rank correlation there is 0.67 against 0.83), and they take a larger first step: similarity at ±0.5 is 0.85 to 0.90 against 0.92 to 0.96.
 - **The reach doubles.** Energy moves 1.75 standard deviations between -2 and +2 and arousal 1.46 standard deviations of real music, where the plain versions had stopped being usable.
 - Harmony's negative side flattens past -1 for both trainers: harmonic change rate has a floor in this model's output that the sets cannot push below.
