@@ -68,8 +68,10 @@ def publish(model, method, name, run, rows, pid, seed, prompt_slot):
         dst = out / rel
         dst.parent.mkdir(parents=True, exist_ok=True)
         if not dst.exists():
-            subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", str(src), "-c:a", "aac", "-b:a", args.bitrate,
-                            "-movflags", "+faststart", str(dst)], check=True)
+            # Every clip is brought to the same loudness so a slider is not judged by how loud it gets.
+            subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", str(src), "-af", "loudnorm=I=-16:TP=-1.5:LRA=11",
+                            "-ar", "44100", "-c:a", "aac", "-b:a", args.bitrate, "-movflags", "+faststart", str(dst)],
+                           check=True)
         clips.append(dict(x=r["scale"], f=str(rel), keep=r.get("clap_keep"), chroma=r.get("chroma_sim"),
                           dir=r.get("clap_dir"), ce=r.get("ce"), pq=r.get("pq"), row=r))
     return clips
