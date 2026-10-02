@@ -136,9 +136,13 @@ def describe(x: np.ndarray, sr: int) -> dict[str, float]:
     power = _power(mono)
     freqs = librosa.fft_frequencies(sr=sr, n_fft=N_FFT)
     rms = float(np.sqrt((mono**2).mean()))
+    centroid, rolloff = centroid_hz(power, freqs), rolloff_hz(power, freqs)
     out = dict(
-        centroid_hz=centroid_hz(power, freqs),
-        rolloff_hz=rolloff_hz(power, freqs),
+        centroid_hz=centroid,
+        rolloff_hz=rolloff,
+        # The same two in octaves above 440 Hz: pitch-like quantities are compared on a log axis.
+        centroid_oct=float(np.log2(max(centroid, 1.0) / 440.0)),
+        rolloff_oct=float(np.log2(max(rolloff, 1.0) / 440.0)),
         bass_ratio=band_ratio_db(power, freqs, 0, 150),
         treble_ratio=band_ratio_db(power, freqs, 4000, sr / 2),
         flatness=flatness(power, freqs),

@@ -1,0 +1,214 @@
+"""Turn evaluation runs into tables and figures.
+
+    python experiments/report.py --eval runs/eval/main --out results/main
+
+Reads <eval>/<method>_<slider>/rows.jsonl for every method and slider it finds and writes
+summary.csv, summary.md, summary.json, leakage.csv, and PNG figures.
+"""
+
+import argparse
+import csv
+import json
+from pathlib import Path
+
+import numpy as np
+import yaml
+
+from audiosliders import metrics as M
+
+# Categorical palette in fixed order: blue, orange, aqua, yellow, magenta.
+COLORS = dict(lora="#2a78d6", guidance="#eb6834", embed="#1baf7a", dsp="#eda100", contrast="#e87ba4")
+LABELS = dict(lora="LoRA slider", guidance="Prompt-pair guidance", embed="Prompt interpolation",
+              dsp="Signal processing", contrast="Descriptor slider")
+SURFACE, INK, MUTED, GRID = "#fcfcfb", "#0b0b0b", "#52514e", "#e6e4de"
+LEAK_KEYS = ["centroid_oct", "rolloff_oct", "bass_ratio", "flatness", "flux", "rms_db", "onset_rate",
+             "pulse_bpm", "percussive_ratio", "decay_s", "side_ratio", "majorness"]
+SHORT = dict(centroid_oct="centroid", rolloff_oct="rolloff", bass_ratio="bass", flatness="flatness", flux="flux",
+             rms_db="loudness", onset_rate="onsets", pulse_bpm="tempo", percussive_ratio="percussive",
+             decay_s="decay", side_ratio="width", majorness="major")
+
+
+def style(plt):
+    plt.rcParams.update({
+        "figure.facecolor": SURFACE, "axes.facecolor": SURFACE, "savefig.facecolor": SURFACE,
+        "axes.edgecolor": GRID, "axes.labelcolor": MUTED, "xtick.color": MUTED, "ytick.color": MUTED,
+        "text.color": INK, "axes.grid": True, "grid.color": GRID, "grid.linewidth": 0.8,
+        "axes.spines.top": False, "axes.spines.right": False, "font.size": 10, "axes.titlesize": 11,
+        "axes.titleweight": "bold", "axes.titlelocation": "left", "lines.linewidth": 2, "lines.markersize": 5,
+        "font.family": "DejaVu Sans", "figure.dpi": 150,
+    })
+
+
+def load(root: Path):
+    runs = {}
+    for d in sorted(root.iterdir()):
+        if (d / "rows.jsonl").exists() and "_" in d.name:
+            method, _, slider = d.name.partition("_")
+            runs[(method, slider)] = M.load_rows(d)
+    return runs
+
+
+def response_figure(runs, spec, out, plt):
+    sliders = [s for s in spec if spec[s].get("measure") and any(k[1] == s for k in runs)]
+    cols = min(4, len(sliders))
+    rows_n = int(np.ceil(len(sliders) / cols))
+    fig, axes = plt.subplots(rows_n, cols, figsize=(3.3 * cols, 2.7 * rows_n), squeeze=False)
+    for ax, name in zip(axes.flat, sliders):
+        key, sign = spec[name]["measure"], spec[name].get("measure_sign", 1)
+        for method in COLORS:
+            if (method, name) not in runs:
+                continue
+            rows = runs[(method, name)]
+            std = M.natural_std(rows, key)
+            r = M.response(rows, key)
+            y, ci = sign * r["mean"] / std, r["ci"] / std
+            ax.fill_between(r["scales"], y - ci, y + ci, color=COLORS[method], alpha=0.15, linewidth=0)
+            ax.plot(r["scales"], y, color=COLORS[method], marker="o", label=LABELS[method])
+        ax.axhline(0, color=MUTED, linewidth=0.8)
+        ax.set_title(f"{name}  ({SHORT.get(key, key)})")
+        ax.set_xlabel("slider position")
+    for ax in axes.flat[len(sliders):]:
+        ax.axis("off")
+    axes[0, 0].set_ylabel("change in descriptor\n(std of unsteered clips)")
+    handles, labels = axes[0, 0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower center", ncol=len(handles), frameon=False, bbox_to_anchor=(0.5, -0.02))
+    fig.suptitle("Does the measured descriptor follow the slider?", x=0.01, ha="left", fontweight="bold", fontsize=13)
+    fig.tight_layout(rect=(0, 0.04, 1, 0.96))
+    fig.savefig(out / "response.png", bbox_inches="tight")
+    plt.close(fig)
+
+
+def tradeoff_figure(runs, spec, out, plt):
+    """Content kept against descriptor moved, one point per scale: up and to the right is better."""
+    sliders = [s for s in spec if spec[s].get("measure") and any(k[1] == s for k in runs)]
+    cols = min(4, len(sliders))
+    rows_n = int(np.ceil(len(sliders) / cols))
+    fig, axes = plt.subplots(rows_n, cols, figsize=(3.3 * cols, 2.7 * rows_n), squeeze=False, sharey=True)
+    for ax, name in zip(axes.flat, sliders):
+        key, sign = spec[name]["measure"], spec[name].get("measure_sign", 1)
+        for method in COLORS:
+            if (method, name) not in runs:
+                continue
+            rows = runs[(method, name)]
+            std = M.natural_std(rows, key)
+            move = sign * M.response(rows, key)["mean"] / std
+            keep = M.response(rows, "clap_keep")["level"]
+            ax.plot(move, keep, color=COLORS[method], marker="o", label=LABELS[method])
+        ax.set_title(name)
+        ax.set_xlabel("change in descriptor (std)")
+    for ax in axes.flat[len(sliders):]:
+        ax.axis("off")
+    axes[0, 0].set_ylabel("CLAP similarity to unsteered clip")
+    handles, labels = axes[0, 0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower center", ncol=len(handles), frameon=False, bbox_to_anchor=(0.5, -0.02))
+    fig.suptitle("How much of the clip survives a given amount of change?", x=0.01, ha="left", fontweight="bold",
+                 fontsize=13)
+    fig.tight_layout(rect=(0, 0.04, 1, 0.96))
+    fig.savefig(out / "tradeoff.png", bbox_inches="tight")
+    plt.close(fig)
+
+
+def leakage_figure(runs, spec, method, out, plt):
+    names = [s for s in spec if (method, s) in runs]
+    if not names:
+        return None
+    table = np.array([[M.leakage(runs[(method, n)], LEAK_KEYS)[k] for k in LEAK_KEYS] for n in names])
+    fig, ax = plt.subplots(figsize=(0.75 * len(LEAK_KEYS) + 2, 0.45 * len(names) + 1.6))
+    lim = np.nanmax(np.abs(table))
+    im = ax.imshow(table, cmap="RdBu_r", vmin=-lim, vmax=lim, aspect="auto")
+    ax.set_xticks(range(len(LEAK_KEYS)), [SHORT[k] for k in LEAK_KEYS], rotation=40, ha="right")
+    ax.set_yticks(range(len(names)), names)
+    ax.grid(False)
+    for i, n in enumerate(names):
+        for j, k in enumerate(LEAK_KEYS):
+            v = table[i, j]
+            if np.isfinite(v):
+                target = spec[n].get("measure") == k
+                ax.text(j, i, f"{v:+.2f}", ha="center", va="center", fontsize=8,
+                        color="white" if abs(v) > 0.6 * lim else INK, fontweight="bold" if target else "normal")
+    fig.colorbar(im, ax=ax, shrink=0.8, label="std per unit of slider")
+    ax.set_title(f"What each {LABELS[method].lower()} moves (bold = its own descriptor)")
+    fig.tight_layout()
+    fig.savefig(out / f"leakage_{method}.png", bbox_inches="tight")
+    plt.close(fig)
+    return names, table
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap.add_argument("--eval", required=True)
+    ap.add_argument("--out", required=True)
+    ap.add_argument("--reference", default=None, help="base run whose CLAP embeddings anchor the kernel distance")
+    ap.add_argument("--max-scale", type=float, default=None, help="ignore scales beyond this magnitude")
+    args = ap.parse_args()
+
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    style(plt)
+    out = Path(args.out)
+    out.mkdir(parents=True, exist_ok=True)
+    spec = yaml.safe_load(Path("configs/sliders.yaml").read_text())
+    runs = load(Path(args.eval))
+    if args.max_scale is not None:
+        runs = {k: [r for r in v if abs(r["scale"]) <= args.max_scale] for k, v in runs.items()}
+    reference = np.load(Path(args.reference) / "clap.npy") if args.reference else None
+
+    table = []
+    for (method, name), rows in runs.items():
+        if name not in spec:
+            continue
+        s = spec[name]
+        row = dict(slider=name, method=LABELS.get(method, method), measure=s.get("measure") or "",
+                   n=len({(r["prompt_index"], r["seed"]) for r in rows}))
+        row.update(M.summarize(rows, s.get("measure"), s.get("measure_sign", 1)))
+        if reference is not None and (Path(args.eval) / f"{method}_{name}" / "clap.npy").exists():
+            emb = np.load(Path(args.eval) / f"{method}_{name}" / "clap.npy")
+            all_rows = M.load_rows(Path(args.eval) / f"{method}_{name}")
+            scales = sorted({r["scale"] for r in rows})
+            ends = np.array([r["scale"] in (scales[0], scales[-1]) for r in all_rows])
+            zero = np.array([r["scale"] == 0 for r in all_rows])
+            row["kad_at_ends"] = M.kernel_distance(emb[ends], reference)
+            row["kad_at_zero"] = M.kernel_distance(emb[zero], reference)
+        table.append(row)
+    table.sort(key=lambda r: (list(spec).index(r["slider"]), list(LABELS.values()).index(r["method"])))
+
+    fields = list(dict.fromkeys(k for r in table for k in r))
+    with (out / "summary.csv").open("w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=fields)
+        w.writeheader()
+        w.writerows(table)
+    cols = [("slider", "Slider", None), ("method", "Method", None), ("rho", "Monotonicity ρ", 2),
+            ("consistent", "Ends ordered", 2), ("range_in_std", "Range (std)", 2), ("clap_range", "CLAP range", 3),
+            ("clap_keep_at_ends", "CLAP kept", 2), ("chroma_sim_at_ends", "Chroma kept", 2),
+            ("clap_prompt_at_ends", "Prompt score", 2)]
+    lines = ["| " + " | ".join(c[1] for c in cols) + " |", "|" + "|".join("---" if c[2] is None else "---:" for c in cols) + "|"]
+    for r in table:
+        cells = []
+        for key, _, digits in cols:
+            v = r.get(key)
+            cells.append("" if v is None or (isinstance(v, float) and not np.isfinite(v)) else
+                         (f"{v:.{digits}f}" if digits is not None else str(v)))
+        lines.append("| " + " | ".join(cells) + " |")
+    (out / "summary.md").write_text("\n".join(lines) + "\n")
+    (out / "summary.json").write_text(json.dumps(dict(
+        summary=table,
+        summary_columns=[dict(key=k, label=l, digits=d) for k, l, d in cols],
+    ), default=lambda o: None if isinstance(o, float) and not np.isfinite(o) else o))
+
+    response_figure(runs, spec, out, plt)
+    tradeoff_figure(runs, spec, out, plt)
+    with (out / "leakage.csv").open("w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["method", "slider"] + LEAK_KEYS)
+        for method in COLORS:
+            got = leakage_figure(runs, spec, method, out, plt)
+            if got:
+                for n, vals in zip(*got):
+                    w.writerow([method, n] + [f"{v:.4f}" for v in vals])
+    print("\n".join(lines))
+
+
+if __name__ == "__main__":
+    main()

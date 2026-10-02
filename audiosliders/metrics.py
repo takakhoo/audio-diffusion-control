@@ -18,7 +18,12 @@ import numpy as np
 def load_rows(path: str | Path) -> list[dict]:
     path = Path(path)
     path = path / "rows.jsonl" if path.is_dir() else path
-    return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
+    rows = [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
+    for r in rows:
+        for hz, octv in (("centroid_hz", "centroid_oct"), ("rolloff_hz", "rolloff_oct")):
+            if hz in r and octv not in r:
+                r[octv] = float(np.log2(max(r[hz], 1.0) / 440.0))
+    return rows
 
 
 def trajectories(rows: Iterable[dict], key: str) -> tuple[np.ndarray, np.ndarray]:

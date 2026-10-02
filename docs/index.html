@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Audio Sliders</title>
+<meta name="description" content="Continuous slider controls for text-to-music diffusion, measured against signal descriptors.">
+<style>
+:root {
+  --bg: #faf9f7; --panel: #ffffff; --ink: #1c1b19; --muted: #6b6861; --line: #e4e1da;
+  --accent: #c2410c; --accent-soft: #fde7d9; --good: #15803d; --track: #d9d5cc;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #131210; --panel: #1c1a17; --ink: #f1eee8; --muted: #a09b90; --line: #2e2b26;
+    --accent: #fb923c; --accent-soft: #3a2415; --good: #4ade80; --track: #3a362f;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 var(--sans); }
+main { max-width: 920px; margin: 0 auto; padding: 40px 16px 80px; }
+h1 { font-size: clamp(30px, 6vw, 44px); line-height: 1.1; letter-spacing: -0.02em; margin: 0 0 12px; }
+h2 { font-size: 20px; margin: 48px 0 12px; letter-spacing: -0.01em; }
+p { margin: 0 0 12px; }
+a { color: var(--accent); }
+.lede { font-size: 18px; color: var(--muted); max-width: 64ch; }
+.links { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px; font-size: 15px; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px; margin-top: 24px; }
+.label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 8px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+.chip { font: inherit; font-size: 14px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line);
+  background: transparent; color: var(--ink); cursor: pointer; }
+.chip:hover { border-color: var(--accent); }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .chip[aria-pressed="true"] { color: #1c1005; } }
+.stage { display: grid; gap: 16px; }
+canvas#spec { width: 100%; height: 180px; border-radius: 10px; background: #000; display: block; }
+.transport { display: flex; align-items: center; gap: 16px; }
+button.play { width: 56px; height: 56px; border-radius: 50%; border: 0; background: var(--accent); color: #fff;
+  font-size: 20px; cursor: pointer; flex: none; display: grid; place-items: center; }
+button.play:disabled { opacity: 0.5; cursor: wait; }
+.sliderbox { flex: 1; min-width: 0; }
+.ends { display: flex; justify-content: space-between; font-size: 14px; color: var(--muted); margin-bottom: 4px; }
+.ends b { color: var(--ink); font-weight: 600; }
+input[type=range] { width: 100%; height: 32px; margin: 0; accent-color: var(--accent); cursor: pointer; }
+.ticks { display: flex; justify-content: space-between; font: 12px var(--mono); color: var(--muted); padding: 0 6px; }
+.readout { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.stat { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+.stat .k { font-size: 12px; color: var(--muted); }
+.stat .v { font: 600 20px var(--mono); font-variant-numeric: tabular-nums; }
+.stat .d { font: 12px var(--mono); color: var(--muted); }
+svg#curve { width: 100%; height: 160px; display: block; }
+.note { font-size: 14px; color: var(--muted); }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: right; padding: 6px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th:first-child, td:first-child, th:nth-child(2), td:nth-child(2) { text-align: left; }
+th { font-weight: 600; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.live input[type=text], .live input[type=number] { font: inherit; padding: 8px 10px; border-radius: 8px;
+  border: 1px solid var(--line); background: var(--bg); color: var(--ink); width: 100%; }
+.live .row { display: grid; grid-template-columns: 110px 1fr 48px; gap: 12px; align-items: center; margin: 6px 0; font-size: 14px; }
+.live button.go { font: inherit; padding: 10px 18px; border-radius: 8px; border: 0; background: var(--accent); color: #fff; cursor: pointer; }
+.hidden { display: none; }
+footer { margin-top: 56px; font-size: 14px; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Audio Sliders</h1>
+  <p class="lede">Drag a slider and the same piece of generated music gets brighter, denser, wetter, or more percussive. Each slider is a small LoRA on Stable Audio Open 1.0, and each one is scored by measuring the audio it produces.</p>
+  <div class="links">
+    <a href="https://github.com/takakhoo/audio-diffusion-control">Code and results</a>
+    <a href="https://github.com/takakhoo/audio-diffusion-control/blob/main/docs/RESEARCH.md">Research map</a>
+  </div>
+
+  <section class="panel" id="player">
+    <p class="label">Prompt</p>
+    <div class="chips" id="prompts"></div>
+    <p class="label">Slider</p>
+    <div class="chips" id="sliders"></div>
+    <p class="label">Control method</p>
+    <div class="chips" id="methods"></div>
+    <div class="stage">
+      <canvas id="spec" width="1200" height="360" aria-label="Spectrogram of the current clip"></canvas>
+      <div class="transport">
+        <button class="play" id="play" aria-label="Play" disabled>&#9654;</button>
+        <div class="sliderbox">
+          <div class="ends"><span id="low"></span><b id="pos"></b><span id="high"></span></div>
+          <input type="range" id="scale" min="0" max="6" step="1" value="3" aria-label="Slider position">
+          <div class="ticks" id="ticks"></div>
+        </div>
+      </div>
+      <div class="readout" id="readout"></div>
+      <div>
+        <p class="label" id="curve-title"></p>
+        <svg id="curve" viewBox="0 0 600 160" preserveAspectRatio="none" role="img"></svg>
+        <p class="note" id="method-note"></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="results" class="hidden">
+    <h2>Measured results</h2>
+    <p class="note" id="results-note"></p>
+    <div class="panel tablewrap"><table id="table"></table></div>
+  </section>
+
+  <section class="panel live hidden" id="live">
+    <p class="label">Live generation</p>
+    <p class="note">This page is being served by the GPU demo server, so you can type a prompt and combine sliders.</p>
+    <input type="text" id="live-prompt" value="mellow jazz piano trio, brushed drums" aria-label="Prompt">
+    <div id="live-sliders" style="margin-top:12px"></div>
+    <div class="row"><span>Seed</span><input type="number" id="live-seed" value="7"><span></span></div>
+    <button class="go" id="live-go">Generate</button> <span class="note" id="live-status"></span>
+    <audio id="live-audio" controls style="width:100%;margin-top:12px" class="hidden"></audio>
+    <div class="readout" id="live-readout" style="margin-top:12px"></div>
+  </section>
+
+  <footer>
+    Audio generated with Stable Audio Open 1.0 (Stability AI Community License). All clips on this page share one seed per prompt; only the slider changes.
+  </footer>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const state = { manifest: null, prompt: 0, slider: null, method: null, index: 3, playing: false };
+let ctx = null, voices = [], buffers = [], loadToken = 0, startedAt = 0;
+
+const fmt = (v, unit) => {
+  if (v == null || !isFinite(v)) return "n/a";
+  const a = Math.abs(v);
+  const s = a >= 1000 ? v.toFixed(0) : a >= 10 ? v.toFixed(1) : a >= 1 ? v.toFixed(2) : v.toFixed(3);
+  return unit ? `${s} ${unit}` : s;
+};
+
+function chips(el, items, current, onPick) {
+  el.innerHTML = "";
+  items.forEach(([key, label]) => {
+    const b = document.createElement("button");
+    b.className = "chip"; b.textContent = label; b.setAttribute("aria-pressed", key === current);
+    b.onclick = () => onPick(key);
+    el.appendChild(b);
+  });
+}
+
+function clipsFor() {
+  const m = state.manifest;
+  return m.clips[`${state.method}/${state.slider}/${state.prompt}`] || [];
+}
+
+function render() {
+  const m = state.manifest, s = m.sliders[state.slider];
+  if (!s.methods.includes(state.method)) state.method = s.methods[0];
+  chips($("prompts"), m.prompts.map((p, i) => [i, p]), state.prompt, (k) => { state.prompt = k; render(); load(); });
+  chips($("sliders"), Object.entries(m.sliders).map(([k, v]) => [k, v.label]), state.slider, (k) => { state.slider = k; render(); load(); });
+  chips($("methods"), s.methods.map((k) => [k, m.methods[k].label]), state.method, (k) => { state.method = k; render(); load(); });
+  $("low").textContent = s.low; $("high").textContent = s.high;
+  $("method-note").textContent = m.methods[state.method].note;
+  const clips = clipsFor();
+  $("scale").max = clips.length - 1;
+  $("ticks").innerHTML = clips.map((c) => `<span>${c.x > 0 ? "+" : ""}${c.x}</span>`).join("");
+  update();
+}
+
+function update() {
+  const m = state.manifest, s = m.sliders[state.slider], clips = clipsFor();
+  const i = Math.min(state.index, clips.length - 1), c = clips[i];
+  if (!c) return;
+  $("scale").value = i;
+  $("pos").textContent = `${c.x > 0 ? "+" : ""}${c.x}`;
+  const zero = clips.find((k) => k.x === 0) || c;
+  const stats = [];
+  if (s.measure) stats.push([s.measure_label, fmt(c.v, s.unit), `${c.v - zero.v >= 0 ? "+" : ""}${fmt(c.v - zero.v, s.unit)} vs 0`]);
+  if (c.keep != null) stats.push(["same clip? (CLAP similarity to 0)", fmt(c.keep), "1.0 = identical"]);
+  if (c.chroma != null) stats.push(["same notes? (chroma similarity)", fmt(c.chroma), "1.0 = identical"]);
+  if (c.dir != null) stats.push(["text direction (CLAP)", fmt(c.dir), `${c.dir - zero.dir >= 0 ? "+" : ""}${fmt(c.dir - zero.dir)} vs 0`]);
+  $("readout").innerHTML = stats.map(([k, v, d]) => `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="d">${d}</div></div>`).join("");
+  drawCurve(clips, i, s);
+  voices.forEach((v, k) => v.gain.gain.setTargetAtTime(k === i ? 1 : 0, ctx.currentTime, 0.015));
+  if (buffers[i]) drawSpectrogram(buffers[i]);
+}
+
+function drawCurve(clips, active, s) {
+  const key = s.measure ? "v" : "dir";
+  const ys = clips.map((c) => c[key]), xs = clips.map((c) => c.x);
+  const ok = ys.filter((y) => y != null && isFinite(y));
+  $("curve-title").textContent = (s.measure ? `${s.measure_label} of this clip at each position` : "CLAP text-direction score at each position");
+  if (!ok.length) { $("curve").innerHTML = ""; return; }
+  const lo = Math.min(...ok), hi = Math.max(...ok), pad = (hi - lo) * 0.15 || 1;
+  const X = (x) => 40 + (x - xs[0]) / (xs[xs.length - 1] - xs[0] || 1) * 540;
+  const Y = (y) => 140 - (y - (lo - pad)) / (hi - lo + 2 * pad) * 125;
+  const pts = clips.map((c) => [X(c.x), Y(c[key])]).filter((p) => isFinite(p[1]));
+  let svg = `<line x1="40" y1="140" x2="580" y2="140" stroke="var(--line)"/>`;
+  svg += `<text x="36" y="${Y(hi) + 4}" text-anchor="end" font-size="11" fill="var(--muted)" font-family="var(--mono)">${fmt(hi)}</text>`;
+  svg += `<text x="36" y="${Y(lo) + 4}" text-anchor="end" font-size="11" fill="var(--muted)" font-family="var(--mono)">${fmt(lo)}</text>`;
+  svg += `<polyline fill="none" stroke="var(--accent)" stroke-width="2" vector-effect="non-scaling-stroke" points="${pts.map((p) => p.join(",")).join(" ")}"/>`;
+  clips.forEach((c, k) => {
+    if (!isFinite(Y(c[key]))) return;
+    svg += `<circle cx="${X(c.x)}" cy="${Y(c[key])}" r="${k === active ? 7 : 4}" fill="${k === active ? "var(--accent)" : "var(--panel)"}" stroke="var(--accent)" stroke-width="2"/>`;
+    svg += `<text x="${X(c.x)}" y="156" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="var(--mono)">${c.x > 0 ? "+" : ""}${c.x}</text>`;
+  });
+  $("curve").setAttribute("preserveAspectRatio", "xMidYMid meet");
+  $("curve").innerHTML = svg;
+}
+
+// Spectrogram drawn in the browser from the decoded clip: log-frequency axis, 40 Hz to 16 kHz.
+const specCache = new WeakMap();
+function spectrogram(buffer) {
+  if (specCache.has(buffer)) return specCache.get(buffer);
+  const N = 2048, W = 600, H = 180, sr = buffer.sampleRate;
+  const a = buffer.getChannelData(0), b = buffer.numberOfChannels > 1 ? buffer.getChannelData(1) : a;
+  const hop = Math.max(1, Math.floor((a.length - N) / W));
+  const win = new Float32Array(N); for (let i = 0; i < N; i++) win[i] = 0.5 - 0.5 * Math.cos(2 * Math.PI * i / N);
+  const re = new Float32Array(N), im = new Float32Array(N), img = new ImageData(W, H);
+  const rev = new Uint32Array(N); const bits = Math.log2(N);
+  for (let i = 0; i < N; i++) { let r = 0; for (let j = 0; j < bits; j++) r |= ((i >> j) & 1) << (bits - 1 - j); rev[i] = r; }
+  const bin = new Float32Array(H);
+  for (let y = 0; y < H; y++) bin[y] = 40 * Math.pow(16000 / 40, 1 - y / (H - 1)) * N / sr;
+  for (let x = 0; x < W; x++) {
+    const o = x * hop;
+    for (let i = 0; i < N; i++) { re[rev[i]] = 0.5 * (a[o + i] + b[o + i]) * win[i] || 0; im[rev[i]] = 0; }
+    for (let size = 2; size <= N; size <<= 1) {
+      const half = size >> 1, step = -2 * Math.PI / size;
+      for (let s = 0; s < N; s += size) for (let k = 0; k < half; k++) {
+        const wr = Math.cos(step * k), wi = Math.sin(step * k), i0 = s + k, i1 = i0 + half;
+        const tr = re[i1] * wr - im[i1] * wi, ti = re[i1] * wi + im[i1] * wr;
+        re[i1] = re[i0] - tr; im[i1] = im[i0] - ti; re[i0] += tr; im[i0] += ti;
+      }
+    }
+    for (let y = 0; y < H; y++) {
+      const k = Math.min(N / 2 - 1, Math.round(bin[y]));
+      const db = 10 * Math.log10(re[k] * re[k] + im[k] * im[k] + 1e-9);
+      const v = Math.max(0, Math.min(1, (db + 30) / 70));
+      const p = 4 * (y * W + x);
+      img.data[p] = 255 * Math.min(1, v * 1.6); img.data[p + 1] = 255 * Math.pow(v, 2.2) * 0.85;
+      img.data[p + 2] = 255 * (0.25 * Math.sin(Math.PI * v) + Math.pow(v, 6)); img.data[p + 3] = 255;
+    }
+  }
+  specCache.set(buffer, img);
+  return img;
+}
+function drawSpectrogram(buffer) {
+  const img = spectrogram(buffer), c = $("spec"), tmp = document.createElement("canvas");
+  tmp.width = img.width; tmp.height = img.height; tmp.getContext("2d").putImageData(img, 0, 0);
+  const g = c.getContext("2d"); g.imageSmoothingEnabled = true; g.drawImage(tmp, 0, 0, c.width, c.height);
+}
+
+function stop() {
+  voices.forEach((v) => { try { v.src.stop(); } catch (e) {} });
+  voices = []; state.playing = false; $("play").innerHTML = "&#9654;";
+}
+function start() {
+  if (!buffers.length) return;
+  ctx.resume();
+  voices = buffers.map((buf, k) => {
+    const src = ctx.createBufferSource(), gain = ctx.createGain();
+    src.buffer = buf; src.loop = true; gain.gain.value = k === state.index ? 1 : 0;
+    src.connect(gain).connect(ctx.destination);
+    return { src, gain };
+  });
+  const when = ctx.currentTime + 0.05;
+  voices.forEach((v) => v.src.start(when));
+  state.playing = true; $("play").innerHTML = "&#10073;&#10073;";
+}
+
+async function load() {
+  const token = ++loadToken, wasPlaying = state.playing;
+  stop(); buffers = []; $("play").disabled = true;
+  ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+  const clips = clipsFor();
+  const loaded = await Promise.all(clips.map(async (c) => {
+    const data = await (await fetch(c.f)).arrayBuffer();
+    return await new Promise((ok, err) => ctx.decodeAudioData(data, ok, err));
+  }));
+  if (token !== loadToken) return;
+  buffers = loaded; $("play").disabled = false;
+  update();
+  if (wasPlaying) start();
+}
+
+function table() {
+  const m = state.manifest;
+  if (!m.summary || !m.summary.length) return;
+  $("results").classList.remove("hidden");
+  $("results-note").textContent = m.summary_note || "";
+  const cols = m.summary_columns;
+  let html = "<tr>" + cols.map((c) => `<th>${c.label}</th>`).join("") + "</tr>";
+  m.summary.forEach((r) => {
+    html += "<tr>" + cols.map((c) => {
+      const v = r[c.key];
+      return typeof v === "number" ? `<td class="num">${v.toFixed(c.digits ?? 2)}</td>` : `<td>${v ?? ""}</td>`;
+    }).join("") + "</tr>";
+  });
+  $("table").innerHTML = html;
+}
+
+async function live() {
+  let sliders;
+  try { sliders = await (await fetch("api/sliders")).json(); } catch (e) { return; }
+  if (!Array.isArray(sliders)) return;
+  $("live").classList.remove("hidden");
+  $("live-sliders").innerHTML = sliders.map((s) =>
+    `<div class="row"><span>${s.name}</span><input type="range" min="-3" max="3" step="0.25" value="0" data-name="${s.name}"><span class="num">0</span></div>`).join("");
+  document.querySelectorAll("#live-sliders input").forEach((el) => el.oninput = () => el.nextElementSibling.textContent = el.value);
+  $("live-go").onclick = async () => {
+    const scales = {};
+    document.querySelectorAll("#live-sliders input").forEach((el) => { if (+el.value) scales[el.dataset.name] = +el.value; });
+    $("live-status").textContent = "generating...";
+    const t0 = performance.now();
+    const res = await fetch("api/generate", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: $("live-prompt").value, seed: +$("live-seed").value, sliders: scales }) });
+    const out = await res.json();
+    if (!res.ok) { $("live-status").textContent = out.detail || "failed"; return; }
+    $("live-status").textContent = `${((performance.now() - t0) / 1000).toFixed(1)} s`;
+    const audio = $("live-audio"); audio.src = out.audio; audio.classList.remove("hidden"); audio.play();
+    $("live-readout").innerHTML = Object.entries(out.descriptors).map(([k, v]) =>
+      `<div class="stat"><div class="k">${k}</div><div class="v">${fmt(v)}</div></div>`).join("");
+  };
+}
+
+$("play").onclick = () => state.playing ? stop() : start();
+$("scale").oninput = (e) => { state.index = +e.target.value; update(); };
+fetch("demo/manifest.json").then((r) => r.json()).then((m) => {
+  state.manifest = m;
+  state.slider = Object.keys(m.sliders)[0];
+  state.method = m.sliders[state.slider].methods[0];
+  state.index = Math.floor(m.scales.length / 2);
+  render(); table(); load();
+}).catch(() => { $("player").innerHTML = "<p>The demo data has not been published yet.</p>"; });
+live();
+</script>
+</body>
+</html>
