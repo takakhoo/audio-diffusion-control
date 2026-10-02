@@ -171,7 +171,7 @@ Two outside approaches were run through the same protocol on ACE-Step, on the sa
 | mood | trained slider | 0.39 | 0.87 | 0.79 | 6.65 |
 | | activation steering | 0.41 | 1.28 | 0.83 | 6.37 |
 
-Activation steering is a real competitor. It is as monotone as the trained slider on four of six attributes and keeps slightly more of the piece on all six. The trained slider reaches further on brightness and harmony. Neither dominates, which agrees with TADA's finding on a different ACE-Step version and argues against treating LoRA sliders as the default.
+Activation steering is a real competitor. Its rank correlation is within 0.05 of the trained slider's on four of six attributes, and it keeps more of the piece on five and the same on the sixth. The trained slider moves its descriptor further on brightness, ensemble, and harmony; activation steering moves it further on density and mood. Neither dominates, which agrees with TADA's finding on a different ACE-Step version and argues against treating LoRA sliders as the default.
 
 **Community sliders.** Nineteen Concept Sliders for ACE-Step 1.5 XL are [published on Hugging Face](https://huggingface.co/Xanthius/Ace-Step-1.5-XL-Concept-Sliders) with no evaluation. `SliderBank.load_peft` loads them unchanged, and seven were measured here for the first time (24 prompts, 2 seeds, positions -6 to +6):
 
