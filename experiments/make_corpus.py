@@ -15,7 +15,7 @@ import numpy as np
 import torch
 import yaml
 
-from audiosliders.backbone import StableAudio, seeded_noise
+from audiosliders.backbone import load_backbone
 from audiosliders.clap import Clap
 from audiosliders.descriptors import describe
 from audiosliders.quality import Aesthetics
@@ -28,14 +28,15 @@ def measure(job):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap.add_argument("--backbone", default="sao")
     ap.add_argument("--out", required=True)
     ap.add_argument("--split", default="train")
     ap.add_argument("--seeds", type=int, default=64)
     ap.add_argument("--seed-offset", type=int, default=10_000)
     ap.add_argument("--shard", type=int, nargs=2, default=[0, 1], metavar=("INDEX", "COUNT"))
     ap.add_argument("--batch", type=int, default=32)
-    ap.add_argument("--steps", type=int, default=50)
-    ap.add_argument("--guidance", type=float, default=7.0)
+    ap.add_argument("--steps", type=int, default=None)
+    ap.add_argument("--guidance", type=float, default=None)
     ap.add_argument("--seconds", type=float, default=10.0)
     ap.add_argument("--workers", type=int, default=12)
     args = ap.parse_args()
@@ -46,7 +47,7 @@ def main():
     jobs = [(i, args.seed_offset + 1000 * i + k) for i in range(len(prompts)) for k in range(args.seeds)]
     jobs = jobs[args.shard[0] :: args.shard[1]]
 
-    model = StableAudio()
+    model = load_backbone(args.backbone)
     clap = Clap()
     aesthetics = Aesthetics()
     pool = ProcessPoolExecutor(args.workers)

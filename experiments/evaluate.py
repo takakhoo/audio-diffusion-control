@@ -16,7 +16,7 @@ import torch
 import yaml
 
 from audiosliders import methods
-from audiosliders.backbone import StableAudio
+from audiosliders.backbone import load_backbone
 from audiosliders.clap import Clap
 from audiosliders.descriptors import content_similarity, describe
 from audiosliders.dsp import EFFECTS
@@ -33,6 +33,7 @@ def measure(job):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap.add_argument("--backbone", default="sao")
     ap.add_argument("--method", required=True, choices=["lora", "guidance", "embed", "dsp", "base"])
     ap.add_argument("--slider", default=None)
     ap.add_argument("--weights", default=None)
@@ -44,8 +45,8 @@ def main():
     ap.add_argument("--seed-offset", type=int, default=0)
     ap.add_argument("--start", type=float, default=1.0, help="steering is active for t <= start")
     ap.add_argument("--eta", type=float, default=4.0)
-    ap.add_argument("--steps", type=int, default=50)
-    ap.add_argument("--guidance", type=float, default=7.0)
+    ap.add_argument("--steps", type=int, default=None)
+    ap.add_argument("--guidance", type=float, default=None)
     ap.add_argument("--seconds", type=float, default=10.0)
     ap.add_argument("--pairs-per-batch", type=int, default=4)
     ap.add_argument("--save-audio", action="store_true")
@@ -59,7 +60,7 @@ def main():
     scales = [0.0] if args.method == "base" else sorted(set(args.scales) | {0.0})
     zero = scales.index(0.0)
 
-    model = StableAudio()
+    model = load_backbone(args.backbone)
     clap = Clap()
     aesthetics = Aesthetics()
     sr = model.sample_rate

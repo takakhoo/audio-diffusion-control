@@ -20,14 +20,19 @@ from pathlib import Path
 import torch
 from torch import Tensor, nn
 
+# Layer names differ by backbone: Stable Audio blocks are transformer_blocks.N.{attn1,attn2,ff},
+# ACE-Step blocks are layers.N.{self_attn,cross_attn,mlp}. Each preset matches both.
+_BLOCK = r"(transformer_blocks|layers)\.\d+\."
 _ATTN = r"(to_q|to_k|to_v|to_out\.0)$"
+_SELF, _CROSS = rf"(attn1|self_attn)\.{_ATTN}", rf"(attn2|cross_attn)\.{_ATTN}"
+_FF = r"(ff\.net\.(0\.proj|2)|mlp\.(gate_proj|up_proj|down_proj))$"
 TARGETS = {
-    "xattn": rf"transformer_blocks\.\d+\.attn2\.{_ATTN}",
-    "self": rf"transformer_blocks\.\d+\.attn1\.{_ATTN}",
-    "attn": rf"transformer_blocks\.\d+\.attn[12]\.{_ATTN}",
-    "ff": r"transformer_blocks\.\d+\.ff\.net\.(0\.proj|2)$",
-    "noxattn": rf"transformer_blocks\.\d+\.(attn1\.{_ATTN}|ff\.net\.(0\.proj|2)$)",
-    "all": rf"transformer_blocks\.\d+\.(attn[12]\.{_ATTN}|ff\.net\.(0\.proj|2)$)",
+    "xattn": _BLOCK + _CROSS,
+    "self": _BLOCK + _SELF,
+    "attn": rf"{_BLOCK}({_SELF}|{_CROSS})",
+    "ff": _BLOCK + _FF,
+    "noxattn": rf"{_BLOCK}({_SELF}|{_FF})",
+    "all": rf"{_BLOCK}({_SELF}|{_CROSS}|{_FF})",
 }
 
 

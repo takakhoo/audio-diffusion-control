@@ -15,7 +15,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -23,7 +22,7 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from .backbone import StableAudio
+from .backbone import load_backbone
 from .lora import SliderBank
 
 
@@ -40,6 +39,7 @@ class ContrastConfig:
     drop_text: float = 0.1
     paired: bool = False
     seed: int = 0
+    backbone: str = "sao"
 
 
 def load_corpus(path: str | Path) -> dict:
@@ -81,7 +81,7 @@ def principal_directions(clap: np.ndarray, groups: np.ndarray, n: int = 16) -> t
 
 
 def train_contrast(
-    model: StableAudio,
+    model,
     bank: SliderBank,
     cfg: ContrastConfig,
     high: tuple[np.ndarray, list[str]],
@@ -91,7 +91,7 @@ def train_contrast(
 ) -> list[dict]:
     rng = np.random.default_rng(cfg.seed)
     torch.manual_seed(cfg.seed)
-    params = bank.add(cfg.name, rank=cfg.rank, alpha=cfg.alpha, targets=cfg.targets, **meta)
+    params = bank.add(cfg.name, rank=cfg.rank, alpha=cfg.alpha, targets=cfg.targets, backbone=model.name, **meta)
     opt = torch.optim.AdamW(params, lr=cfg.lr, weight_decay=0.0)
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda i: min(1.0, (i + 1) / 50))
     half = cfg.batch // 2
@@ -112,8 +112,7 @@ def train_contrast(
         else:
             t = torch.cat([t, torch.rand(half, device=model.device) * 0.98 + 0.01])
             eps = torch.cat([eps, torch.randn_like(eps)])
-        a, s = torch.cos(t * math.pi / 2).view(-1, 1, 1), torch.sin(t * math.pi / 2).view(-1, 1, 1)
-        z, target = a * x0 + s * eps, a * eps - s * x0
+        z, target = model.diffuse(x0, eps, t)
         with bank.at(**{cfg.name: scale}):
             pred = model.v(z, t, cond)
         loss = torch.nn.functional.mse_loss(pred, target)
@@ -138,7 +137,7 @@ def main() -> None:
     ap.add_argument("--prompt-index", type=int, default=None, help="use only clips of this prompt")
     ap.add_argument("--out", default="runs/sliders")
     for f, typ in [("rank", int), ("alpha", float), ("targets", str), ("lr", float), ("iters", int),
-                   ("batch", int), ("seed", int)]:
+                   ("batch", int), ("seed", int), ("backbone", str)]:
         ap.add_argument(f"--{f}", type=typ, default=None)
     args = ap.parse_args()
 
@@ -163,9 +162,9 @@ def main() -> None:
         raise SystemExit(f"unknown --by {args.by!r}")
     ih, il = split_ends(values, groups, args.fraction)
     over = {k: v for k, v in vars(args).items() if k in ContrastConfig.__dataclass_fields__ and v is not None}
-    cfg = ContrastConfig(**over)
+    cfg = ContrastConfig(name=args.name, **{k: v for k, v in over.items() if k != "name"})
 
-    model = StableAudio()
+    model = load_backbone(cfg.backbone)
     bank = SliderBank(model.dit)
     lat = corpus["latents"]
     history = train_contrast(

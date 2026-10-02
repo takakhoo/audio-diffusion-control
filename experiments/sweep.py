@@ -9,18 +9,19 @@ import soundfile as sf
 import torch
 import yaml
 
-from audiosliders.backbone import StableAudio
+from audiosliders.backbone import load_backbone
 from audiosliders.clap import Clap
 from audiosliders.descriptors import content_similarity, describe
 from audiosliders.lora import SliderBank
 
 ap = argparse.ArgumentParser()
+ap.add_argument("--backbone", default="sao")
 ap.add_argument("weights")
 ap.add_argument("--out", default=None)
 ap.add_argument("--scales", type=float, nargs="+", default=[-2, -1, 0, 1, 2])
 ap.add_argument("--prompts", type=int, default=8)
 ap.add_argument("--start", type=float, default=1.0, help="slider is active for t <= start")
-ap.add_argument("--steps", type=int, default=50)
+ap.add_argument("--steps", type=int, default=None)
 ap.add_argument("--split", default="eval")
 ap.add_argument("--save-audio", action="store_true")
 args = ap.parse_args()
@@ -29,7 +30,7 @@ weights = Path(args.weights)
 out = Path(args.out or weights.with_suffix(""))
 out.mkdir(parents=True, exist_ok=True)
 prompts = yaml.safe_load(Path("configs/prompts.yaml").read_text())[args.split][: args.prompts]
-model = StableAudio()
+model = load_backbone(args.backbone)
 bank = SliderBank(model.dit)
 meta = bank.load("s", weights)
 clap = Clap()

@@ -32,19 +32,21 @@ class Cond:
 
     cross: Tensor  # (B, 130, 768): 128 T5 tokens, then seconds_start and seconds_total
     glob: Tensor  # (B, 1, 1536)
+    empty: Tensor | None = None  # learned "no prompt" tokens, for models that have them
 
     def __len__(self) -> int:
         return self.cross.shape[0]
 
     def null(self) -> "Cond":
-        return Cond(torch.zeros_like(self.cross), self.glob)
+        cross = torch.zeros_like(self.cross) if self.empty is None else self.empty.expand_as(self.cross)
+        return Cond(cross, self.glob, self.empty)
 
     def __getitem__(self, idx) -> "Cond":
-        return Cond(self.cross[idx], self.glob[idx])
+        return Cond(self.cross[idx], self.glob[idx], self.empty)
 
     @staticmethod
     def cat(conds: Sequence["Cond"]) -> "Cond":
-        return Cond(torch.cat([c.cross for c in conds]), torch.cat([c.glob for c in conds]))
+        return Cond(torch.cat([c.cross for c in conds]), torch.cat([c.glob for c in conds]), conds[0].empty)
 
 
 def t_to_sigma(t: Tensor) -> Tensor:
@@ -68,6 +70,9 @@ def seeded_noise(seeds: Sequence[int], shape: tuple[int, ...], device) -> Tensor
 
 
 class StableAudio:
+    name = "sao"
+    steps, guidance = 50, 7.0
+
     def __init__(self, device: str = "cuda", model_id: str = MODEL_ID, half: bool = True):
         from diffusers import StableAudioPipeline
         from diffusers.models.embeddings import get_1d_rotary_pos_embed
@@ -92,6 +97,15 @@ class StableAudio:
 
     def frames(self, seconds: float) -> int:
         return math.ceil(seconds * self.sample_rate / self.hop)
+
+    def latent_shape(self, seconds: float) -> tuple[int, int]:
+        return (self.channels, self.frames(seconds))
+
+    @staticmethod
+    def diffuse(x0: Tensor, eps: Tensor, t: Tensor) -> tuple[Tensor, Tensor]:
+        """Noisy latent at time t and the prediction target for it."""
+        a, s = torch.cos(t * math.pi / 2).view(-1, 1, 1), torch.sin(t * math.pi / 2).view(-1, 1, 1)
+        return a * x0 + s * eps, a * eps - s * x0
 
     @torch.no_grad()
     def encode_text(self, prompts: Sequence[str]) -> Tensor:
@@ -224,8 +238,8 @@ class StableAudio:
         prompts: Sequence[str],
         seeds: Sequence[int],
         seconds: float = 10.0,
-        steps: int = 50,
-        guidance: float = 7.0,
+        steps: int | None = None,
+        guidance: float | None = None,
         wrap: Callable[[Predictor], Predictor] | None = None,
         sde: bool = False,
         latents: bool = False,
@@ -233,9 +247,20 @@ class StableAudio:
     ) -> Tensor:
         """Text to audio. `wrap` lets sliders and baselines modify the guided predictor."""
         cond = cond if cond is not None else self.encode(prompts, seconds)
-        predict = self.cfg(cond, guidance)
+        predict = self.cfg(cond, self.guidance if guidance is None else guidance)
         if wrap is not None:
             predict = wrap(predict)
-        noise = seeded_noise(seeds, (self.channels, self.frames(seconds)), self.device)
-        z, _ = self.sample(predict, noise, steps=steps, sde=sde, sde_seeds=seeds)
+        noise = seeded_noise(seeds, self.latent_shape(seconds), self.device)
+        z, _ = self.sample(predict, noise, steps=steps or self.steps, sde=sde, sde_seeds=seeds)
         return z if latents else self.fit_peak(self.decode(z, seconds))
+
+
+def load_backbone(name: str = "sao", device: str = "cuda"):
+    """`sao` is Stable Audio Open 1.0; `ace-turbo` and `ace-base` are ACE-Step 1.5 XL."""
+    if name == "sao":
+        return StableAudio(device)
+    if name.startswith("ace-"):
+        from .ace import AceStep
+
+        return AceStep(name.split("-", 1)[1], device)
+    raise ValueError(f"unknown backbone {name!r}")

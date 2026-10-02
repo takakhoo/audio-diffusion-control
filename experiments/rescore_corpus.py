@@ -11,11 +11,12 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from audiosliders.backbone import StableAudio
+from audiosliders.backbone import load_backbone
 from audiosliders.descriptors import describe
 from audiosliders.quality import Aesthetics
 
 ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+ap.add_argument("--backbone", default="sao")
 ap.add_argument("--corpus", required=True)
 ap.add_argument("--shard", required=True, help="two-digit shard tag, e.g. 00")
 ap.add_argument("--seconds", type=float, default=10.0)
@@ -25,7 +26,7 @@ args = ap.parse_args()
 path = Path(args.corpus)
 rows = [json.loads(line) for line in (path / f"rows_{args.shard}.jsonl").read_text().splitlines() if line]
 latents = np.load(path / f"latents_{args.shard}.npy")
-model, aesthetics = StableAudio(), Aesthetics()
+model, aesthetics = load_backbone(args.backbone), Aesthetics()
 pool = ProcessPoolExecutor(12)
 pending = []
 for b in range(0, len(rows), args.batch):

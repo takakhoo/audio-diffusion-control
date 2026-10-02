@@ -22,7 +22,7 @@ from pathlib import Path
 import torch
 import yaml
 
-from .backbone import Cond, StableAudio, seeded_noise
+from .backbone import Cond, load_backbone, seeded_noise
 from .lora import SliderBank
 
 
@@ -38,22 +38,26 @@ class TrainConfig:
     iters: int = 1000
     batch: int = 4
     eta: float = 4.0
-    guidance: float = 7.0
+    guidance: float | None = None  # None: the backbone's default
     seconds: float = 10.0
-    sample_steps: int = 30
+    sample_steps: int | None = None  # None: 30 for Stable Audio, the model's own count for few-step models
+    backbone: str = "sao"
     max_stop: float = 1.0
     seed: int = 0
 
 
-def train_slider(model: StableAudio, bank: SliderBank, cfg: TrainConfig, prompts: list[str], log=print) -> list[dict]:
+def train_slider(model, bank: SliderBank, cfg: TrainConfig, prompts: list[str], log=print) -> list[dict]:
     rng = random.Random(cfg.seed)
     torch.manual_seed(cfg.seed)
     params = bank.add(
-        cfg.name, rank=cfg.rank, alpha=cfg.alpha, targets=cfg.targets, positive=cfg.positive, negative=cfg.negative
+        cfg.name, rank=cfg.rank, alpha=cfg.alpha, targets=cfg.targets, positive=cfg.positive, negative=cfg.negative,
+        backbone=model.name,
     )
+    guidance = model.guidance if cfg.guidance is None else cfg.guidance
+    steps = cfg.sample_steps or min(30, model.steps)
     opt = torch.optim.AdamW(params, lr=cfg.lr, weight_decay=0.0)
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda i: min(1.0, (i + 1) / 50))
-    frames = model.frames(cfg.seconds)
+    shape = model.latent_shape(cfg.seconds)
     # Half the batch trains the positive direction and half the negative, on the same step.
     scale = torch.tensor([1.0, -1.0], device=model.device).repeat(cfg.batch // 2 + 1)[: cfg.batch]
     history = []
@@ -63,11 +67,11 @@ def train_slider(model: StableAudio, bank: SliderBank, cfg: TrainConfig, prompts
         c0 = model.encode(base, cfg.seconds)
         cp = model.encode([f"{p}, {cfg.positive}" for p in base], cfg.seconds)
         cn = model.encode([f"{p}, {cfg.negative}" for p in base], cfg.seconds)
-        stop = rng.randrange(0, int(cfg.sample_steps * cfg.max_stop))
-        noise = seeded_noise([rng.randrange(2**31) for _ in base], (model.channels, frames), model.device)
+        stop = rng.randrange(0, int(steps * cfg.max_stop))
+        noise = seeded_noise([rng.randrange(2**31) for _ in base], shape, model.device)
         with torch.no_grad():
             with bank.at(**{cfg.name: scale}):
-                z, t = model.sample(model.cfg(c0, cfg.guidance), noise, steps=cfg.sample_steps, stop=stop)
+                z, t = model.sample(model.cfg(c0, guidance), noise, steps=steps, stop=stop)
             v0, vp, vn = model.v(torch.cat([z, z, z]), t, Cond.cat([c0, cp, cn])).chunk(3)
             target = v0 + scale.view(-1, 1, 1) * cfg.eta * (vp - vn)
         with bank.at(**{cfg.name: scale}):
@@ -98,7 +102,8 @@ def main() -> None:
     ap.add_argument("--out", default="runs/sliders")
     ap.add_argument("--tag", default=None, help="output name, defaults to the slider key")
     for f, typ in [("rank", int), ("alpha", float), ("targets", str), ("lr", float), ("iters", int),
-                   ("batch", int), ("eta", float), ("guidance", float), ("seconds", float), ("seed", int)]:
+                   ("batch", int), ("eta", float), ("guidance", float), ("seconds", float), ("seed", int),
+                   ("backbone", str), ("sample_steps", int)]:
         ap.add_argument(f"--{f}", type=typ, default=None)
     args = ap.parse_args()
 
@@ -110,7 +115,7 @@ def main() -> None:
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
 
-    model = StableAudio()
+    model = load_backbone(cfg.backbone)
     bank = SliderBank(model.dit)
     history = train_slider(model, bank, cfg, prompts)
     bank.save(cfg.name, out / f"{tag}.safetensors")

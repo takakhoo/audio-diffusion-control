@@ -70,4 +70,4 @@ def embed(
     neg = model.encode([f"{p}, {negative}" for p in prompts], seconds)
     s = scales.view(-1, 1, 1)
     cross = base.cross + s.clamp(min=0) * (pos.cross - base.cross) + (-s).clamp(min=0) * (neg.cross - base.cross)
-    return Cond(cross, base.glob)
+    return Cond(cross, base.glob, base.empty)
