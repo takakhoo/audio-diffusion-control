@@ -13,6 +13,26 @@ International Society for Music Information Retrieval Conference, London, 12 to 
   - *Anonymity.* The demo page and this repository identify the author. Submission needs an anonymized copy of both as supplementary material.
   - *Preprints.* ISMIR strongly discourages near-duplicate arXiv postings and forbids promoting the paper during review. An arXiv version posted months earlier, with the submission adding the listening study and baselines, is the low-risk route. Take the venue name off the README between submission and notification.
 
+## The rules, verified against the ISMIR 2026 author guidelines (2 October 2026)
+
+The 2026 cycle is closed (abstracts 20 April, papers 27 April, notification 10 July, camera-ready 31 July, conference from 8 November 2026), so the target is the 2027 cycle, whose call is expected around January 2027 with the same shape. What the 2026 guidelines require, and how the draft meets each:
+
+| Rule | Draft |
+|---|---|
+| **6+N**: six pages of scientific content including figures and tables; references, an optional ethics statement, an optional AI usage statement, and (after acceptance) acknowledgements on further pages. **No appendices.** Overlength papers are rejected unreviewed. | Content ends on page 6 with the ethics statement; references on pages 7 and 8. |
+| Official template, PDF under 10 MB, fonts embedded, no margin or font changes. | ISMIR 2026 template, `\usepackage[submission]{ismir}`, 0.6 MB. |
+| Double-blind: no names, no "our previous work", self-citation in the third person, no acknowledgements at submission, supplementary material checked for identifying content. Violations can be desk-rejected. | Anonymous. The public repository, demo, and Hugging Face page name the author, so an anonymised copy of code and audio is needed as supplementary material before submission. |
+| No near-duplicate manuscripts on public archives during the review period, and no promotion of the work during review. | Decide before April 2027 whether an arXiv version goes up (months before) or waits for notification. |
+| Abstract fixed at the abstract deadline together with title, authors, and subject areas; it must stand on its own. | 200 words; final wording to be frozen a week before the abstract deadline. |
+| Figures: alt text, colour-blind-friendly palettes. | Palette is blue/orange/pink/green with distinct lightness; alt text still to be added to the figure environments. |
+| References in a section named REFERENCES, numbered in order of first citation, IEEE style. | Done by the template's `IEEEtran.bst`. |
+| Optional ethics statement, up to one page, encouraged for generation work. | Included. |
+| Optional AI usage statement at the end of the PDF if AI tools were used. | Not included; decide before submission. |
+| At least one author registered by the registration deadline, or the paper is withdrawn. | Noted. |
+| Reviewers rate: scholarly/scientific quality, novelty (which explicitly includes new musical applications of existing methods), reusable insights, pioneering proposals, readability and organisation, potential to generate discourse, relevance to ISMIR. Completed work only; claims supported by appropriate statistics; standard or sufficiently large datasets. | Confidence intervals on every headline number; 24 held-out prompts and three seeds per cell; 14,985 plus 47,942 recordings. |
+
+Sources: the ISMIR 2026 [author guidelines](https://ismir2026.ismir.net/authors/author-guidelines) and [call for papers](https://ismir2026.ismir.net/authors/call-for-papers), the ISMIR [reviewer guidelines](https://ismir.net/reviewer-guidelines/), and the ISMIR 2021 [advice on preparing a paper](https://ismir2021.ismir.net/blog/preparing/).
+
 ## What the paper still needs to be competitive there
 
 Status on 2 October 2026:

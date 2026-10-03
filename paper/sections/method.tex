@@ -1,29 +1,41 @@
-\section{Method}
+\section{Sliders and How We Train Them}
 
-\smallskip\noindent\textbf{Backbones.} Two frozen text-to-music models sit behind one interface. Stable Audio Open 1.0 \citep{evans2024sao} is a latent diffusion transformer with a $v$-prediction objective, sampled with DPM-Solver++(2M) for 50 steps at guidance 7. ACE-Step 1.5 XL turbo \citep{gong2026acestep} is a rectified-flow transformer, $x_t=(1-t)x_0+t\epsilon$ with the network predicting $\epsilon-x_0$, distilled to 8 Euler steps without guidance. Everything below is written for a generic prediction $f_\theta(z_t,t,c)$.
+\subsection{Backbones}
 
-\smallskip\noindent\textbf{A slider.} A slider is a set of low-rank updates, one per linear layer in the attention and feed-forward blocks. With position $s\in\mathbb{R}$ a layer computes
+Two frozen text-to-music generators sit behind one interface. Stable Audio Open 1.0 \citep{evans2024sao} is a latent diffusion transformer with a $v$-prediction objective, sampled with DPM-Solver++(2M) for 50 steps at guidance 7. ACE-Step 1.5 XL turbo \citep{gong2026acestep} is a rectified-flow transformer, $x_t=(1-t)x_0+t\epsilon$ with the network predicting $\epsilon-x_0$, distilled to 8 Euler steps with no guidance. Everything below is written for a generic prediction $f_\theta(z_t,t,c)$ and applies to both. Stable Audio 3 small appears once, as a check that nothing depends on the first two.
+
+\subsection{A slider}
+
+A slider is a set of low-rank updates, one per linear layer in the attention and feed-forward blocks. With position $s\in\mathbb{R}$ a layer computes
 \begin{equation}
   y = Wx + s\,\frac{\alpha}{r}\,BAx ,
 \end{equation}
-with $r=4$ and $\alpha=1$. $s$ is read at every forward pass and can differ per sample. Sliders add, and a slider can be switched on only for $t\le t_0$ (\emph{gating}).
+with $r=4$ and $\alpha=1$. The position is read at every forward pass and can differ per sample, so one batch can hold a clip at several positions. Sliders add, and a slider can be switched on only for $t\le t_0$, which we call gating.
 
-\smallskip\noindent\textbf{Training from a prompt pair.} Let $c^+$ and $c^-$ be a base prompt $c$ with a phrase for each end of the attribute appended. Following Concept Sliders, for $s\in\{+1,-1\}$ the slider is trained so that
+\subsection{Training from a prompt pair}
+
+Let $c^+$ and $c^-$ be a base prompt $c$ with a phrase for each end of the attribute appended, say ``happy, joyful'' and ``sad, melancholic''. Following Concept Sliders, for $s\in\{+1,-1\}$ the slider is trained so that
 \begin{equation}
 \begin{split}
   f_{\theta,s}(z_t,t,c) \approx{}& f_\theta(z_t,t,c) \\ &+ s\,\eta\,\bigl(f_\theta(z_t,t,c^+)-f_\theta(z_t,t,c^-)\bigr),
 \end{split}\label{eq:pair}
 \end{equation}
-with the right-hand side from the frozen model. $z_t$ comes from sampling for a random number of steps with the slider active. We use $\eta=4$ for Stable Audio Open and $\eta=2$ for ACE-Step, 1{,}000 iterations, and 48 training prompts disjoint from the evaluation prompts.
+with the right-hand side from the frozen model. The state $z_t$ comes from sampling for a random number of steps with the slider active, so the slider learns on states it will visit. We use $\eta=4$ for Stable Audio Open and $\eta=2$ for ACE-Step, 1{,}000 iterations, and 48 training prompts that share nothing with the evaluation prompts.
 
-\smallskip\noindent\textbf{Training from two sets of clips.} The second trainer uses no text. Given sets $H$ and $L$ of latents, we minimise the model's denoising loss with the slider at $+1$ on $H$ and at $-1$ on $L$:
+\subsection{Training from two sets of clips}
+
+The second trainer never sees text. Given two sets $H$ and $L$ of latents, we minimise the generator's own denoising loss with the slider at $+1$ on $H$ and at $-1$ on $L$:
 \begin{equation}
 \begin{split}
   &\mathbb{E}_{x_0\in H}\,\bigl\|f_{\theta,+1}(z_t,t,c)-u\bigr\|^2 \\ &+ \mathbb{E}_{x_0\in L}\,\bigl\|f_{\theta,-1}(z_t,t,c)-u\bigr\|^2 ,
 \end{split}
 \end{equation}
-where $u$ is the regression target for $(x_0,\epsilon,t)$. One update serves both ends with opposite sign, so to first order what the sets share cancels. $H$ and $L$ are the top and bottom 20--30\% of the model's own clips along some per-clip measurement, taken \emph{within each prompt} so that prompts are balanced. The measurement can be a descriptor, a quality score, or the projection on a direction in an embedding space, and it can be residualised against other measurements first. No differentiable path through the decoder or the embedding model is needed. A \emph{graded} variant trains every clip at its own position, its standing inside its prompt scaled so that the two tails average $\pm1$, with clips far from zero drawn more often.
+where $u$ is the regression target for $(x_0,\epsilon,t)$. One update serves both ends with opposite sign, so to first order whatever the two sets share pulls the update in opposite directions and cancels. What remains is the difference between the sets. We build $H$ and $L$ from the generator's own output: generate a corpus, measure something on every clip, and take the top and bottom 20--30\% \emph{within each prompt}, so that no prompt is a shortcut for ``high''. The measurement can be a signal descriptor, a quality score, or the projection on a direction in an embedding space, and it can be residualised against other measurements first so the two sets differ in the target and little else. Nothing has to be differentiable through the decoder or the embedding model. A \emph{graded} variant trains every clip at its own position, its standing inside its prompt scaled so that the two tails average $\pm1$, drawing clips far from zero more often.
 
-\smallskip\noindent\textbf{Axes.} We take directions from three places. (i) Principal components of CLAP embeddings of 1{,}024 clips of one concept, as in SliderSpace. (ii) Principal and independent components \citep{yamagiwa2023ica} of CLAP \citep{wu2023clap} and MuQ-MuLan \citep{zhu2025muq} embeddings of \covReal{} real recordings from FMA \citep{defferrard2017fma}, after removing the 40\% most vocal clips and each genre's mean. (iii) Principal components of the generator's own activations: the mean cross-attention output of every block for 768 clips, with each prompt's mean removed.
+\subsection{Where the axes come from}
 
-\smallskip\noindent\textbf{Other ways to move an attribute.} Under identical prompts, seeds, and sampler we also run the right-hand side of Eq.~\eqref{eq:pair} directly at every step (the training-free recipe of FreeSliders, three forward passes per step); activation steering, which adds the mean difference in cross-attention output between $c^+$ and $c^-$ to every block \citep{staniszewski2026tada}; interpolation of the text conditioning toward $c^+$ or $c^-$; and, where one exists, a conventional effect applied to the unsteered clip.
+We take directions from three places. (i) Principal components of CLAP embeddings of 1{,}024 clips of one concept, as in SliderSpace. (ii) Principal and independent components \citep{yamagiwa2023ica} of CLAP \citep{wu2023clap} and MuQ-MuLan \citep{zhu2025muq} embeddings of \covReal{} real recordings from FMA \citep{defferrard2017fma}, after dropping the 40\% most vocal clips and removing each genre's mean, so that an axis describes how recordings of the same genre differ. (iii) Principal components of the generator's own activations: the mean cross-attention output of every block for 768 clips, with each prompt's mean removed.
+
+\subsection{Other ways to move an attribute}
+
+Under identical prompts, seeds, and sampler we also run the right-hand side of Eq.~\eqref{eq:pair} directly at every step, which is the training-free recipe of FreeSliders and costs three forward passes per step; activation steering, which adds the mean difference in cross-attention output between $c^+$ and $c^-$ to every block \citep{staniszewski2026tada}; interpolation of the text conditioning toward $c^+$ or $c^-$; and, where one exists, a conventional effect applied to the unsteered clip.
