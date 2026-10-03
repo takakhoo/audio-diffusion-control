@@ -54,3 +54,24 @@ The centroid and the CLAP direction are monotone across all five positions. Afte
 - The tags move the right way: energy lowers *reverberant, calm, dreamy, minor key*; mood raises *happy* and lowers *dark-toned, mysterious*.
 
 The next step for this backbone is the gated evaluation that fixed Stable Audio Open, and more than 600 iterations.
+
+## With timestep gating
+
+The same six sliders with the slider switched on only after the first 10 or 20 of the 50 Euler steps (`--start 0.99` and `0.95` on this model's sigmoid schedule; [`gate099/`](gate099/summary.md), [`gate095/`](gate095/summary.md)).
+
+| Slider | Steps left unsteered | ρ | Usable span | Descriptor moved in the span (std) | Piece kept | Enjoyment at the ends |
+|---|---:|---:|---|---:|---:|---:|
+| brightness | 0 | 0.84 | 0 to +1.5 | 0.87 | 0.66 | 5.16 |
+| brightness | 20 | 0.48 | -1 to +1.5 | 0.38 | 0.81 | 6.23 |
+| energy | 0 | 0.70 | -1 to +1 | 1.53 | 0.63 | 5.70 |
+| energy | 20 | 0.72 | -1.5 to +1.5 | 1.13 | 0.69 | 6.39 |
+| harmony | 0 | 0.68 | -0.5 to +1.5 | 0.80 | 0.75 | 6.00 |
+| harmony | 20 | 0.67 | -1 to +1.5 | 0.69 | 0.80 | 6.33 |
+| ensemble | 0 | 0.67 | 0 to +1.5 | 0.70 | 0.63 | 5.87 |
+| ensemble | 20 | 0.57 | -0.5 to +1.5 | 0.54 | 0.85 | 6.20 |
+| tempo | 0 | 0.43 | -0.5 to +1.5 | 1.24 | 0.78 | 5.82 |
+| tempo | 20 | 0.50 | -1 to +1.5 | 1.33 | 0.79 | 6.39 |
+| mood | 0 | 0.34 | -1.5 to +1.5 | 0.95 | 0.66 | 6.43 |
+| mood | 20 | 0.32 | -1.5 to +1.5 | 0.65 | 0.79 | 6.65 |
+
+The same trade as on Stable Audio Open: leaving the first 20 steps alone keeps more of the piece (0.69 to 0.85 against 0.63 to 0.78), lifts enjoyment at the ends by 0.2 to 1.1 points, and widens every usable span on the negative side, at the cost of range. Brightness pays the most, since its effect is set early; tempo and energy lose almost nothing. Leaving only 10 steps alone buys little.
